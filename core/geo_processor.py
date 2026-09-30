@@ -24,14 +24,16 @@ def generar_modelo_3d(ruta_dem, ruta_rio):
         x_dem = np.array(xs)
         y_dem = np.array(ys)
 
-    fig = go.Figure(data=[go.Surface(
-        z=z, x=x_dem, y=y_dem, 
-        colorscale='Earth', 
-        opacity=0.8,
-        showscale=False,
-        name='Terreno'
-    )])
-
+    fig.update_layout(
+    title="Modelo de Elevación - Río San Juan",
+    scene=dict(
+        aspectmode='manual',
+        aspectratio=dict(x=1, y=1, z=0.3), # El z=0.3 exagera la altura para que las montañas resalten
+        xaxis_title="Longitud",
+        yaxis_title="Latitud",
+        zaxis_title="Elevación (m)"
+    ),
+    margin=dict(l=0, r=0, b=0, t=30)
     # 2. Procesar el Río
     rio = gpd.read_file(ruta_rio)
     
