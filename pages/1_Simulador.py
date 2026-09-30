@@ -1,6 +1,5 @@
 import streamlit as st
 from core.state_manager import init_session_state, avanzar_etapa, get_estado_actual
-from core.mapa_3d import dibujar_mapa
 
 # 1. Configuración de la página
 st.set_page_config(page_title="Simulador", page_icon="🕹️", layout="wide")
@@ -26,8 +25,12 @@ with main_col:
     
     try:
         with st.spinner("Cargando modelo 3D de alta fidelidad..."):
-            # Llamamos a la función segura que creamos en core
-            dibujar_mapa()
+            # Aquí pegamos tu enlace exacto de GitHub Pages
+            enlace_mapa = "https://jesushernanllarenageologo.github.io/Simulador_Villicum-/visor_3d/index.html"
+            
+            # Usamos iframe para incrustarlo como si fuera un video de YouTube
+            st.components.v1.iframe(enlace_mapa, height=600, scrolling=False)
+            
     except Exception as e:
         st.error(f"Error al dibujar el mapa: {e}")
 
