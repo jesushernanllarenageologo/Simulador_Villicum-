@@ -25,7 +25,8 @@ with main_col:
     
     try:
         with st.spinner("Cargando modelo 3D de alta fidelidad..."):
-            # Asegúrate de que el nombre de la carpeta coincida con la que exportaste
+            
+            # Como la carpeta ahora está al lado del archivo, la encuentra directo
             visor_qgis = components.declare_component("visor_qgis", path="visor_3d")
             visor_qgis(height=600)
             
