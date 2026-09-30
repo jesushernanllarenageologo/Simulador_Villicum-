@@ -25,20 +25,17 @@ def generar_modelo_3d(ruta_dem, ruta_rio):
         y_dem = np.array(ys)
 
 # La línea de arriba marca el margen
-    fig = go.Figure(...)
-    
-    # Esta línea debe arrancar exactamente a la misma altura que la de arriba
-    fig.update_layout(
-        title="Modelo de Elevación - Río San Juan",
-        scene=dict(
-            aspectmode='manual',
-            aspectratio=dict(x=1, y=1, z=0.3), 
-            xaxis_title="Longitud",
-            yaxis_title="Latitud",
-            zaxis_title="Elevación (m)"
-        ),
-        margin=dict(l=0, r=0, b=0, t=30)
-    )
+    try:
+                with st.spinner("Cargando modelo 3D de alta fidelidad..."):
+                    # Reemplaza "nombre_de_tu_carpeta" con el nombre real de la carpeta que exportaste
+                    visor_qgis = components.declare_component("visor_qgis", path="nombre_de_tu_carpeta")
+                    
+                    # Mostramos el visor en la aplicación
+                    visor_qgis(height=600)
+                    
+            except Exception as e:
+                st.error(f"Error al cargar el visor 3D: {e}")
+                st.info("Asegúrate de que la carpeta del visor esté en el repositorio y el nombre sea correcto.")
     # 2. Procesar el Río
     rio = gpd.read_file(ruta_rio)
     

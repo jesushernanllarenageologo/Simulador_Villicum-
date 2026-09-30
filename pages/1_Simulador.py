@@ -1,6 +1,6 @@
-import streamlit as st
+import streamlit.components.v1 as components
 from core.state_manager import init_session_state, avanzar_etapa, get_estado_actual, reiniciar_simulacion
-from core.geo_processor import generar_modelo_3d
+
 
 st.set_page_config(page_title="Simulador", page_icon="🕹️", layout="wide")
 init_session_state()
@@ -22,20 +22,18 @@ main_col, control_col = st.columns([3, 1])
 with main_col:
     st.subheader("Modelo Geográfico 3D")
     
-    # Rutas relativas a los archivos que exportaste de QGIS
-    RUTA_DEM = "data/processed/dem_sanjuan_opt.tif"
-    RUTA_RIO = "data/processed/rio_sanjuan.geojson"
-    
     try:
-        with st.spinner("Cargando modelo geográfico del Río San Juan..."):
-            figura_3d = generar_modelo_3d(RUTA_DEM, RUTA_RIO)
-            st.plotly_chart(figura_3d, use_container_width=True)
+        with st.spinner("Cargando modelo 3D de alta fidelidad..."):
+            # Asegúrate de que el nombre de la carpeta coincida con la que exportaste
+            visor_qgis = components.declare_component("visor_qgis", path="visor_3d")
+            visor_qgis(height=600)
+            
     except Exception as e:
-        st.error(f"Error al cargar los datos geográficos: {e}")
-        st.info("Asegúrate de haber arrastrado el DEM y el GeoJSON del río a la carpeta data/processed/ de tu proyecto.")
+        st.error(f"Error al cargar el visor 3D: {e}")
 
 with control_col:
     st.subheader("Controles")
+    # ... DE AQUÍ PARA ABAJO NO TOQUES NADA, DEJA TODOS TUS BOTONES COMO ESTÁN ...
     
     # Controles según la etapa
     if st.session_state.etapa_actual == 0:
