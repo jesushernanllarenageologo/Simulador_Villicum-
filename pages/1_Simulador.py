@@ -1,3 +1,4 @@
+import streamlit as st
 import streamlit.components.v1 as components
 from core.state_manager import init_session_state, avanzar_etapa, get_estado_actual, reiniciar_simulacion
 
