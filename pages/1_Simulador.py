@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 import streamlit.components.v1 as components
 from core.state_manager import init_session_state, avanzar_etapa, get_estado_actual, reiniciar_simulacion
 
@@ -26,8 +27,10 @@ with main_col:
     try:
         with st.spinner("Cargando modelo 3D de alta fidelidad..."):
             
-            # Como la carpeta ahora está al lado del archivo, la encuentra directo
-            visor_qgis = components.declare_component("visor_qgis", path="visor_3d")
+            # Esta línea calcula la ruta exacta y absoluta hacia tu carpeta
+            ruta_visor = os.path.join(os.path.dirname(__file__), "visor_3d")
+            
+            visor_qgis = components.declare_component("visor_qgis", path=ruta_visor)
             visor_qgis(height=600)
             
     except Exception as e:
