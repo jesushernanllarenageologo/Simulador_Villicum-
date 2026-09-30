@@ -24,7 +24,11 @@ def generar_modelo_3d(ruta_dem, ruta_rio):
         x_dem = np.array(xs)
         y_dem = np.array(ys)
 
-   fig.update_layout(
+# La línea de arriba marca el margen
+fig = go.Figure(...)
+    
+    # Esta línea debe arrancar exactamente a la misma altura que la de arriba
+fig.update_layout(
     title="Modelo de Elevación - Río San Juan",
     scene=dict(
         aspectmode='manual',
