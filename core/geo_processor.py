@@ -25,20 +25,20 @@ def generar_modelo_3d(ruta_dem, ruta_rio):
         y_dem = np.array(ys)
 
 # La línea de arriba marca el margen
-fig = go.Figure(...)
+    fig = go.Figure(...)
     
     # Esta línea debe arrancar exactamente a la misma altura que la de arriba
-fig.update_layout(
-    title="Modelo de Elevación - Río San Juan",
-    scene=dict(
-        aspectmode='manual',
-        aspectratio=dict(x=1, y=1, z=0.3), 
-        xaxis_title="Longitud",
-        yaxis_title="Latitud",
-        zaxis_title="Elevación (m)"
-    ),
-    margin=dict(l=0, r=0, b=0, t=30)
-)
+    fig.update_layout(
+        title="Modelo de Elevación - Río San Juan",
+        scene=dict(
+            aspectmode='manual',
+            aspectratio=dict(x=1, y=1, z=0.3), 
+            xaxis_title="Longitud",
+            yaxis_title="Latitud",
+            zaxis_title="Elevación (m)"
+        ),
+        margin=dict(l=0, r=0, b=0, t=30)
+    )
     # 2. Procesar el Río
     rio = gpd.read_file(ruta_rio)
     
