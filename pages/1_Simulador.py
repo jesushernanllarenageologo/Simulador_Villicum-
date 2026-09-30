@@ -1,5 +1,6 @@
 import streamlit as st
 from core.state_manager import init_session_state, avanzar_etapa, get_estado_actual, reiniciar_simulacion
+from core.geo_processor import generar_modelo_3d
 
 st.set_page_config(page_title="Simulador", page_icon="🕹️", layout="wide")
 init_session_state()
@@ -20,9 +21,18 @@ main_col, control_col = st.columns([3, 1])
 
 with main_col:
     st.subheader("Modelo Geográfico 3D")
-    st.info("Espacio reservado para el modelo 3D (DEM + Río San Juan)")
-    # Aquí irá el mapa 3D de Plotly en los próximos MVPs
-    st.container(height=500, border=True)
+    
+    # Rutas relativas a los archivos que exportaste de QGIS
+    RUTA_DEM = "data/processed/dem_sanjuan_opt.tif"
+    RUTA_RIO = "data/processed/rio_sanjuan.geojson"
+    
+    try:
+        with st.spinner("Cargando modelo geográfico del Río San Juan..."):
+            figura_3d = generar_modelo_3d(RUTA_DEM, RUTA_RIO)
+            st.plotly_chart(figura_3d, use_container_width=True)
+    except Exception as e:
+        st.error(f"Error al cargar los datos geográficos: {e}")
+        st.info("Asegúrate de haber arrastrado el DEM y el GeoJSON del río a la carpeta data/processed/ de tu proyecto.")
 
 with control_col:
     st.subheader("Controles")
