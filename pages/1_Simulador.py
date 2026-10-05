@@ -39,8 +39,18 @@ with control_col:
     st.subheader("Controles")
     st.write("Seleccione el escenario hidrológico inicial.")
     
-    escenario = st.selectbox("Escenario", ["Normal", "Sequía", "Abundancia"])
+    escenario = st.selectbox(
+        "Escenario",
+        ["Normal", "Sequía", "Abundancia"]
+    )
     
-    if st.button("▶ Iniciar"):
+    if st.button("▶ Iniciar", use_container_width=True):
+        
+        # Guardamos el escenario elegido
+        st.session_state.escenario_seleccionado = escenario
+        
+        # Avanzamos la etapa del simulador
         avanzar_etapa()
-        st.rerun()
+        
+        # Vamos a la pantalla de simulación
+        st.switch_page("pages/5_Simulacion.py")
