@@ -92,7 +92,7 @@ def crear_tarjeta_proceso(
 
 
 # ============================================================
-# ESCENARIO SELECCIONADO
+# ESCENARIO
 # ============================================================
 
 escenario = st.session_state.get(
@@ -128,8 +128,8 @@ if escenario != "Superavitario":
     )
 
     st.info(
-        f"El escenario {escenario} todavía no "
-        "tiene cargada la experiencia audiovisual."
+        f"El escenario {escenario} todavía no tiene "
+        "cargada la experiencia audiovisual."
     )
 
     if st.button("← Volver"):
@@ -142,7 +142,7 @@ if escenario != "Superavitario":
 
 
 # ============================================================
-# RUTAS DE ARCHIVOS
+# RUTAS
 # ============================================================
 
 video_path = (
@@ -220,157 +220,12 @@ fondo_mina_data_uri = file_to_data_uri(
 
 
 # ============================================================
-# MODELO EDUCATIVO DE LA MINA
-# ============================================================
-
-DECISIONES_MINA = {
-
-    "alta": {
-
-        "titulo": "Alta recirculación",
-
-        "recirculacion": 80,
-
-        "consumo_neto": 5,
-
-        "caudal_restante": 95,
-
-        "video_siguiente": "Caudal_alto.mp4"
-
-    },
-
-    "media": {
-
-        "titulo": "Recirculación intermedia",
-
-        "recirculacion": 60,
-
-        "consumo_neto": 10,
-
-        "caudal_restante": 90,
-
-        "video_siguiente": "Caudal_medio.mp4"
-
-    },
-
-    "nula": {
-
-        "titulo": "Sin recirculación",
-
-        "recirculacion": 0,
-
-        "consumo_neto": 25,
-
-        "caudal_restante": 75,
-
-        "video_siguiente": "Caudal_bajo.mp4"
-
-    }
-
-}
-
-
-# ============================================================
-# ESTADO DE LA EXPERIENCIA
+# ESTADO STREAMLIT
 # ============================================================
 
 if "experiencia_iniciada" not in st.session_state:
 
     st.session_state.experiencia_iniciada = False
-
-
-if "caudal_inicio_mina" not in st.session_state:
-
-    st.session_state.caudal_inicio_mina = float(
-        st.session_state.caudal_actual
-    )
-
-
-# ============================================================
-# LEER DECISIÓN DESDE LA URL
-# ============================================================
-
-decision_url = st.query_params.get(
-    "decision_mina"
-)
-
-
-if decision_url in DECISIONES_MINA:
-
-    configuracion = DECISIONES_MINA[
-        decision_url
-    ]
-
-    st.session_state.decision_mina = (
-        decision_url
-    )
-
-    st.session_state.mostrar_resultado_mina = (
-        True
-    )
-
-    # Siempre calculamos desde el caudal
-    # con el que llegamos inicialmente a la mina.
-    # Así no se descuenta varias veces.
-
-    caudal_base = (
-        st.session_state.caudal_inicio_mina
-    )
-
-    porcentaje_restante = (
-        configuracion["caudal_restante"] / 100
-    )
-
-    nuevo_caudal = (
-        caudal_base
-        * porcentaje_restante
-    )
-
-    st.session_state.caudal_actual = round(
-        nuevo_caudal,
-        2
-    )
-
-
-# ============================================================
-# RESULTADO ACTUAL
-# ============================================================
-
-mostrar_resultado = st.session_state.get(
-    "mostrar_resultado_mina",
-    False
-)
-
-
-decision_guardada = st.session_state.get(
-    "decision_mina"
-)
-
-
-if (
-    mostrar_resultado
-    and decision_guardada in DECISIONES_MINA
-):
-
-    resultado = DECISIONES_MINA[
-        decision_guardada
-    ]
-
-else:
-
-    resultado = {
-
-        "titulo": "",
-
-        "recirculacion": 0,
-
-        "consumo_neto": 0,
-
-        "caudal_restante": 100,
-
-        "video_siguiente": ""
-
-    }
 
 
 # ============================================================
@@ -387,7 +242,7 @@ st.markdown(
 
 
 # ============================================================
-# PANTALLA INICIAL
+# PANTALLA DE INICIO
 # ============================================================
 
 if not st.session_state.experiencia_iniciada:
@@ -427,9 +282,9 @@ if not st.session_state.experiencia_iniciada:
 
 else:
 
-    # --------------------------------------------------------
-    # TARJETA TRADICIONAL
-    # --------------------------------------------------------
+    # ========================================================
+    # TARJETAS
+    # ========================================================
 
     tradicional_html = crear_tarjeta_proceso(
 
@@ -450,10 +305,6 @@ else:
     )
 
 
-    # --------------------------------------------------------
-    # TARJETA MODERNA
-    # --------------------------------------------------------
-
     moderno_html = crear_tarjeta_proceso(
 
         titulo="Circuito cerrado y recirculación",
@@ -473,18 +324,18 @@ else:
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # FONDO
-    # --------------------------------------------------------
+    # ========================================================
 
     if fondo_mina_data_uri:
 
         fondo_css = f"""
         linear-gradient(
             90deg,
-            rgba(0,0,0,0.52) 0%,
-            rgba(0,0,0,0.38) 45%,
-            rgba(0,0,0,0.22) 100%
+            rgba(0,0,0,0.48) 0%,
+            rgba(0,0,0,0.34) 48%,
+            rgba(0,0,0,0.20) 100%
         ),
         url("{fondo_mina_data_uri}")
         """
@@ -500,30 +351,14 @@ else:
         """
 
 
-    # --------------------------------------------------------
-    # ESTADO INICIAL DEL COMPONENTE
-    # --------------------------------------------------------
-
-    if mostrar_resultado:
-
-        estado_inicial = "resultado"
-
-        autoplay_video = ""
-
-    else:
-
-        estado_inicial = "video"
-
-        autoplay_video = "autoplay"
-
-
     # ========================================================
-    # HTML
+    # HTML COMPLETO
     # ========================================================
 
     html_template = """
 
 <style>
+
 
 /* =========================================================
    GENERAL
@@ -628,13 +463,12 @@ body {
 
     backdrop-filter: blur(7px);
 
-    -webkit-backdrop-filter: blur(7px);
+    -webkit-backdrop-filter:
+        blur(7px);
 
     font-size: 18px;
 
     font-weight: 600;
-
-    z-index: 5;
 
 }
 
@@ -673,11 +507,10 @@ body {
     background-repeat:
         no-repeat;
 
-    overflow-y:
-        auto;
+    overflow-y: auto;
 
     animation:
-        aparecer 0.65s ease;
+        aparecer 0.55s ease;
 
 }
 
@@ -789,7 +622,8 @@ body {
 
     overflow: hidden;
 
-    backdrop-filter: blur(8px);
+    backdrop-filter:
+        blur(8px);
 
     -webkit-backdrop-filter:
         blur(8px);
@@ -797,20 +631,6 @@ body {
     box-shadow:
         0 10px 25px
         rgba(0,0,0,0.22);
-
-    transition:
-        0.25s;
-
-}
-
-
-.card-proceso:hover {
-
-    transform:
-        translateY(-3px);
-
-    border-color:
-        rgba(110,209,220,0.70);
 
 }
 
@@ -830,8 +650,6 @@ body {
 
 .placeholder-foto {
 
-    width: 100%;
-
     height: 200px;
 
     display: flex;
@@ -842,8 +660,6 @@ body {
 
     background:
         rgba(255,255,255,0.10);
-
-    color: white;
 
 }
 
@@ -879,8 +695,6 @@ body {
 
     margin-bottom: 10px;
 
-    color: white;
-
 }
 
 
@@ -910,20 +724,15 @@ body {
     border-radius: 15px;
 
     background:
-        rgba(10,20,25,0.50);
+        rgba(10,20,25,0.52);
 
     border:
         1px solid
         rgba(112,214,222,0.42);
 
-    color: white;
-
     line-height: 1.55;
 
     backdrop-filter:
-        blur(8px);
-
-    -webkit-backdrop-filter:
         blur(8px);
 
 }
@@ -931,7 +740,7 @@ body {
 
 
 /* =========================================================
-   BOTONES
+   BOTONES DE NAVEGACIÓN
 ========================================================= */
 
 .botones-navegacion {
@@ -946,8 +755,6 @@ body {
 
     margin-top: 22px;
 
-    margin-bottom: 15px;
-
     flex-wrap: wrap;
 
 }
@@ -955,12 +762,6 @@ body {
 
 .btn-principal,
 .btn-secundario {
-
-    display: inline-block;
-
-    text-decoration: none;
-
-    color: white;
 
     border:
         1px solid
@@ -970,6 +771,8 @@ body {
 
     padding:
         15px 25px;
+
+    color: white;
 
     font-size: 16px;
 
@@ -1005,10 +808,7 @@ body {
 .btn-secundario {
 
     background:
-        rgba(10,20,25,0.58);
-
-    backdrop-filter:
-        blur(8px);
+        rgba(10,20,25,0.62);
 
 }
 
@@ -1039,8 +839,6 @@ body {
 
     margin-bottom: 20px;
 
-    color: white;
-
     text-shadow:
         0 3px 9px
         rgba(0,0,0,0.70);
@@ -1064,12 +862,16 @@ body {
 
     display: block;
 
-    text-decoration: none;
+    width: 100%;
+
+    box-sizing: border-box;
+
+    text-align: left;
 
     color: white;
 
     background:
-        rgba(10,20,25,0.50);
+        rgba(10,20,25,0.58);
 
     border:
         1px solid
@@ -1092,6 +894,13 @@ body {
     transition:
         0.25s;
 
+    cursor: pointer;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
 }
 
 
@@ -1101,7 +910,7 @@ body {
         translateY(-5px);
 
     background:
-        rgba(32,150,161,0.32);
+        rgba(32,150,161,0.36);
 
     border-color:
         #71d9df;
@@ -1121,6 +930,8 @@ body {
 
 
 .opcion span {
+
+    display: block;
 
     font-size: 15px;
 
@@ -1241,8 +1052,6 @@ body {
 
     line-height: 1;
 
-    color: white;
-
 }
 
 
@@ -1254,7 +1063,7 @@ body {
 
     color: #cdebf0;
 
-    max-width: 130px;
+    max-width: 140px;
 
 }
 
@@ -1315,7 +1124,7 @@ body {
     display: grid;
 
     grid-template-columns:
-        repeat(3,1fr);
+        repeat(3, 1fr);
 
     gap: 12px;
 
@@ -1327,7 +1136,7 @@ body {
 .metrica {
 
     background:
-        rgba(9,22,29,0.57);
+        rgba(9,22,29,0.60);
 
     border:
         1px solid
@@ -1349,8 +1158,6 @@ body {
 
     font-weight: 800;
 
-    color: white;
-
 }
 
 
@@ -1368,7 +1175,7 @@ body {
 .resultado-explicacion {
 
     background:
-        rgba(9,22,29,0.55);
+        rgba(9,22,29,0.59);
 
     border:
         1px solid
@@ -1380,8 +1187,6 @@ body {
 
     line-height: 1.6;
 
-    color: white;
-
     backdrop-filter:
         blur(8px);
 
@@ -1392,7 +1197,8 @@ body {
 
     margin-top: 18px;
 
-    padding: 14px 17px;
+    padding:
+        14px 17px;
 
     border-radius: 12px;
 
@@ -1401,7 +1207,7 @@ body {
     line-height: 1.5;
 
     background:
-        rgba(0,0,0,0.36);
+        rgba(0,0,0,0.40);
 
     border:
         1px solid
@@ -1412,24 +1218,29 @@ body {
 }
 
 
+
+/* =========================================================
+   MENSAJE SIGUIENTE TRAMO
+========================================================= */
+
 .siguiente-panel {
 
     display: none;
 
     margin-top: 18px;
 
-    padding: 17px;
+    padding: 18px;
 
     text-align: center;
 
     border-radius: 13px;
 
     background:
-        rgba(76,193,209,0.16);
+        rgba(76,193,209,0.18);
 
     border:
         1px solid
-        rgba(76,193,209,0.42);
+        rgba(76,193,209,0.45);
 
 }
 
@@ -1445,14 +1256,23 @@ body {
     .opciones,
     .resultado-grid {
 
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            1fr;
 
     }
 
 
     .metricas {
 
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .titulo-mina {
+
+        font-size: 33px;
 
     }
 
@@ -1474,13 +1294,6 @@ body {
 
     }
 
-
-    .titulo-mina {
-
-        font-size: 33px;
-
-    }
-
 }
 
 </style>
@@ -1498,7 +1311,7 @@ body {
 
     <video
         id="video-rio"
-        __AUTOPLAY__
+        autoplay
         muted
         playsinline
     >
@@ -1578,26 +1391,24 @@ body {
 
     <div class="botones-navegacion">
 
-        <a
-            href="#"
+        <button
             id="btn-repetir-info"
             class="btn-secundario"
         >
 
             ↻ Volver a reproducir la simulación
 
-        </a>
+        </button>
 
 
-        <a
-            href="#"
+        <button
             id="btn-ir-decision"
             class="btn-principal"
         >
 
             Continuar a la toma de decisión →
 
-        </a>
+        </button>
 
     </div>
 
@@ -1627,9 +1438,9 @@ body {
 
     <div class="descripcion">
 
-        Para este modelo educativo se considera que el
-        proceso requiere un volumen equivalente al 25 %
-        del caudal inicial.
+        Para este modelo educativo se considera que
+        el proceso requiere un volumen equivalente al
+        <strong>25 % del caudal inicial</strong>.
 
         La cantidad realmente consumida dependerá de
         cuánto de ese volumen pueda recuperarse y reutilizarse.
@@ -1647,12 +1458,9 @@ body {
     <div class="opciones">
 
 
-        <!-- ALTA -->
-
-        <a
+        <button
             class="opcion"
-            href="/Simulacion?decision_mina=alta"
-            target="_top"
+            onclick="seleccionarDecision('alta')"
         >
 
             <strong>
@@ -1670,16 +1478,13 @@ body {
 
             </span>
 
-        </a>
+        </button>
 
 
 
-        <!-- MEDIA -->
-
-        <a
+        <button
             class="opcion"
-            href="/Simulacion?decision_mina=media"
-            target="_top"
+            onclick="seleccionarDecision('media')"
         >
 
             <strong>
@@ -1690,23 +1495,20 @@ body {
 
             <span>
 
-                Recuperación parcial del agua.
+                Recuperación parcial.
 
                 El consumo neto equivalente será
                 aproximadamente 10 % del caudal inicial.
 
             </span>
 
-        </a>
+        </button>
 
 
 
-        <!-- NULA -->
-
-        <a
+        <button
             class="opcion"
-            href="/Simulacion?decision_mina=nula"
-            target="_top"
+            onclick="seleccionarDecision('nula')"
         >
 
             <strong>
@@ -1717,14 +1519,14 @@ body {
 
             <span>
 
-                Todo el requerimiento se cubre mediante
-                nuevos aportes de agua.
+                Todo el requerimiento se cubre
+                mediante nuevos aportes.
 
                 El consumo neto equivalente será 25 %.
 
             </span>
 
-        </a>
+        </button>
 
 
     </div>
@@ -1732,26 +1534,24 @@ body {
 
     <div class="botones-navegacion">
 
-        <a
-            href="#"
+        <button
             id="btn-volver-info"
             class="btn-secundario"
         >
 
             ← Volver a la información
 
-        </a>
+        </button>
 
 
-        <a
-            href="#"
+        <button
             id="btn-repetir-decision"
             class="btn-secundario"
         >
 
             ↻ Reproducir recorrido
 
-        </a>
+        </button>
 
     </div>
 
@@ -1783,13 +1583,15 @@ body {
 
         Elegiste:
 
-        <strong>
-            __RESULTADO_TITULO__
+        <strong id="resultado-titulo">
+            -
         </strong>
 
-        La visualización muestra cómo se distribuye
-        el caudal inicial normalizado después de considerar
-        el consumo neto de la mina.
+        <br>
+
+        La visualización muestra la relación entre
+        recirculación, consumo neto y disponibilidad
+        de agua para continuar aguas abajo.
 
     </div>
 
@@ -1798,28 +1600,34 @@ body {
     <div class="resultado-grid">
 
 
-        <!-- GRÁFICO DONUT -->
+        <!-- =========================================
+             DONUT
+        ========================================== -->
 
         <div>
 
 
             <div class="donut-wrapper">
 
+
                 <div
+                    id="donut"
                     class="donut"
-                    style="
-                        --consumo:
-                        __RESULTADO_CONSUMO__;
-                    "
+                    style="--consumo: 5;"
                 >
 
                     <div class="donut-centro">
 
-                        <div class="donut-numero">
 
-                            __RESULTADO_RESTANTE__%
+                        <div
+                            id="donut-restante"
+                            class="donut-numero"
+                        >
+
+                            95%
 
                         </div>
+
 
                         <div class="donut-texto">
 
@@ -1828,14 +1636,19 @@ body {
 
                         </div>
 
+
                     </div>
 
+
                 </div>
+
 
             </div>
 
 
+
             <div class="leyenda">
+
 
                 <div>
 
@@ -1864,6 +1677,7 @@ body {
 
                 </div>
 
+
             </div>
 
 
@@ -1871,7 +1685,9 @@ body {
 
 
 
-        <!-- INFORMACIÓN DEL RESULTADO -->
+        <!-- =========================================
+             DATOS
+        ========================================== -->
 
         <div>
 
@@ -1881,15 +1697,18 @@ body {
 
                 <div class="metrica">
 
-                    <div class="metrica-numero">
+                    <div
+                        id="metrica-recirculacion"
+                        class="metrica-numero"
+                    >
 
-                        __RESULTADO_RECIRC__%
+                        80%
 
                     </div>
 
                     <div class="metrica-label">
 
-                        Recirculación seleccionada
+                        Recirculación
 
                     </div>
 
@@ -1899,9 +1718,12 @@ body {
 
                 <div class="metrica">
 
-                    <div class="metrica-numero">
+                    <div
+                        id="metrica-consumo"
+                        class="metrica-numero"
+                    >
 
-                        -__RESULTADO_CONSUMO__%
+                        -5%
 
                     </div>
 
@@ -1917,9 +1739,12 @@ body {
 
                 <div class="metrica">
 
-                    <div class="metrica-numero">
+                    <div
+                        id="metrica-restante"
+                        class="metrica-numero"
+                    >
 
-                        __RESULTADO_RESTANTE__%
+                        95%
 
                     </div>
 
@@ -1947,33 +1772,34 @@ body {
                 El proceso requiere un volumen equivalente
                 al <strong>25 %</strong> del caudal inicial.
 
+                <br><br>
+
                 Con una recirculación del
 
-                <strong>
-                    __RESULTADO_RECIRC__ %
+                <strong id="texto-recirculacion">
+                    80 %
                 </strong>,
 
-                una parte del agua utilizada vuelve
+                parte del agua utilizada vuelve
                 al circuito.
 
                 <br><br>
 
                 El consumo neto equivalente resulta en
 
-                <strong>
-                    __RESULTADO_CONSUMO__ %
+                <strong id="texto-consumo">
+                    5 %
                 </strong>
 
                 del caudal inicial.
 
                 Por lo tanto,
 
-                <strong>
-                    __RESULTADO_RESTANTE__ %
+                <strong id="texto-restante">
+                    95 %
                 </strong>
 
-                continúa disponible para el siguiente
-                tramo de la cuenca.
+                continúa disponible aguas abajo.
 
             </div>
 
@@ -1986,8 +1812,8 @@ body {
                 </strong>
 
                 estos porcentajes son valores normalizados
-                utilizados para visualizar la relación entre
-                demanda, recuperación y consumo neto.
+                utilizados para visualizar la relación
+                entre demanda, recuperación y consumo neto.
 
                 No representan directamente el porcentaje
                 real del caudal del Río San Juan utilizado
@@ -2006,37 +1832,34 @@ body {
     <div class="botones-navegacion">
 
 
-        <a
-            href="#"
+        <button
             id="btn-cambiar-decision"
             class="btn-secundario"
         >
 
             ← Cambiar decisión
 
-        </a>
+        </button>
 
 
-        <a
-            href="#"
+        <button
             id="btn-repetir-resultado"
             class="btn-secundario"
         >
 
             ↻ Reproducir recorrido
 
-        </a>
+        </button>
 
 
-        <a
-            href="#"
+        <button
             id="btn-continuar-diques"
             class="btn-principal"
         >
 
             Continuar hacia los diques →
 
-        </a>
+        </button>
 
 
     </div>
@@ -2048,21 +1871,10 @@ body {
         class="siguiente-panel"
     >
 
-        ✅ Resultado registrado.
-
-        <br><br>
-
-        El siguiente tramo utilizará:
-
-        <strong>
-            02_Mina_Diques/__VIDEO_SIGUIENTE__
-        </strong>
-
     </div>
 
 
 </div>
-
 
 
 </div>
@@ -2071,9 +1883,26 @@ body {
 
 <script>
 
-/* =========================================================
-   ELEMENTOS
-========================================================= */
+
+// ==========================================================
+// VARIABLES DE LA DECISIÓN
+// ==========================================================
+
+let decisionActual = null;
+
+let recirculacionActual = 0;
+
+let consumoActual = 0;
+
+let restanteActual = 100;
+
+let videoSiguiente = "";
+
+
+
+// ==========================================================
+// ELEMENTOS
+// ==========================================================
 
 const video =
     document.getElementById(
@@ -2105,58 +1934,10 @@ const resultadoMina =
     );
 
 
-const btnDecision =
-    document.getElementById(
-        "btn-ir-decision"
-    );
 
-
-const btnRepetirInfo =
-    document.getElementById(
-        "btn-repetir-info"
-    );
-
-
-const btnVolverInfo =
-    document.getElementById(
-        "btn-volver-info"
-    );
-
-
-const btnRepetirDecision =
-    document.getElementById(
-        "btn-repetir-decision"
-    );
-
-
-const btnCambiarDecision =
-    document.getElementById(
-        "btn-cambiar-decision"
-    );
-
-
-const btnRepetirResultado =
-    document.getElementById(
-        "btn-repetir-resultado"
-    );
-
-
-const btnContinuarDiques =
-    document.getElementById(
-        "btn-continuar-diques"
-    );
-
-
-const siguientePanel =
-    document.getElementById(
-        "siguiente-panel"
-    );
-
-
-
-/* =========================================================
-   FUNCIONES
-========================================================= */
+// ==========================================================
+// FUNCIONES DE NAVEGACIÓN
+// ==========================================================
 
 function ocultarTodo() {
 
@@ -2175,16 +1956,12 @@ function ocultarTodo() {
 }
 
 
-function reproducirDesdeInicio() {
+function mostrarVideo() {
 
     ocultarTodo();
 
     pantallaVideo.style.display =
         "block";
-
-    video.currentTime = 0;
-
-    video.play();
 
 }
 
@@ -2213,8 +1990,6 @@ function mostrarResultado() {
 
     ocultarTodo();
 
-    video.pause();
-
     resultadoMina.style.display =
         "block";
 
@@ -2222,35 +1997,206 @@ function mostrarResultado() {
 
 
 
-/* =========================================================
-   ESTADO INICIAL
-========================================================= */
+// ==========================================================
+// REPETIR VIDEO
+// ==========================================================
 
-const estadoInicial =
-    "__ESTADO_INICIAL__";
+function reproducirDesdeInicio() {
+
+    mostrarVideo();
+
+    video.currentTime = 0;
+
+    const reproduccion =
+        video.play();
+
+    if (
+        reproduccion !== undefined
+    ) {
+
+        reproduccion.catch(
+            function(error) {
+
+                console.log(
+                    "Autoplay bloqueado:",
+                    error
+                );
+
+            }
+        );
+
+    }
+
+}
 
 
-if (
-    estadoInicial ===
-    "resultado"
-) {
+
+// ==========================================================
+// DECISIONES
+// ==========================================================
+
+function seleccionarDecision(tipo) {
+
+
+    // ------------------------------------------------------
+    // ALTA
+    // ------------------------------------------------------
+
+    if (tipo === "alta") {
+
+        decisionActual =
+            "Alta recirculación";
+
+        recirculacionActual =
+            80;
+
+        consumoActual =
+            5;
+
+        restanteActual =
+            95;
+
+        videoSiguiente =
+            "Caudal_alto.mp4";
+
+    }
+
+
+    // ------------------------------------------------------
+    // MEDIA
+    // ------------------------------------------------------
+
+    else if (tipo === "media") {
+
+        decisionActual =
+            "Recirculación intermedia";
+
+        recirculacionActual =
+            60;
+
+        consumoActual =
+            10;
+
+        restanteActual =
+            90;
+
+        videoSiguiente =
+            "Caudal_medio.mp4";
+
+    }
+
+
+    // ------------------------------------------------------
+    // NULA
+    // ------------------------------------------------------
+
+    else if (tipo === "nula") {
+
+        decisionActual =
+            "Sin recirculación";
+
+        recirculacionActual =
+            0;
+
+        consumoActual =
+            25;
+
+        restanteActual =
+            75;
+
+        videoSiguiente =
+            "Caudal_bajo.mp4";
+
+    }
+
+
+    // ------------------------------------------------------
+    // ACTUALIZAR INTERFAZ
+    // ------------------------------------------------------
+
+    actualizarResultado();
 
     mostrarResultado();
 
 }
 
-else {
 
-    pantallaVideo.style.display =
-        "block";
+
+// ==========================================================
+// ACTUALIZAR RESULTADO
+// ==========================================================
+
+function actualizarResultado() {
+
+
+    document.getElementById(
+        "resultado-titulo"
+    ).textContent =
+        decisionActual;
+
+
+    document.getElementById(
+        "donut"
+    ).style.setProperty(
+        "--consumo",
+        consumoActual
+    );
+
+
+    document.getElementById(
+        "donut-restante"
+    ).textContent =
+        restanteActual + "%";
+
+
+    document.getElementById(
+        "metrica-recirculacion"
+    ).textContent =
+        recirculacionActual + "%";
+
+
+    document.getElementById(
+        "metrica-consumo"
+    ).textContent =
+        "-" + consumoActual + "%";
+
+
+    document.getElementById(
+        "metrica-restante"
+    ).textContent =
+        restanteActual + "%";
+
+
+    document.getElementById(
+        "texto-recirculacion"
+    ).textContent =
+        recirculacionActual + " %";
+
+
+    document.getElementById(
+        "texto-consumo"
+    ).textContent =
+        consumoActual + " %";
+
+
+    document.getElementById(
+        "texto-restante"
+    ).textContent =
+        restanteActual + " %";
+
+
+    document.getElementById(
+        "siguiente-panel"
+    ).style.display =
+        "none";
 
 }
 
 
 
-/* =========================================================
-   CUANDO TERMINA EL VIDEO
-========================================================= */
+// ==========================================================
+// FIN DEL VIDEO
+// ==========================================================
 
 video.addEventListener(
     "ended",
@@ -2263,15 +2209,15 @@ video.addEventListener(
 
 
 
-/* =========================================================
-   INFORMACIÓN → DECISIÓN
-========================================================= */
+// ==========================================================
+// BOTONES INFORMACIÓN
+// ==========================================================
 
-btnDecision.addEventListener(
+document.getElementById(
+    "btn-ir-decision"
+).addEventListener(
     "click",
-    function(event) {
-
-        event.preventDefault();
+    function() {
 
         mostrarDecision();
 
@@ -2279,16 +2225,11 @@ btnDecision.addEventListener(
 );
 
 
-
-/* =========================================================
-   REPETIR DESDE INFORMACIÓN
-========================================================= */
-
-btnRepetirInfo.addEventListener(
+document.getElementById(
+    "btn-repetir-info"
+).addEventListener(
     "click",
-    function(event) {
-
-        event.preventDefault();
+    function() {
 
         reproducirDesdeInicio();
 
@@ -2297,15 +2238,15 @@ btnRepetirInfo.addEventListener(
 
 
 
-/* =========================================================
-   DECISIÓN → INFORMACIÓN
-========================================================= */
+// ==========================================================
+// BOTONES DECISIÓN
+// ==========================================================
 
-btnVolverInfo.addEventListener(
+document.getElementById(
+    "btn-volver-info"
+).addEventListener(
     "click",
-    function(event) {
-
-        event.preventDefault();
+    function() {
 
         mostrarInformacion();
 
@@ -2313,16 +2254,11 @@ btnVolverInfo.addEventListener(
 );
 
 
-
-/* =========================================================
-   REPETIR DESDE DECISIÓN
-========================================================= */
-
-btnRepetirDecision.addEventListener(
+document.getElementById(
+    "btn-repetir-decision"
+).addEventListener(
     "click",
-    function(event) {
-
-        event.preventDefault();
+    function() {
 
         reproducirDesdeInicio();
 
@@ -2331,15 +2267,15 @@ btnRepetirDecision.addEventListener(
 
 
 
-/* =========================================================
-   RESULTADO → CAMBIAR DECISIÓN
-========================================================= */
+// ==========================================================
+// BOTONES RESULTADO
+// ==========================================================
 
-btnCambiarDecision.addEventListener(
+document.getElementById(
+    "btn-cambiar-decision"
+).addEventListener(
     "click",
-    function(event) {
-
-        event.preventDefault();
+    function() {
 
         mostrarDecision();
 
@@ -2347,16 +2283,11 @@ btnCambiarDecision.addEventListener(
 );
 
 
-
-/* =========================================================
-   REPETIR DESDE RESULTADO
-========================================================= */
-
-btnRepetirResultado.addEventListener(
+document.getElementById(
+    "btn-repetir-resultado"
+).addEventListener(
     "click",
-    function(event) {
-
-        event.preventDefault();
+    function() {
 
         reproducirDesdeInicio();
 
@@ -2364,27 +2295,59 @@ btnRepetirResultado.addEventListener(
 );
 
 
-
-/* =========================================================
-   CONTINUAR A DIQUES
-========================================================= */
-
-btnContinuarDiques.addEventListener(
+document.getElementById(
+    "btn-continuar-diques"
+).addEventListener(
     "click",
-    function(event) {
+    function() {
 
-        event.preventDefault();
+        const panel =
+            document.getElementById(
+                "siguiente-panel"
+            );
 
-        siguientePanel.style.display =
+
+        panel.innerHTML =
+
+            "✅ Decisión registrada." +
+
+            "<br><br>" +
+
+            "Caudal disponible: " +
+
+            "<strong>" +
+            restanteActual +
+            "%</strong>" +
+
+            "<br><br>" +
+
+            "El siguiente tramo utilizará: " +
+
+            "<strong>" +
+
+            "02_Mina_Diques/" +
+            videoSiguiente +
+
+            "</strong>";
+
+
+        panel.style.display =
             "block";
 
-        siguientePanel.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest"
+
+        panel.scrollIntoView({
+
+            behavior:
+                "smooth",
+
+            block:
+                "nearest"
+
         });
 
     }
 );
+
 
 </script>
 
@@ -2392,7 +2355,7 @@ btnContinuarDiques.addEventListener(
 
 
     # ========================================================
-    # REEMPLAZAR VARIABLES HTML
+    # REEMPLAZOS
     # ========================================================
 
     html = html_template
@@ -2422,50 +2385,8 @@ btnContinuarDiques.addEventListener(
     )
 
 
-    html = html.replace(
-        "__AUTOPLAY__",
-        autoplay_video
-    )
-
-
-    html = html.replace(
-        "__ESTADO_INICIAL__",
-        estado_inicial
-    )
-
-
-    html = html.replace(
-        "__RESULTADO_TITULO__",
-        str(resultado["titulo"])
-    )
-
-
-    html = html.replace(
-        "__RESULTADO_RECIRC__",
-        str(resultado["recirculacion"])
-    )
-
-
-    html = html.replace(
-        "__RESULTADO_CONSUMO__",
-        str(resultado["consumo_neto"])
-    )
-
-
-    html = html.replace(
-        "__RESULTADO_RESTANTE__",
-        str(resultado["caudal_restante"])
-    )
-
-
-    html = html.replace(
-        "__VIDEO_SIGUIENTE__",
-        str(resultado["video_siguiente"])
-    )
-
-
     # ========================================================
-    # MOSTRAR COMPONENTE
+    # MOSTRAR
     # ========================================================
 
     st.components.v1.html(
