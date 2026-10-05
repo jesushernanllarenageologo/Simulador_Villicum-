@@ -6,9 +6,9 @@ import mimetypes
 from core.state_manager import init_session_state
 
 
-# ==================================================
-# CONFIGURACIÓN GENERAL
-# ==================================================
+# ============================================================
+# CONFIGURACIÓN
+# ============================================================
 
 st.set_page_config(
     page_title="Simulación",
@@ -21,9 +21,9 @@ init_session_state()
 BASE_DIR = Path(__file__).resolve().parents[1]
 
 
-# ==================================================
-# FUNCIONES AUXILIARES
-# ==================================================
+# ============================================================
+# FUNCIONES
+# ============================================================
 
 def file_to_data_uri(file_path: Path):
 
@@ -91,9 +91,9 @@ def crear_tarjeta_proceso(
     """
 
 
-# ==================================================
-# ESCENARIO SELECCIONADO
-# ==================================================
+# ============================================================
+# ESCENARIO
+# ============================================================
 
 escenario = st.session_state.get(
     "escenario_seleccionado"
@@ -115,9 +115,9 @@ if not escenario:
     st.stop()
 
 
-# ==================================================
+# ============================================================
 # POR AHORA SOLO SUPERAVITARIO
-# ==================================================
+# ============================================================
 
 if escenario != "Superavitario":
 
@@ -141,9 +141,9 @@ if escenario != "Superavitario":
     st.stop()
 
 
-# ==================================================
-# RUTAS DE ARCHIVOS
-# ==================================================
+# ============================================================
+# ARCHIVOS
+# ============================================================
 
 video_path = (
     BASE_DIR
@@ -181,9 +181,9 @@ fondo_mina_path = (
 )
 
 
-# ==================================================
+# ============================================================
 # COMPROBAR VIDEO
-# ==================================================
+# ============================================================
 
 if not video_path.exists():
 
@@ -191,16 +191,14 @@ if not video_path.exists():
         "No se encontró el video Superavitario.mp4"
     )
 
-    st.code(
-        str(video_path)
-    )
+    st.code(str(video_path))
 
     st.stop()
 
 
-# ==================================================
+# ============================================================
 # CONVERTIR ARCHIVOS
-# ==================================================
+# ============================================================
 
 video_data_uri = file_to_data_uri(
     video_path
@@ -219,18 +217,190 @@ fondo_mina_data_uri = file_to_data_uri(
 )
 
 
-# ==================================================
-# ESTADO DE LA EXPERIENCIA
-# ==================================================
+# ============================================================
+# CONFIGURACIÓN EDUCATIVA DE LAS DECISIONES
+# ============================================================
+#
+# Modelo normalizado:
+#
+# Caudal inicial = 100 %
+# Demanda bruta del proceso minero = 25 %
+#
+# Consumo neto =
+# demanda bruta × (1 - recirculación)
+#
+# Alta:
+# 25 × (1 - 0.80) = 5 %
+#
+# Media:
+# 25 × (1 - 0.60) = 10 %
+#
+# Nula:
+# 25 × (1 - 0.00) = 25 %
+#
+# ============================================================
+
+DECISIONES_MINA = {
+
+    "alta": {
+
+        "titulo": "Alta recirculación",
+
+        "recirculacion": 80,
+
+        "consumo_neto": 5,
+
+        "caudal_restante": 95,
+
+        "video_siguiente": "Caudal_alto.mp4"
+
+    },
+
+    "media": {
+
+        "titulo": "Recirculación intermedia",
+
+        "recirculacion": 60,
+
+        "consumo_neto": 10,
+
+        "caudal_restante": 90,
+
+        "video_siguiente": "Caudal_medio.mp4"
+
+    },
+
+    "nula": {
+
+        "titulo": "Sin recirculación",
+
+        "recirculacion": 0,
+
+        "consumo_neto": 25,
+
+        "caudal_restante": 75,
+
+        "video_siguiente": "Caudal_bajo.mp4"
+
+    }
+
+}
+
+
+# ============================================================
+# ESTADO
+# ============================================================
 
 if "experiencia_iniciada" not in st.session_state:
 
     st.session_state.experiencia_iniciada = False
 
 
-# ==================================================
-# ENCABEZADO
-# ==================================================
+# Guardamos el caudal con el que el río llega a la mina.
+# Así cambiar la decisión no resta agua varias veces.
+
+if "caudal_inicio_mina" not in st.session_state:
+
+    st.session_state.caudal_inicio_mina = float(
+        st.session_state.caudal_actual
+    )
+
+
+# ============================================================
+# LEER DECISIÓN DESDE URL
+# ============================================================
+
+decision_url = st.query_params.get(
+    "decision_mina"
+)
+
+
+if decision_url in DECISIONES_MINA:
+
+    configuracion = DECISIONES_MINA[
+        decision_url
+    ]
+
+    st.session_state.decision_mina = (
+        decision_url
+    )
+
+    st.session_state.mostrar_resultado_mina = (
+        True
+    )
+
+    # Recalculamos SIEMPRE desde el caudal inicial
+    # de la parada. Así el usuario puede cambiar
+    # de decisión sin descontar agua dos veces.
+
+    caudal_base = (
+        st.session_state.caudal_inicio_mina
+    )
+
+    porcentaje_restante = (
+        configuracion["caudal_restante"]
+        / 100
+    )
+
+    nuevo_caudal = (
+        caudal_base
+        * porcentaje_restante
+    )
+
+    st.session_state.caudal_actual = round(
+        nuevo_caudal,
+        2
+    )
+
+
+# ============================================================
+# RESULTADO ACTUAL
+# ============================================================
+
+mostrar_resultado = (
+    st.session_state.get(
+        "mostrar_resultado_mina",
+        False
+    )
+)
+
+
+decision_guardada = (
+    st.session_state.get(
+        "decision_mina"
+    )
+)
+
+
+if (
+    mostrar_resultado
+    and decision_guardada in DECISIONES_MINA
+):
+
+    resultado = DECISIONES_MINA[
+        decision_guardada
+    ]
+
+else:
+
+    resultado = {
+
+        "titulo": "",
+
+        "recirculacion": 0,
+
+        "consumo_neto": 0,
+
+        "caudal_restante": 100,
+
+        "video_siguiente": ""
+
+    }
+
+
+# ============================================================
+# ENCABEZADO STREAMLIT
+# ============================================================
 
 st.title(
     "🌊 Simulación Hídrica"
@@ -241,9 +411,9 @@ st.markdown(
 )
 
 
-# ==================================================
-# PANTALLA INICIAL
-# ==================================================
+# ============================================================
+# INICIO
+# ============================================================
 
 if not st.session_state.experiencia_iniciada:
 
@@ -251,8 +421,8 @@ if not st.session_state.experiencia_iniciada:
         """
         La cuenca inicia con una **alta disponibilidad hídrica**.
 
-        El recorrido comenzará en la **Cordillera de los Andes**
-        y seguirá el curso del **Río San Juan** hasta la primera
+        El recorrido comienza en la **Cordillera de los Andes**
+        y sigue el curso del **Río San Juan** hasta la primera
         parada del simulador: **la actividad minera**.
         """
     )
@@ -271,20 +441,22 @@ if not st.session_state.experiencia_iniciada:
             use_container_width=True
         ):
 
-            st.session_state.experiencia_iniciada = True
+            st.session_state.experiencia_iniciada = (
+                True
+            )
 
             st.rerun()
 
 
-# ==================================================
+# ============================================================
 # EXPERIENCIA
-# ==================================================
+# ============================================================
 
 else:
 
-    # ==================================================
+    # --------------------------------------------------------
     # TARJETA TRADICIONAL
-    # ==================================================
+    # --------------------------------------------------------
 
     tradicional_html = crear_tarjeta_proceso(
 
@@ -293,11 +465,11 @@ else:
         subtitulo="MAYOR USO DE AGUA FRESCA",
 
         texto="""
-        En un esquema tradicional con menor recuperación
-        interna, una mayor cantidad del agua utilizada debe
-        ser reemplazada mediante nuevos aportes desde la cuenca.
+        En un esquema con menor recuperación interna,
+        una mayor cantidad del agua utilizada debe
+        reemplazarse mediante nuevos aportes desde la cuenca.
 
-        Esto genera un mayor consumo neto de agua.
+        Esto incrementa el consumo neto de agua fresca.
         """,
 
         imagen=img_tradicional_data_uri
@@ -305,9 +477,9 @@ else:
     )
 
 
-    # ==================================================
+    # --------------------------------------------------------
     # TARJETA MODERNA
-    # ==================================================
+    # --------------------------------------------------------
 
     moderno_html = crear_tarjeta_proceso(
 
@@ -316,11 +488,11 @@ else:
         subtitulo="GESTIÓN HÍDRICA MODERNA",
 
         texto="""
-        En operaciones con sistemas de recuperación,
-        el agua utilizada puede ser captada, tratada y
-        reutilizada nuevamente dentro del proceso.
+        Mediante sistemas de recuperación, parte del agua
+        utilizada puede ser captada, tratada y reutilizada
+        nuevamente dentro del proceso.
 
-        Esto disminuye la necesidad de incorporar agua fresca.
+        Esto reduce la necesidad de incorporar agua fresca.
         """,
 
         imagen=img_moderno_data_uri
@@ -328,18 +500,18 @@ else:
     )
 
 
-    # ==================================================
+    # --------------------------------------------------------
     # FONDO
-    # ==================================================
+    # --------------------------------------------------------
 
     if fondo_mina_data_uri:
 
         fondo_css = f"""
         linear-gradient(
             90deg,
-            rgba(0, 0, 0, 0.52) 0%,
-            rgba(0, 0, 0, 0.38) 45%,
-            rgba(0, 0, 0, 0.22) 100%
+            rgba(0,0,0,0.52) 0%,
+            rgba(0,0,0,0.38) 45%,
+            rgba(0,0,0,0.22) 100%
         ),
         url("{fondo_mina_data_uri}")
         """
@@ -355,707 +527,1363 @@ else:
         """
 
 
-    # ==================================================
+    # --------------------------------------------------------
+    # ESTADO INICIAL DEL COMPONENTE
+    # --------------------------------------------------------
+
+    if mostrar_resultado:
+
+        estado_inicial = "resultado"
+
+        autoplay_video = ""
+
+    else:
+
+        estado_inicial = "video"
+
+        autoplay_video = "autoplay"
+
+
+    # ========================================================
     # HTML
-    # ==================================================
+    # ========================================================
 
-    html = f"""
+    html_template = """
 
-    <style>
+<style>
 
+/* =========================================================
+   GENERAL
+========================================================= */
 
-    /* ==================================================
-       GENERAL
-    ================================================== */
+body {
 
-    body {{
+    margin: 0;
 
-        margin: 0;
+    background: #101820;
 
-        background: #101820;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-        font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
+}
 
-    }}
 
+.experiencia {
 
-    .experiencia {{
+    width: 100%;
 
-        width: 100%;
+    height: 900px;
 
-        height: 900px;
+    position: relative;
 
-        position: relative;
+    border-radius: 18px;
 
-        border-radius: 18px;
+    overflow: hidden;
 
-        overflow: hidden;
+    background: #101820;
 
-        background: #101820;
+    box-shadow:
+        0 18px 45px
+        rgba(0,0,0,0.20);
 
-        box-shadow:
-            0 18px 45px
-            rgba(0,0,0,0.20);
+}
 
-    }}
 
 
+/* =========================================================
+   VIDEO
+========================================================= */
 
-    /* ==================================================
-       VIDEO
-    ================================================== */
+#pantalla-video {
 
-    #pantalla-video {{
+    width: 100%;
 
-        width: 100%;
+    height: 900px;
 
-        height: 900px;
+    position: relative;
 
-        position: relative;
+    overflow: hidden;
 
-        overflow: hidden;
+    background: black;
 
-        background: black;
+}
 
-    }}
 
+#video-rio {
 
-    #video-rio {{
+    position: absolute;
 
-        position: absolute;
+    top: 0;
 
-        top: 0;
+    left: 0;
 
-        left: 0;
+    width: 100%;
 
-        width: 100%;
+    height: 100%;
 
-        height: 100%;
+    object-fit: cover;
 
-        object-fit: cover;
+    object-position: center;
 
-        object-position: center;
+    display: block;
 
-        display: block;
+}
 
-    }}
 
+.etiqueta-video {
 
-    .etiqueta-video {{
+    position: absolute;
 
-        position: absolute;
+    top: 30px;
 
-        top: 30px;
+    left: 35px;
 
-        left: 35px;
+    padding: 12px 20px;
 
-        padding: 12px 20px;
+    background:
+        rgba(0,0,0,0.48);
 
-        background:
-            rgba(0,0,0,0.48);
+    color: white;
 
-        color: white;
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
 
-        border:
-            1px solid
-            rgba(255,255,255,0.18);
+    border-radius: 12px;
 
-        border-radius: 12px;
+    backdrop-filter: blur(7px);
 
-        backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
 
-        -webkit-backdrop-filter: blur(7px);
+    font-size: 18px;
 
-        font-size: 18px;
+    font-weight: 600;
 
-        font-weight: 600;
+    z-index: 5;
 
-        z-index: 5;
+}
 
-    }}
 
 
+/* =========================================================
+   PANTALLAS
+========================================================= */
 
-    /* ==================================================
-       PANTALLAS MINA
-    ================================================== */
+#info-mina,
+#decision-mina,
+#resultado-mina {
 
-    #info-mina,
-    #decision-mina {{
+    display: none;
 
-        display: none;
+    width: 100%;
 
-        width: 100%;
+    height: 900px;
 
-        height: 900px;
+    box-sizing: border-box;
 
-        box-sizing: border-box;
+    padding:
+        35px 38px;
 
-        padding:
-            35px 38px;
+    color: white;
 
-        color: white;
+    background:
+        __FONDO__;
 
-        background:
-            {fondo_css};
+    background-size:
+        cover;
 
-        background-size:
-            cover;
+    background-position:
+        center;
 
-        background-position:
-            center;
+    background-repeat:
+        no-repeat;
 
-        background-repeat:
-            no-repeat;
+    overflow-y:
+        auto;
 
-        animation:
-            aparecer 0.8s ease;
+    animation:
+        aparecer 0.65s ease;
 
-        overflow-y: auto;
+}
 
-    }}
 
+@keyframes aparecer {
 
-    @keyframes aparecer {{
+    from {
+        opacity: 0;
+    }
 
-        from {{
-            opacity: 0;
-        }}
+    to {
+        opacity: 1;
+    }
 
-        to {{
-            opacity: 1;
-        }}
+}
 
-    }}
 
 
+/* =========================================================
+   TÍTULOS
+========================================================= */
 
-    /* ==================================================
-       TÍTULOS
-    ================================================== */
+.titulo-etapa {
 
-    .titulo-etapa {{
+    font-size: 14px;
 
-        font-size: 14px;
+    letter-spacing: 2.4px;
 
-        letter-spacing: 2.4px;
+    color: #69d6dd;
 
-        color: #69d6dd;
+    font-weight: 700;
 
-        font-weight: 700;
+    margin-bottom: 10px;
 
-        margin-bottom: 10px;
+    text-shadow:
+        0 2px 7px
+        rgba(0,0,0,0.55);
 
-        text-shadow:
-            0 2px 7px
-            rgba(0,0,0,0.55);
+}
 
-    }}
 
+.titulo-mina {
 
-    .titulo-mina {{
+    font-size: 42px;
 
-        font-size: 42px;
+    font-weight: 800;
 
-        font-weight: 800;
+    margin-bottom: 12px;
 
-        margin-bottom: 12px;
+    color: white;
 
-        color: white;
+    text-shadow:
+        0 3px 10px
+        rgba(0,0,0,0.65);
 
-        text-shadow:
-            0 3px 10px
-            rgba(0,0,0,0.65);
+}
 
-    }}
 
+.descripcion {
 
-    .descripcion {{
+    font-size: 17px;
 
-        font-size: 17px;
+    line-height: 1.6;
 
-        line-height: 1.6;
+    max-width: 1050px;
 
-        max-width: 1050px;
+    color: white;
 
-        color: white;
+    margin-bottom: 24px;
 
-        margin-bottom: 24px;
+    text-shadow:
+        0 2px 7px
+        rgba(0,0,0,0.80);
 
-        text-shadow:
-            0 2px 7px
-            rgba(0,0,0,0.80);
+}
 
-    }}
 
 
+/* =========================================================
+   TARJETAS INFORMATIVAS
+========================================================= */
 
-    /* ==================================================
-       TARJETAS
-    ================================================== */
+.grid-procesos {
 
-    .grid-procesos {{
+    display: grid;
 
-        display: grid;
+    grid-template-columns:
+        repeat(2, 1fr);
 
-        grid-template-columns:
-            repeat(2, 1fr);
+    gap: 18px;
 
-        gap: 18px;
+    margin-top: 18px;
 
-        margin-top: 18px;
+    margin-bottom: 20px;
 
-        margin-bottom: 20px;
+}
 
-    }}
 
+.card-proceso {
 
-    .card-proceso {{
+    background:
+        rgba(12,22,27,0.52);
 
-        background:
-            rgba(12, 22, 27, 0.52);
+    border:
+        1px solid
+        rgba(255,255,255,0.24);
 
-        border:
-            1px solid
-            rgba(255,255,255,0.24);
+    border-radius: 17px;
 
-        border-radius: 17px;
+    overflow: hidden;
 
-        overflow: hidden;
+    backdrop-filter: blur(8px);
 
-        backdrop-filter:
-            blur(8px);
+    -webkit-backdrop-filter:
+        blur(8px);
 
-        -webkit-backdrop-filter:
-            blur(8px);
+    box-shadow:
+        0 10px 25px
+        rgba(0,0,0,0.22);
 
-        box-shadow:
-            0 10px 25px
-            rgba(0,0,0,0.22);
+    transition:
+        0.25s;
 
-        transition:
-            0.25s;
+}
 
-    }}
 
+.card-proceso:hover {
 
-    .card-proceso:hover {{
+    transform:
+        translateY(-3px);
 
-        transform:
-            translateY(-3px);
+    border-color:
+        rgba(110,209,220,0.70);
 
-        border-color:
-            rgba(110,209,220,0.70);
+}
 
-    }}
 
+.foto-proceso {
 
-    .foto-proceso {{
+    width: 100%;
 
-        width: 100%;
+    height: 200px;
 
-        height: 200px;
+    object-fit: cover;
 
-        object-fit: cover;
+    display: block;
 
-        display: block;
+}
 
-    }}
 
+.placeholder-foto {
 
-    .placeholder-foto {{
+    width: 100%;
 
-        width: 100%;
+    height: 200px;
 
-        height: 200px;
+    display: flex;
 
-        display: flex;
+    align-items: center;
 
-        align-items: center;
+    justify-content: center;
 
-        justify-content: center;
+    background:
+        rgba(255,255,255,0.10);
 
-        background:
-            rgba(255,255,255,0.10);
+    color: white;
 
-        color: white;
+}
 
-    }}
 
+.card-proceso-body {
 
-    .card-proceso-body {{
+    padding:
+        17px 20px 19px 20px;
 
-        padding:
-            17px 20px 19px 20px;
+}
 
-    }}
 
+.card-subtitle {
 
-    .card-subtitle {{
+    font-size: 12px;
 
-        font-size: 12px;
+    letter-spacing: 1.5px;
 
-        letter-spacing: 1.5px;
+    color: #75dce2;
 
-        color: #75dce2;
+    font-weight: 700;
 
-        font-weight: 700;
+    margin-bottom: 7px;
 
-        margin-bottom: 7px;
+}
 
-    }}
 
+.card-title {
 
-    .card-title {{
+    font-size: 23px;
 
-        font-size: 23px;
+    font-weight: 750;
 
-        font-weight: 750;
+    margin-bottom: 10px;
 
-        margin-bottom: 10px;
+    color: white;
 
-        color: white;
+}
 
-        text-shadow:
-            0 2px 5px
-            rgba(0,0,0,0.4);
 
-    }}
+.card-text {
 
+    font-size: 15px;
 
-    .card-text {{
+    line-height: 1.5;
 
-        font-size: 15px;
+    color: #f3f3f3;
 
-        line-height: 1.5;
+}
 
-        color: #f3f3f3;
 
-    }}
 
+/* =========================================================
+   CONCEPTO CLAVE
+========================================================= */
 
+.info-clave {
 
-    /* ==================================================
-       CONCEPTO CLAVE
-    ================================================== */
+    margin-top: 10px;
 
-    .info-clave {{
+    padding:
+        16px 20px;
 
-        margin-top: 10px;
+    border-radius: 15px;
 
-        padding:
-            16px 20px;
+    background:
+        rgba(10,20,25,0.50);
 
-        border-radius: 15px;
+    border:
+        1px solid
+        rgba(112,214,222,0.42);
 
-        background:
-            rgba(10,20,25,0.50);
+    color: white;
 
-        border:
-            1px solid
-            rgba(112,214,222,0.42);
+    line-height: 1.55;
 
-        color: white;
+    backdrop-filter:
+        blur(8px);
 
-        line-height: 1.55;
+    -webkit-backdrop-filter:
+        blur(8px);
 
-        backdrop-filter:
-            blur(8px);
+}
 
-        -webkit-backdrop-filter:
-            blur(8px);
 
-        box-shadow:
-            0 8px 24px
-            rgba(0,0,0,0.18);
 
-    }}
+/* =========================================================
+   BOTONES
+========================================================= */
 
+.botones-navegacion {
 
+    display: flex;
 
-    /* ==================================================
-       BOTONES
-    ================================================== */
+    justify-content: center;
 
-    .botones-navegacion {{
+    align-items: center;
 
-        display: flex;
+    gap: 14px;
 
-        justify-content: center;
+    margin-top: 22px;
 
-        align-items: center;
+    margin-bottom: 15px;
 
-        gap: 14px;
+    flex-wrap: wrap;
 
-        margin-top: 22px;
+}
 
-        margin-bottom: 15px;
 
-        flex-wrap: wrap;
+.btn-principal,
+.btn-secundario {
 
-    }}
+    display: inline-block;
 
+    text-decoration: none;
 
-    .btn-continuar,
-    .btn-secundario {{
+    color: white;
 
-        display: inline-block;
+    border:
+        1px solid
+        rgba(255,255,255,0.28);
 
-        text-decoration: none;
+    border-radius: 13px;
 
-        color: white;
+    padding:
+        15px 25px;
 
-        border:
-            1px solid
-            rgba(255,255,255,0.28);
+    font-size: 16px;
 
-        border-radius: 13px;
+    font-weight: 700;
 
-        padding:
-            15px 25px;
+    cursor: pointer;
 
-        font-size: 16px;
+    transition:
+        0.25s;
 
-        font-weight: 700;
+}
 
-        box-shadow:
-            0 8px 22px
-            rgba(0,0,0,0.25);
 
-        transition:
-            all 0.25s ease;
+.btn-principal {
 
-        cursor: pointer;
+    background:
+        rgba(22,156,171,0.95);
 
-    }}
+}
 
 
-    .btn-continuar {{
+.btn-principal:hover {
 
-        background:
-            rgba(22, 156, 171, 0.95);
+    transform:
+        translateY(-3px);
 
-    }}
+    background:
+        rgba(42,187,199,1);
 
+}
 
-    .btn-continuar:hover {{
 
-        transform:
-            translateY(-3px);
+.btn-secundario {
 
-        background:
-            rgba(42, 187, 199, 1);
+    background:
+        rgba(10,20,25,0.58);
 
-        box-shadow:
-            0 12px 28px
-            rgba(0,0,0,0.30);
+    backdrop-filter:
+        blur(8px);
 
-    }}
+}
 
 
-    .btn-secundario {{
+.btn-secundario:hover {
 
-        background:
-            rgba(10, 20, 25, 0.58);
+    transform:
+        translateY(-3px);
 
-        backdrop-filter:
-            blur(8px);
+    background:
+        rgba(255,255,255,0.16);
 
-        -webkit-backdrop-filter:
-            blur(8px);
+}
 
-    }}
 
 
-    .btn-secundario:hover {{
+/* =========================================================
+   DECISIONES
+========================================================= */
 
-        transform:
-            translateY(-3px);
+.pregunta {
 
-        background:
-            rgba(255,255,255,0.16);
+    font-size: 25px;
 
-    }}
+    font-weight: 700;
 
+    margin-top: 32px;
 
+    margin-bottom: 20px;
 
-    /* ==================================================
-       DECISIONES
-    ================================================== */
+    color: white;
 
-    .pregunta {{
+    text-shadow:
+        0 3px 9px
+        rgba(0,0,0,0.70);
 
-        font-size: 25px;
+}
 
-        font-weight: 700;
 
-        margin-top: 32px;
+.opciones {
 
-        margin-bottom: 20px;
+    display: grid;
 
-        color: white;
+    grid-template-columns:
+        repeat(3, 1fr);
 
-        text-shadow:
-            0 3px 9px
-            rgba(0,0,0,0.70);
+    gap: 17px;
 
-    }}
+}
 
 
-    .opciones {{
+.opcion {
 
-        display: grid;
+    display: block;
 
-        grid-template-columns:
-            repeat(3, 1fr);
+    text-decoration: none;
 
-        gap: 17px;
+    color: white;
 
-    }}
+    background:
+        rgba(10,20,25,0.50);
 
+    border:
+        1px solid
+        rgba(255,255,255,0.24);
 
-    .opcion {{
+    border-radius: 17px;
 
-        display: block;
+    padding: 23px;
 
-        text-decoration: none;
+    backdrop-filter:
+        blur(8px);
 
-        color: white;
+    -webkit-backdrop-filter:
+        blur(8px);
 
-        background:
-            rgba(10,20,25,0.50);
+    box-shadow:
+        0 9px 24px
+        rgba(0,0,0,0.22);
 
-        border:
-            1px solid
-            rgba(255,255,255,0.24);
+    transition:
+        0.25s;
 
-        border-radius: 17px;
+}
 
-        padding: 23px;
 
-        backdrop-filter:
-            blur(8px);
+.opcion:hover {
 
-        -webkit-backdrop-filter:
-            blur(8px);
+    transform:
+        translateY(-5px);
 
-        box-shadow:
-            0 9px 24px
-            rgba(0,0,0,0.22);
+    background:
+        rgba(32,150,161,0.32);
 
-        transition:
-            all 0.25s ease;
+    border-color:
+        #71d9df;
 
-    }}
+}
 
 
-    .opcion:hover {{
+.opcion strong {
 
-        transform:
-            translateY(-5px);
+    display: block;
 
-        background:
-            rgba(32,150,161,0.32);
+    font-size: 20px;
 
-        border-color:
-            #71d9df;
+    margin-bottom: 9px;
 
-        box-shadow:
-            0 14px 30px
-            rgba(0,0,0,0.28);
+}
 
-    }}
 
+.opcion span {
 
-    .opcion strong {{
+    font-size: 15px;
 
-        display: block;
+    line-height: 1.5;
 
-        font-size: 20px;
+    color: #f0f0f0;
 
-        margin-bottom: 9px;
+}
 
-        color: white;
 
-    }}
 
+/* =========================================================
+   RESULTADO
+========================================================= */
 
-    .opcion span {{
+.resultado-grid {
 
-        font-size: 15px;
+    display: grid;
 
-        line-height: 1.5;
+    grid-template-columns:
+        0.85fr 1.15fr;
 
-        color: #f0f0f0;
+    gap: 38px;
 
-    }}
+    align-items: center;
 
+    margin-top: 25px;
 
+}
 
-    /* ==================================================
-       RESPONSIVE
-    ================================================== */
 
-    @media (max-width: 900px) {{
+.donut-wrapper {
 
-        .grid-procesos,
-        .opciones {{
+    display: flex;
 
-            grid-template-columns: 1fr;
+    justify-content: center;
 
-        }}
+    align-items: center;
 
-        #info-mina,
-        #decision-mina {{
+}
 
-            padding: 26px 22px;
 
-        }}
+.donut {
 
-        .titulo-mina {{
+    width: 315px;
 
-            font-size: 33px;
+    height: 315px;
 
-        }}
+    border-radius: 50%;
 
-    }}
+    background:
 
+        conic-gradient(
 
-    </style>
+            #e9a23b
+            0%
+            calc(var(--consumo) * 1%),
 
+            #4dc1d1
+            calc(var(--consumo) * 1%)
+            100%
 
+        );
 
-    <div class="experiencia">
+    display: flex;
 
+    align-items: center;
 
-        <!-- ===========================================
-             VIDEO
-        ============================================ -->
+    justify-content: center;
 
-        <div id="pantalla-video">
+    box-shadow:
+        0 18px 45px
+        rgba(0,0,0,0.30);
 
+    position: relative;
 
-            <video
-                id="video-rio"
-                autoplay
-                muted
-                playsinline
-            >
+}
 
-                <source
-                    src="{video_data_uri}"
-                    type="video/mp4"
+
+.donut::before {
+
+    content: "";
+
+    width: 205px;
+
+    height: 205px;
+
+    background:
+        rgba(7,19,26,0.94);
+
+    border-radius: 50%;
+
+    position: absolute;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.12);
+
+}
+
+
+.donut-centro {
+
+    position: relative;
+
+    z-index: 3;
+
+    text-align: center;
+
+}
+
+
+.donut-numero {
+
+    font-size: 54px;
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    color: white;
+
+}
+
+
+.donut-texto {
+
+    margin-top: 8px;
+
+    font-size: 15px;
+
+    color: #cdebf0;
+
+    max-width: 130px;
+
+}
+
+
+.leyenda {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 25px;
+
+    margin-top: 18px;
+
+    font-size: 14px;
+
+}
+
+
+.punto {
+
+    width: 12px;
+
+    height: 12px;
+
+    display: inline-block;
+
+    border-radius: 3px;
+
+    margin-right: 6px;
+
+}
+
+
+.punto-consumo {
+
+    background:
+        #e9a23b;
+
+}
+
+
+.punto-restante {
+
+    background:
+        #4dc1d1;
+
+}
+
+
+
+/* =========================================================
+   MÉTRICAS
+========================================================= */
+
+.metricas {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.metrica {
+
+    background:
+        rgba(9,22,29,0.57);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+    padding: 18px;
+
+    border-radius: 14px;
+
+    backdrop-filter:
+        blur(8px);
+
+}
+
+
+.metrica-numero {
+
+    font-size: 31px;
+
+    font-weight: 800;
+
+    color: white;
+
+}
+
+
+.metrica-label {
+
+    font-size: 13px;
+
+    color: #cde0e5;
+
+    margin-top: 4px;
+
+}
+
+
+.resultado-explicacion {
+
+    background:
+        rgba(9,22,29,0.55);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.19);
+
+    border-radius: 16px;
+
+    padding: 21px;
+
+    line-height: 1.6;
+
+    color: white;
+
+    backdrop-filter:
+        blur(8px);
+
+}
+
+
+.modelo-educativo {
+
+    margin-top: 18px;
+
+    padding: 14px 17px;
+
+    border-radius: 12px;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    background:
+        rgba(0,0,0,0.36);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.16);
+
+    color: #dce7ea;
+
+}
+
+
+.siguiente-panel {
+
+    display: none;
+
+    margin-top: 18px;
+
+    padding: 17px;
+
+    text-align: center;
+
+    border-radius: 13px;
+
+    background:
+        rgba(76,193,209,0.16);
+
+    border:
+        1px solid
+        rgba(76,193,209,0.42);
+
+}
+
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .grid-procesos,
+    .opciones,
+    .resultado-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .metricas {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .donut {
+
+        width: 250px;
+
+        height: 250px;
+
+    }
+
+
+    .donut::before {
+
+        width: 165px;
+
+        height: 165px;
+
+    }
+
+
+    .titulo-mina {
+
+        font-size: 33px;
+
+    }
+
+}
+
+</style>
+
+
+
+<div class="experiencia">
+
+
+<!-- =====================================================
+     VIDEO
+===================================================== -->
+
+<div id="pantalla-video">
+
+    <video
+        id="video-rio"
+        __AUTOPLAY__
+        muted
+        playsinline
+    >
+
+        <source
+            src="__VIDEO_DATA__"
+            type="video/mp4"
+        >
+
+    </video>
+
+
+    <div class="etiqueta-video">
+
+        🏔️ Cordillera → Mina
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     INFORMACIÓN
+===================================================== -->
+
+<div id="info-mina">
+
+    <div class="titulo-etapa">
+
+        PARADA 1 · CUENCA ALTA
+
+    </div>
+
+
+    <div class="titulo-mina">
+
+        ⛏️ Gestión del agua en la actividad minera
+
+    </div>
+
+
+    <div class="descripcion">
+
+        Antes de tomar una decisión, observá cómo
+        diferentes formas de gestión pueden modificar
+        el consumo neto de agua de una operación minera.
+
+        La recuperación y recirculación permiten reutilizar
+        parte del agua utilizada y reducir la necesidad
+        de incorporar nuevos aportes.
+
+    </div>
+
+
+    <div class="grid-procesos">
+
+        __TRADICIONAL__
+
+        __MODERNO__
+
+    </div>
+
+
+    <div class="info-clave">
+
+        <strong>💡 Concepto clave:</strong>
+
+        una mayor eficiencia en recuperación y recirculación
+        disminuye la necesidad de incorporar agua fresca.
+
+        Por lo tanto, el consumo neto de la operación puede
+        reducirse significativamente.
+
+    </div>
+
+
+    <div class="botones-navegacion">
+
+        <a
+            href="#"
+            id="btn-repetir-info"
+            class="btn-secundario"
+        >
+
+            ↻ Volver a reproducir la simulación
+
+        </a>
+
+
+        <a
+            href="#"
+            id="btn-ir-decision"
+            class="btn-principal"
+        >
+
+            Continuar a la toma de decisión →
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     DECISIÓN
+===================================================== -->
+
+<div id="decision-mina">
+
+    <div class="titulo-etapa">
+
+        PARADA 1 · DECISIÓN
+
+    </div>
+
+
+    <div class="titulo-mina">
+
+        ♻️ ¿Cómo gestionarías el agua?
+
+    </div>
+
+
+    <div class="descripcion">
+
+        Para este modelo educativo se considera que el
+        proceso requiere un volumen equivalente al 25 %
+        del caudal inicial.
+
+        La cantidad realmente consumida dependerá de
+        cuánto de ese volumen pueda recuperarse y reutilizarse.
+
+    </div>
+
+
+    <div class="pregunta">
+
+        Seleccioná una estrategia
+
+    </div>
+
+
+    <div class="opciones">
+
+
+        <a
+            class="opcion"
+            href="?decision_mina=alta"
+            target="_parent"
+        >
+
+            <strong>
+
+                ♻️ Alta recirculación · 80 %
+
+            </strong>
+
+            <span>
+
+                Alta recuperación y reutilización.
+
+                El consumo neto equivalente será
+                aproximadamente 5 % del caudal inicial.
+
+            </span>
+
+        </a>
+
+
+
+        <a
+            class="opcion"
+            href="?decision_mina=media"
+            target="_parent"
+        >
+
+            <strong>
+
+                ⚖️ Recirculación intermedia · 60 %
+
+            </strong>
+
+            <span>
+
+                Recuperación parcial del agua.
+
+                El consumo neto equivalente será
+                aproximadamente 10 % del caudal inicial.
+
+            </span>
+
+        </a>
+
+
+
+        <a
+            class="opcion"
+            href="?decision_mina=nula"
+            target="_parent"
+        >
+
+            <strong>
+
+                💧 Sin recirculación · 0 %
+
+            </strong>
+
+            <span>
+
+                Todo el requerimiento se cubre mediante
+                nuevos aportes de agua.
+
+                El consumo neto equivalente será 25 %.
+
+            </span>
+
+        </a>
+
+
+    </div>
+
+
+    <div class="botones-navegacion">
+
+        <a
+            href="#"
+            id="btn-volver-info"
+            class="btn-secundario"
+        >
+
+            ← Volver a la información
+
+        </a>
+
+
+        <a
+            href="#"
+            id="btn-repetir-decision"
+            class="btn-secundario"
+        >
+
+            ↻ Reproducir recorrido
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     RESULTADO
+===================================================== -->
+
+<div id="resultado-mina">
+
+    <div class="titulo-etapa">
+
+        RESULTADO · PARADA 1
+
+    </div>
+
+
+    <div class="titulo-mina">
+
+        📊 Impacto de tu decisión
+
+    </div>
+
+
+    <div class="descripcion">
+
+        Elegiste:
+
+        <strong>
+            __RESULTADO_TITULO__
+        </strong>
+
+        La siguiente visualización muestra cómo se
+        distribuye el caudal inicial normalizado después
+        de considerar el consumo neto de la mina.
+
+    </div>
+
+
+
+    <div class="resultado-grid">
+
+
+        <!-- GRÁFICO -->
+
+        <div>
+
+
+            <div class="donut-wrapper">
+
+                <div
+                    class="donut"
+                    style="
+                        --consumo:
+                        __RESULTADO_CONSUMO__;
+                    "
                 >
 
-            </video>
+                    <div class="donut-centro">
+
+                        <div class="donut-numero">
+
+                            __RESULTADO_RESTANTE__%
+
+                        </div>
+
+                        <div class="donut-texto">
+
+                            continúa disponible
+                            aguas abajo
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
 
-            <div class="etiqueta-video">
+            <div class="leyenda">
 
-                🏔️ Cordillera → Mina
+                <div>
+
+                    <span
+                        class="
+                            punto
+                            punto-restante
+                        "
+                    ></span>
+
+                    Caudal restante
+
+                </div>
+
+
+                <div>
+
+                    <span
+                        class="
+                            punto
+                            punto-consumo
+                        "
+                    ></span>
+
+                    Consumo neto
+
+                </div>
 
             </div>
 
@@ -1064,239 +1892,128 @@ else:
 
 
 
-        <!-- ===========================================
-             INFORMACIÓN MINERA
-        ============================================ -->
+        <!-- DATOS -->
 
-        <div id="info-mina">
+        <div>
 
 
-            <div class="titulo-etapa">
-
-                PARADA 1 · CUENCA ALTA
-
-            </div>
+            <div class="metricas">
 
 
-            <div class="titulo-mina">
+                <div class="metrica">
 
-                ⛏️ Gestión del agua en la actividad minera
+                    <div class="metrica-numero">
 
-            </div>
+                        __RESULTADO_RECIRC__%
 
+                    </div>
 
-            <div class="descripcion">
+                    <div class="metrica-label">
 
-                Antes de tomar una decisión, observá cómo
-                diferentes formas de gestión pueden modificar
-                el consumo neto de agua de una operación minera.
+                        Recirculación seleccionada
 
-                La recuperación y recirculación permiten
-                reutilizar parte del agua utilizada y reducir
-                la necesidad de incorporar nuevos aportes.
+                    </div>
 
-            </div>
+                </div>
 
 
 
-            <div class="grid-procesos">
+                <div class="metrica">
 
-                {tradicional_html}
+                    <div class="metrica-numero">
 
-                {moderno_html}
+                        -__RESULTADO_CONSUMO__%
 
-            </div>
+                    </div>
 
+                    <div class="metrica-label">
 
+                        Consumo neto simulado
 
-            <div class="info-clave">
+                    </div>
 
-                <strong>💡 Concepto clave:</strong>
-
-                una mayor eficiencia en la recuperación y
-                recirculación disminuye la necesidad de
-                incorporar agua fresca al proceso.
-
-                Esto reduce el consumo neto de agua de la
-                operación y permite conservar una mayor
-                disponibilidad del recurso en la cuenca.
-
-            </div>
+                </div>
 
 
 
-            <div class="botones-navegacion">
+                <div class="metrica">
 
+                    <div class="metrica-numero">
 
-                <a
-                    href="#"
-                    id="btn-repetir"
-                    class="btn-secundario"
-                >
+                        __RESULTADO_RESTANTE__%
 
-                    ↻ Volver a reproducir la simulación
+                    </div>
 
-                </a>
+                    <div class="metrica-label">
 
+                        Caudal disponible
 
-                <a
-                    href="#"
-                    id="btn-ir-decision"
-                    class="btn-continuar"
-                >
+                    </div>
 
-                    Continuar a la toma de decisión →
-
-                </a>
+                </div>
 
 
             </div>
 
 
-        </div>
 
+            <div class="resultado-explicacion">
 
+                <strong>
+                    ¿Qué ocurrió?
+                </strong>
 
-        <!-- ===========================================
-             DECISIÓN
-        ============================================ -->
+                <br><br>
 
-        <div id="decision-mina">
+                El proceso requiere un volumen equivalente
+                al <strong>25 %</strong> del caudal inicial.
 
+                Con una recirculación del
 
-            <div class="titulo-etapa">
+                <strong>
+                    __RESULTADO_RECIRC__ %
+                </strong>,
 
-                PARADA 1 · DECISIÓN
+                una parte importante del agua utilizada
+                vuelve al circuito.
 
-            </div>
+                <br><br>
 
+                El consumo neto equivalente resulta en
 
-            <div class="titulo-mina">
+                <strong>
+                    __RESULTADO_CONSUMO__ %
+                </strong>
 
-                ♻️ ¿Cómo gestionarías el agua?
+                del caudal inicial.
 
-            </div>
+                Por lo tanto,
 
+                <strong>
+                    __RESULTADO_RESTANTE__ %
+                </strong>
 
-            <div class="descripcion">
-
-                El Río San Juan ha llegado a la zona minera.
-
-                Ahora deberás seleccionar una estrategia
-                de gestión hídrica.
-
-                Tu decisión modificará el caudal disponible
-                para continuar el recorrido hacia los diques.
-
-            </div>
-
-
-
-            <div class="pregunta">
-
-                ¿Qué estrategia aplicarías?
+                continúa disponible para el siguiente tramo
+                de la cuenca.
 
             </div>
 
 
 
-            <div class="opciones">
+            <div class="modelo-educativo">
 
+                <strong>
+                    ℹ️ Modelo educativo simplificado:
+                </strong>
 
-                <a
-                    class="opcion"
-                    href="?decision_mina=alta"
-                    target="_parent"
-                >
+                los porcentajes representan valores
+                normalizados utilizados para mostrar
+                la relación entre demanda, recuperación
+                y consumo neto.
 
-                    <strong>
-                        ♻️ Alta recirculación
-                    </strong>
-
-                    <span>
-
-                        Priorizar la recuperación y
-                        reutilización del agua.
-
-                        Menor consumo neto de agua fresca.
-
-                    </span>
-
-                </a>
-
-
-
-                <a
-                    class="opcion"
-                    href="?decision_mina=media"
-                    target="_parent"
-                >
-
-                    <strong>
-                        ⚖️ Recirculación intermedia
-                    </strong>
-
-                    <span>
-
-                        Mantener una gestión intermedia
-                        entre recuperación y aporte
-                        de agua fresca.
-
-                    </span>
-
-                </a>
-
-
-
-                <a
-                    class="opcion"
-                    href="?decision_mina=baja"
-                    target="_parent"
-                >
-
-                    <strong>
-                        💧 Baja recirculación
-                    </strong>
-
-                    <span>
-
-                        Mayor incorporación de agua fresca
-                        al proceso y mayor consumo neto
-                        desde la cuenca.
-
-                    </span>
-
-                </a>
-
-
-            </div>
-
-
-
-            <div class="botones-navegacion">
-
-
-                <a
-                    href="#"
-                    id="btn-volver-info"
-                    class="btn-secundario"
-                >
-
-                    ← Volver a la información
-
-                </a>
-
-
-                <a
-                    href="#"
-                    id="btn-repetir-decision"
-                    class="btn-secundario"
-                >
-
-                    ↻ Reproducir nuevamente el recorrido
-
-                </a>
-
+                No representan directamente el porcentaje
+                real del caudal del Río San Juan utilizado
+                por una operación minera específica.
 
             </div>
 
@@ -1308,253 +2025,465 @@ else:
 
 
 
-    <script>
+    <div class="botones-navegacion">
 
 
-    // ==================================================
-    // REFERENCIAS
-    // ==================================================
+        <a
+            href="#"
+            id="btn-cambiar-decision"
+            class="btn-secundario"
+        >
 
-    const video =
-        document.getElementById(
-            "video-rio"
-        );
+            ← Cambiar decisión
 
-
-    const pantallaVideo =
-        document.getElementById(
-            "pantalla-video"
-        );
+        </a>
 
 
-    const infoMina =
-        document.getElementById(
-            "info-mina"
-        );
+        <a
+            href="#"
+            id="btn-repetir-resultado"
+            class="btn-secundario"
+        >
+
+            ↻ Reproducir recorrido
+
+        </a>
 
 
-    const decisionMina =
-        document.getElementById(
-            "decision-mina"
-        );
+        <a
+            href="#"
+            id="btn-continuar-diques"
+            class="btn-principal"
+        >
+
+            Continuar hacia los diques →
+
+        </a>
 
 
-    const botonDecision =
-        document.getElementById(
-            "btn-ir-decision"
-        );
-
-
-    const botonRepetir =
-        document.getElementById(
-            "btn-repetir"
-        );
-
-
-    const botonVolverInfo =
-        document.getElementById(
-            "btn-volver-info"
-        );
-
-
-    const botonRepetirDecision =
-        document.getElementById(
-            "btn-repetir-decision"
-        );
+    </div>
 
 
 
-    // ==================================================
-    // FUNCIÓN PARA REPRODUCIR DESDE EL PRINCIPIO
-    // ==================================================
+    <div
+        id="siguiente-panel"
+        class="siguiente-panel"
+    >
 
-    function reproducirDesdeInicio() {{
+        ✅ Resultado registrado.
 
-        infoMina.style.display =
-            "none";
+        <br><br>
 
-        decisionMina.style.display =
-            "none";
+        El siguiente tramo utilizará:
 
-        pantallaVideo.style.display =
+        <strong>
+            02_Mina_Diques/__VIDEO_SIGUIENTE__
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+const video =
+    document.getElementById(
+        "video-rio"
+    );
+
+
+const pantallaVideo =
+    document.getElementById(
+        "pantalla-video"
+    );
+
+
+const infoMina =
+    document.getElementById(
+        "info-mina"
+    );
+
+
+const decisionMina =
+    document.getElementById(
+        "decision-mina"
+    );
+
+
+const resultadoMina =
+    document.getElementById(
+        "resultado-mina"
+    );
+
+
+const btnDecision =
+    document.getElementById(
+        "btn-ir-decision"
+    );
+
+
+const btnRepetirInfo =
+    document.getElementById(
+        "btn-repetir-info"
+    );
+
+
+const btnVolverInfo =
+    document.getElementById(
+        "btn-volver-info"
+    );
+
+
+const btnRepetirDecision =
+    document.getElementById(
+        "btn-repetir-decision"
+    );
+
+
+const btnCambiarDecision =
+    document.getElementById(
+        "btn-cambiar-decision"
+    );
+
+
+const btnRepetirResultado =
+    document.getElementById(
+        "btn-repetir-resultado"
+    );
+
+
+const btnContinuarDiques =
+    document.getElementById(
+        "btn-continuar-diques"
+    );
+
+
+const siguientePanel =
+    document.getElementById(
+        "siguiente-panel"
+    );
+
+
+
+/* =========================================================
+   FUNCIONES
+========================================================= */
+
+function ocultarTodo() {
+
+    pantallaVideo.style.display =
+        "none";
+
+    infoMina.style.display =
+        "none";
+
+    decisionMina.style.display =
+        "none";
+
+    resultadoMina.style.display =
+        "none";
+
+}
+
+
+function reproducirDesdeInicio() {
+
+    ocultarTodo();
+
+    pantallaVideo.style.display =
+        "block";
+
+    video.currentTime = 0;
+
+    video.play();
+
+}
+
+
+function mostrarInformacion() {
+
+    ocultarTodo();
+
+    infoMina.style.display =
+        "block";
+
+}
+
+
+function mostrarDecision() {
+
+    ocultarTodo();
+
+    decisionMina.style.display =
+        "block";
+
+}
+
+
+function mostrarResultado() {
+
+    ocultarTodo();
+
+    video.pause();
+
+    resultadoMina.style.display =
+        "block";
+
+}
+
+
+
+/* =========================================================
+   ESTADO INICIAL
+========================================================= */
+
+const estadoInicial =
+    "__ESTADO_INICIAL__";
+
+
+if (
+    estadoInicial ===
+    "resultado"
+) {
+
+    mostrarResultado();
+
+}
+
+else {
+
+    pantallaVideo.style.display =
+        "block";
+
+}
+
+
+
+/* =========================================================
+   FIN DEL VIDEO
+========================================================= */
+
+video.addEventListener(
+    "ended",
+    function() {
+
+        mostrarInformacion();
+
+    }
+);
+
+
+
+/* =========================================================
+   INFORMACIÓN → DECISIÓN
+========================================================= */
+
+btnDecision.addEventListener(
+    "click",
+    function(event) {
+
+        event.preventDefault();
+
+        mostrarDecision();
+
+    }
+);
+
+
+
+/* =========================================================
+   REPETIR DESDE INFORMACIÓN
+========================================================= */
+
+btnRepetirInfo.addEventListener(
+    "click",
+    function(event) {
+
+        event.preventDefault();
+
+        reproducirDesdeInicio();
+
+    }
+);
+
+
+
+/* =========================================================
+   DECISIÓN → INFORMACIÓN
+========================================================= */
+
+btnVolverInfo.addEventListener(
+    "click",
+    function(event) {
+
+        event.preventDefault();
+
+        mostrarInformacion();
+
+    }
+);
+
+
+
+/* =========================================================
+   REPETIR DESDE DECISIÓN
+========================================================= */
+
+btnRepetirDecision.addEventListener(
+    "click",
+    function(event) {
+
+        event.preventDefault();
+
+        reproducirDesdeInicio();
+
+    }
+);
+
+
+
+/* =========================================================
+   RESULTADO → CAMBIAR DECISIÓN
+========================================================= */
+
+btnCambiarDecision.addEventListener(
+    "click",
+    function(event) {
+
+        event.preventDefault();
+
+        mostrarDecision();
+
+    }
+);
+
+
+
+/* =========================================================
+   REPETIR DESDE RESULTADO
+========================================================= */
+
+btnRepetirResultado.addEventListener(
+    "click",
+    function(event) {
+
+        event.preventDefault();
+
+        reproducirDesdeInicio();
+
+    }
+);
+
+
+
+/* =========================================================
+   CONTINUAR HACIA DIQUES
+========================================================= */
+
+btnContinuarDiques.addEventListener(
+    "click",
+    function(event) {
+
+        event.preventDefault();
+
+        siguientePanel.style.display =
             "block";
 
-        video.currentTime = 0;
+        siguientePanel.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
 
-        video.play();
+    }
+);
 
-    }}
+</script>
 
-
-
-    // ==================================================
-    // CUANDO TERMINA EL VIDEO
-    // ==================================================
-
-    video.addEventListener(
-        "ended",
-        function() {{
-
-            pantallaVideo.style.display =
-                "none";
-
-            decisionMina.style.display =
-                "none";
-
-            infoMina.style.display =
-                "block";
-
-        }}
-    );
+"""
 
 
+    # ========================================================
+    # REEMPLAZOS
+    # ========================================================
 
-    // ==================================================
-    // INFORMACIÓN → DECISIÓN
-    // ==================================================
+    html = html_template
 
-    botonDecision.addEventListener(
-        "click",
-        function(event) {{
+    html = html.replace(
+        "__FONDO__",
+        fondo_css
+    )
 
-            event.preventDefault();
+    html = html.replace(
+        "__VIDEO_DATA__",
+        video_data_uri or ""
+    )
 
-            infoMina.style.display =
-                "none";
+    html = html.replace(
+        "__TRADICIONAL__",
+        tradicional_html
+    )
 
-            decisionMina.style.display =
-                "block";
+    html = html.replace(
+        "__MODERNO__",
+        moderno_html
+    )
 
-        }}
-    );
+    html = html.replace(
+        "__AUTOPLAY__",
+        autoplay_video
+    )
 
-
-
-    // ==================================================
-    // INFORMACIÓN → REPETIR VIDEO
-    // ==================================================
-
-    botonRepetir.addEventListener(
-        "click",
-        function(event) {{
-
-            event.preventDefault();
-
-            reproducirDesdeInicio();
-
-        }}
-    );
-
+    html = html.replace(
+        "__ESTADO_INICIAL__",
+        estado_inicial
+    )
 
 
-    // ==================================================
-    // DECISIÓN → INFORMACIÓN
-    // ==================================================
+    # RESULTADO
 
-    botonVolverInfo.addEventListener(
-        "click",
-        function(event) {{
+    html = html.replace(
+        "__RESULTADO_TITULO__",
+        str(resultado["titulo"])
+    )
 
-            event.preventDefault();
+    html = html.replace(
+        "__RESULTADO_RECIRC__",
+        str(resultado["recirculacion"])
+    )
 
-            decisionMina.style.display =
-                "none";
+    html = html.replace(
+        "__RESULTADO_CONSUMO__",
+        str(resultado["consumo_neto"])
+    )
 
-            infoMina.style.display =
-                "block";
+    html = html.replace(
+        "__RESULTADO_RESTANTE__",
+        str(resultado["caudal_restante"])
+    )
 
-        }}
-    );
-
-
-
-    // ==================================================
-    // DECISIÓN → REPETIR VIDEO
-    // ==================================================
-
-    botonRepetirDecision.addEventListener(
-        "click",
-        function(event) {{
-
-            event.preventDefault();
-
-            reproducirDesdeInicio();
-
-        }}
-    );
+    html = html.replace(
+        "__VIDEO_SIGUIENTE__",
+        str(resultado["video_siguiente"])
+    )
 
 
-    </script>
-
-    """
-
-
-    # ==================================================
+    # ========================================================
     # MOSTRAR COMPONENTE
-    # ==================================================
+    # ========================================================
 
     st.components.v1.html(
         html,
         height=920,
         scrolling=False
-    )
-
-
-# ==================================================
-# LEER DECISIÓN
-# ==================================================
-
-decision = st.query_params.get(
-    "decision_mina"
-)
-
-
-if decision:
-
-    decision_anterior = st.session_state.get(
-        "decision_mina"
-    )
-
-    if decision != decision_anterior:
-
-        st.session_state[
-            "decision_mina"
-        ] = decision
-
-
-        # ==================================================
-        # MODIFICACIÓN PROVISORIA DEL CAUDAL
-        # ==================================================
-
-        if decision == "alta":
-
-            st.session_state.caudal_actual = (
-                st.session_state.caudal_actual
-                - 5
-            )
-
-
-        elif decision == "media":
-
-            st.session_state.caudal_actual = (
-                st.session_state.caudal_actual
-                - 10
-            )
-
-
-        elif decision == "baja":
-
-            st.session_state.caudal_actual = (
-                st.session_state.caudal_actual
-                - 20
-            )
-
-
-    st.query_params.clear()
-
-
-    st.success(
-        f"Decisión registrada: {decision}. "
-        f"Caudal actual: "
-        f"{st.session_state.caudal_actual}"
     )
