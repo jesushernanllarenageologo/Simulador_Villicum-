@@ -7,7 +7,7 @@ from core.state_manager import init_session_state
 
 
 # ============================================================
-# CONFIGURACIÓN
+# CONFIGURACIÓN GENERAL
 # ============================================================
 
 st.set_page_config(
@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 
 
 # ============================================================
-# FUNCIONES
+# FUNCIONES AUXILIARES
 # ============================================================
 
 def file_to_data_uri(file_path: Path):
@@ -92,7 +92,7 @@ def crear_tarjeta_proceso(
 
 
 # ============================================================
-# ESCENARIO
+# ESCENARIO SELECCIONADO
 # ============================================================
 
 escenario = st.session_state.get(
@@ -142,7 +142,7 @@ if escenario != "Superavitario":
 
 
 # ============================================================
-# ARCHIVOS
+# RUTAS DE ARCHIVOS
 # ============================================================
 
 video_path = (
@@ -191,7 +191,9 @@ if not video_path.exists():
         "No se encontró el video Superavitario.mp4"
     )
 
-    st.code(str(video_path))
+    st.code(
+        str(video_path)
+    )
 
     st.stop()
 
@@ -218,26 +220,7 @@ fondo_mina_data_uri = file_to_data_uri(
 
 
 # ============================================================
-# CONFIGURACIÓN EDUCATIVA DE LAS DECISIONES
-# ============================================================
-#
-# Modelo normalizado:
-#
-# Caudal inicial = 100 %
-# Demanda bruta del proceso minero = 25 %
-#
-# Consumo neto =
-# demanda bruta × (1 - recirculación)
-#
-# Alta:
-# 25 × (1 - 0.80) = 5 %
-#
-# Media:
-# 25 × (1 - 0.60) = 10 %
-#
-# Nula:
-# 25 × (1 - 0.00) = 25 %
-#
+# MODELO EDUCATIVO DE LA MINA
 # ============================================================
 
 DECISIONES_MINA = {
@@ -288,16 +271,13 @@ DECISIONES_MINA = {
 
 
 # ============================================================
-# ESTADO
+# ESTADO DE LA EXPERIENCIA
 # ============================================================
 
 if "experiencia_iniciada" not in st.session_state:
 
     st.session_state.experiencia_iniciada = False
 
-
-# Guardamos el caudal con el que el río llega a la mina.
-# Así cambiar la decisión no resta agua varias veces.
 
 if "caudal_inicio_mina" not in st.session_state:
 
@@ -307,7 +287,7 @@ if "caudal_inicio_mina" not in st.session_state:
 
 
 # ============================================================
-# LEER DECISIÓN DESDE URL
+# LEER DECISIÓN DESDE LA URL
 # ============================================================
 
 decision_url = st.query_params.get(
@@ -329,17 +309,16 @@ if decision_url in DECISIONES_MINA:
         True
     )
 
-    # Recalculamos SIEMPRE desde el caudal inicial
-    # de la parada. Así el usuario puede cambiar
-    # de decisión sin descontar agua dos veces.
+    # Siempre calculamos desde el caudal
+    # con el que llegamos inicialmente a la mina.
+    # Así no se descuenta varias veces.
 
     caudal_base = (
         st.session_state.caudal_inicio_mina
     )
 
     porcentaje_restante = (
-        configuracion["caudal_restante"]
-        / 100
+        configuracion["caudal_restante"] / 100
     )
 
     nuevo_caudal = (
@@ -357,18 +336,14 @@ if decision_url in DECISIONES_MINA:
 # RESULTADO ACTUAL
 # ============================================================
 
-mostrar_resultado = (
-    st.session_state.get(
-        "mostrar_resultado_mina",
-        False
-    )
+mostrar_resultado = st.session_state.get(
+    "mostrar_resultado_mina",
+    False
 )
 
 
-decision_guardada = (
-    st.session_state.get(
-        "decision_mina"
-    )
+decision_guardada = st.session_state.get(
+    "decision_mina"
 )
 
 
@@ -399,7 +374,7 @@ else:
 
 
 # ============================================================
-# ENCABEZADO STREAMLIT
+# ENCABEZADO
 # ============================================================
 
 st.title(
@@ -412,7 +387,7 @@ st.markdown(
 
 
 # ============================================================
-# INICIO
+# PANTALLA INICIAL
 # ============================================================
 
 if not st.session_state.experiencia_iniciada:
@@ -421,8 +396,8 @@ if not st.session_state.experiencia_iniciada:
         """
         La cuenca inicia con una **alta disponibilidad hídrica**.
 
-        El recorrido comienza en la **Cordillera de los Andes**
-        y sigue el curso del **Río San Juan** hasta la primera
+        El recorrido comenzará en la **Cordillera de los Andes**
+        y seguirá el curso del **Río San Juan** hasta la primera
         parada del simulador: **la actividad minera**.
         """
     )
@@ -441,9 +416,7 @@ if not st.session_state.experiencia_iniciada:
             use_container_width=True
         ):
 
-            st.session_state.experiencia_iniciada = (
-                True
-            )
+            st.session_state.experiencia_iniciada = True
 
             st.rerun()
 
@@ -1674,10 +1647,12 @@ body {
     <div class="opciones">
 
 
+        <!-- ALTA -->
+
         <a
             class="opcion"
-            href="?decision_mina=alta"
-            target="_parent"
+            href="/Simulacion?decision_mina=alta"
+            target="_top"
         >
 
             <strong>
@@ -1699,10 +1674,12 @@ body {
 
 
 
+        <!-- MEDIA -->
+
         <a
             class="opcion"
-            href="?decision_mina=media"
-            target="_parent"
+            href="/Simulacion?decision_mina=media"
+            target="_top"
         >
 
             <strong>
@@ -1724,10 +1701,12 @@ body {
 
 
 
+        <!-- NULA -->
+
         <a
             class="opcion"
-            href="?decision_mina=nula"
-            target="_parent"
+            href="/Simulacion?decision_mina=nula"
+            target="_top"
         >
 
             <strong>
@@ -1808,9 +1787,9 @@ body {
             __RESULTADO_TITULO__
         </strong>
 
-        La siguiente visualización muestra cómo se
-        distribuye el caudal inicial normalizado después
-        de considerar el consumo neto de la mina.
+        La visualización muestra cómo se distribuye
+        el caudal inicial normalizado después de considerar
+        el consumo neto de la mina.
 
     </div>
 
@@ -1819,7 +1798,7 @@ body {
     <div class="resultado-grid">
 
 
-        <!-- GRÁFICO -->
+        <!-- GRÁFICO DONUT -->
 
         <div>
 
@@ -1892,7 +1871,7 @@ body {
 
 
 
-        <!-- DATOS -->
+        <!-- INFORMACIÓN DEL RESULTADO -->
 
         <div>
 
@@ -1974,8 +1953,8 @@ body {
                     __RESULTADO_RECIRC__ %
                 </strong>,
 
-                una parte importante del agua utilizada
-                vuelve al circuito.
+                una parte del agua utilizada vuelve
+                al circuito.
 
                 <br><br>
 
@@ -1993,8 +1972,8 @@ body {
                     __RESULTADO_RESTANTE__ %
                 </strong>
 
-                continúa disponible para el siguiente tramo
-                de la cuenca.
+                continúa disponible para el siguiente
+                tramo de la cuenca.
 
             </div>
 
@@ -2006,10 +1985,9 @@ body {
                     ℹ️ Modelo educativo simplificado:
                 </strong>
 
-                los porcentajes representan valores
-                normalizados utilizados para mostrar
-                la relación entre demanda, recuperación
-                y consumo neto.
+                estos porcentajes son valores normalizados
+                utilizados para visualizar la relación entre
+                demanda, recuperación y consumo neto.
 
                 No representan directamente el porcentaje
                 real del caudal del Río San Juan utilizado
@@ -2271,7 +2249,7 @@ else {
 
 
 /* =========================================================
-   FIN DEL VIDEO
+   CUANDO TERMINA EL VIDEO
 ========================================================= */
 
 video.addEventListener(
@@ -2388,7 +2366,7 @@ btnRepetirResultado.addEventListener(
 
 
 /* =========================================================
-   CONTINUAR HACIA DIQUES
+   CONTINUAR A DIQUES
 ========================================================= */
 
 btnContinuarDiques.addEventListener(
@@ -2414,35 +2392,41 @@ btnContinuarDiques.addEventListener(
 
 
     # ========================================================
-    # REEMPLAZOS
+    # REEMPLAZAR VARIABLES HTML
     # ========================================================
 
     html = html_template
+
 
     html = html.replace(
         "__FONDO__",
         fondo_css
     )
 
+
     html = html.replace(
         "__VIDEO_DATA__",
         video_data_uri or ""
     )
+
 
     html = html.replace(
         "__TRADICIONAL__",
         tradicional_html
     )
 
+
     html = html.replace(
         "__MODERNO__",
         moderno_html
     )
 
+
     html = html.replace(
         "__AUTOPLAY__",
         autoplay_video
     )
+
 
     html = html.replace(
         "__ESTADO_INICIAL__",
@@ -2450,27 +2434,29 @@ btnContinuarDiques.addEventListener(
     )
 
 
-    # RESULTADO
-
     html = html.replace(
         "__RESULTADO_TITULO__",
         str(resultado["titulo"])
     )
+
 
     html = html.replace(
         "__RESULTADO_RECIRC__",
         str(resultado["recirculacion"])
     )
 
+
     html = html.replace(
         "__RESULTADO_CONSUMO__",
         str(resultado["consumo_neto"])
     )
 
+
     html = html.replace(
         "__RESULTADO_RESTANTE__",
         str(resultado["caudal_restante"])
     )
+
 
     html = html.replace(
         "__VIDEO_SIGUIENTE__",
