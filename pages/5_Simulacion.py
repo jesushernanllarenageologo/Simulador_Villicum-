@@ -26,10 +26,6 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 # ==================================================
 
 def file_to_data_uri(file_path: Path):
-    """
-    Convierte videos e imágenes locales a formato Data URI
-    para utilizarlos dentro del HTML.
-    """
 
     if not file_path.exists():
         return None
@@ -120,7 +116,7 @@ if not escenario:
 
 
 # ==================================================
-# POR AHORA SOLO PROBAMOS SUPERAVITARIO
+# POR AHORA SOLO SUPERAVITARIO
 # ==================================================
 
 if escenario != "Superavitario":
@@ -149,8 +145,6 @@ if escenario != "Superavitario":
 # RUTAS DE ARCHIVOS
 # ==================================================
 
-# VIDEO CORDILLERA → MINA
-
 video_path = (
     BASE_DIR
     / "assets"
@@ -159,8 +153,6 @@ video_path = (
     / "Superavitario.mp4"
 )
 
-
-# FOTO MÉTODO MODERNO
 
 img_moderno_path = (
     BASE_DIR
@@ -171,8 +163,6 @@ img_moderno_path = (
 )
 
 
-# FOTO MÉTODO TRADICIONAL
-
 img_tradicional_path = (
     BASE_DIR
     / "assets"
@@ -181,8 +171,6 @@ img_tradicional_path = (
     / "metodo_tradicional_abierto.jpg"
 )
 
-
-# FONDO GENERAL DE LA MINA
 
 fondo_mina_path = (
     BASE_DIR
@@ -211,7 +199,7 @@ if not video_path.exists():
 
 
 # ==================================================
-# CONVERTIR ARCHIVOS A DATA URI
+# CONVERTIR ARCHIVOS
 # ==================================================
 
 video_data_uri = file_to_data_uri(
@@ -241,7 +229,7 @@ if "experiencia_iniciada" not in st.session_state:
 
 
 # ==================================================
-# ENCABEZADO STREAMLIT
+# ENCABEZADO
 # ==================================================
 
 st.title(
@@ -294,9 +282,9 @@ if not st.session_state.experiencia_iniciada:
 
 else:
 
-    # ------------------------------------------------
-    # TARJETA MÉTODO TRADICIONAL
-    # ------------------------------------------------
+    # ==================================================
+    # TARJETA TRADICIONAL
+    # ==================================================
 
     tradicional_html = crear_tarjeta_proceso(
 
@@ -317,9 +305,9 @@ else:
     )
 
 
-    # ------------------------------------------------
-    # TARJETA MÉTODO MODERNO
-    # ------------------------------------------------
+    # ==================================================
+    # TARJETA MODERNA
+    # ==================================================
 
     moderno_html = crear_tarjeta_proceso(
 
@@ -340,18 +328,18 @@ else:
     )
 
 
-    # ------------------------------------------------
-    # SI NO EXISTE FONDO, USAR COLOR
-    # ------------------------------------------------
+    # ==================================================
+    # FONDO
+    # ==================================================
 
     if fondo_mina_data_uri:
 
         fondo_css = f"""
         linear-gradient(
             90deg,
-            rgba(4,14,23,0.91) 0%,
-            rgba(4,14,23,0.77) 45%,
-            rgba(4,14,23,0.50) 100%
+            rgba(0, 0, 0, 0.52) 0%,
+            rgba(0, 0, 0, 0.38) 45%,
+            rgba(0, 0, 0, 0.22) 100%
         ),
         url("{fondo_mina_data_uri}")
         """
@@ -361,14 +349,14 @@ else:
         fondo_css = """
         linear-gradient(
             135deg,
-            #071722,
-            #183241
+            #28343b,
+            #50616a
         )
         """
 
 
     # ==================================================
-    # HTML COMPLETO
+    # HTML
     # ==================================================
 
     html = f"""
@@ -384,8 +372,7 @@ else:
 
         margin: 0;
 
-        background:
-            #071722;
+        background: #101820;
 
         font-family:
             Arial,
@@ -399,7 +386,7 @@ else:
 
         width: 100%;
 
-        min-height: 780px;
+        min-height: 900px;
 
         position: relative;
 
@@ -407,11 +394,11 @@ else:
 
         overflow: hidden;
 
-        background: #071722;
+        background: #101820;
 
         box-shadow:
             0 18px 45px
-            rgba(0,0,0,0.25);
+            rgba(0,0,0,0.20);
 
     }}
 
@@ -455,25 +442,22 @@ else:
 
         left: 35px;
 
-        padding:
-            12px 20px;
+        padding: 12px 20px;
 
         background:
-            rgba(3,14,23,0.70);
+            rgba(0,0,0,0.48);
 
         color: white;
 
         border:
             1px solid
-            rgba(255,255,255,0.15);
+            rgba(255,255,255,0.18);
 
         border-radius: 12px;
 
-        backdrop-filter:
-            blur(9px);
+        backdrop-filter: blur(7px);
 
-        -webkit-backdrop-filter:
-            blur(9px);
+        -webkit-backdrop-filter: blur(7px);
 
         font-size: 18px;
 
@@ -492,12 +476,12 @@ else:
 
         display: none;
 
-        min-height: 780px;
+        min-height: 900px;
 
         box-sizing: border-box;
 
         padding:
-            42px 48px;
+            35px 38px;
 
         color: white;
 
@@ -522,15 +506,11 @@ else:
     @keyframes aparecer {{
 
         from {{
-
             opacity: 0;
-
         }}
 
         to {{
-
             opacity: 1;
-
         }}
 
     }}
@@ -547,56 +527,58 @@ else:
 
         letter-spacing: 2.4px;
 
-        color: #6ed1dc;
+        color: #69d6dd;
 
         font-weight: 700;
 
-        margin-bottom: 12px;
+        margin-bottom: 10px;
 
         text-shadow:
-            0 2px 8px
-            rgba(0,0,0,0.40);
+            0 2px 7px
+            rgba(0,0,0,0.55);
 
     }}
 
 
     .titulo-mina {{
 
-        font-size: 43px;
+        font-size: 42px;
 
         font-weight: 800;
 
-        margin-bottom: 15px;
+        margin-bottom: 12px;
+
+        color: white;
 
         text-shadow:
-            0 3px 12px
-            rgba(0,0,0,0.55);
+            0 3px 10px
+            rgba(0,0,0,0.65);
 
     }}
 
 
     .descripcion {{
 
-        font-size: 18px;
+        font-size: 17px;
 
-        line-height: 1.65;
+        line-height: 1.6;
 
-        max-width: 1000px;
+        max-width: 1050px;
 
-        color: #f0f6f8;
+        color: white;
 
-        margin-bottom: 30px;
+        margin-bottom: 24px;
 
         text-shadow:
-            0 2px 8px
-            rgba(0,0,0,0.40);
+            0 2px 7px
+            rgba(0,0,0,0.80);
 
     }}
 
 
 
     /* ==================================================
-       TARJETAS DE INFORMACIÓN
+       TARJETAS
     ================================================== */
 
     .grid-procesos {{
@@ -606,11 +588,11 @@ else:
         grid-template-columns:
             repeat(2, 1fr);
 
-        gap: 22px;
+        gap: 18px;
 
-        margin-top: 22px;
+        margin-top: 18px;
 
-        margin-bottom: 25px;
+        margin-bottom: 20px;
 
     }}
 
@@ -618,25 +600,25 @@ else:
     .card-proceso {{
 
         background:
-            rgba(10,25,35,0.58);
+            rgba(12, 22, 27, 0.52);
 
         border:
             1px solid
-            rgba(255,255,255,0.20);
+            rgba(255,255,255,0.24);
 
-        border-radius: 18px;
+        border-radius: 17px;
 
         overflow: hidden;
 
         backdrop-filter:
-            blur(11px);
+            blur(8px);
 
         -webkit-backdrop-filter:
-            blur(11px);
+            blur(8px);
 
         box-shadow:
-            0 12px 30px
-            rgba(0,0,0,0.28);
+            0 10px 25px
+            rgba(0,0,0,0.22);
 
         transition:
             0.25s;
@@ -650,7 +632,7 @@ else:
             translateY(-3px);
 
         border-color:
-            rgba(110,209,220,0.55);
+            rgba(110,209,220,0.70);
 
     }}
 
@@ -659,7 +641,7 @@ else:
 
         width: 100%;
 
-        height: 245px;
+        height: 200px;
 
         object-fit: cover;
 
@@ -672,7 +654,7 @@ else:
 
         width: 100%;
 
-        height: 245px;
+        height: 200px;
 
         display: flex;
 
@@ -681,16 +663,17 @@ else:
         justify-content: center;
 
         background:
-            rgba(255,255,255,0.08);
+            rgba(255,255,255,0.10);
 
-        color: #dce8ec;
+        color: white;
 
     }}
 
 
     .card-proceso-body {{
 
-        padding: 20px 22px 24px 22px;
+        padding:
+            17px 20px 19px 20px;
 
     }}
 
@@ -701,24 +684,28 @@ else:
 
         letter-spacing: 1.5px;
 
-        color: #6ed1dc;
+        color: #75dce2;
 
         font-weight: 700;
 
-        margin-bottom: 8px;
+        margin-bottom: 7px;
 
     }}
 
 
     .card-title {{
 
-        font-size: 24px;
+        font-size: 23px;
 
         font-weight: 750;
 
-        margin-bottom: 12px;
+        margin-bottom: 10px;
 
         color: white;
+
+        text-shadow:
+            0 2px 5px
+            rgba(0,0,0,0.4);
 
     }}
 
@@ -727,47 +714,47 @@ else:
 
         font-size: 15px;
 
-        line-height: 1.55;
+        line-height: 1.5;
 
-        color: #e1eaee;
+        color: #f3f3f3;
 
     }}
 
 
 
     /* ==================================================
-       MENSAJE CLAVE
+       CONCEPTO CLAVE
     ================================================== */
 
     .info-clave {{
 
-        margin-top: 15px;
+        margin-top: 10px;
 
         padding:
-            18px 22px;
+            16px 20px;
 
-        border-radius: 16px;
+        border-radius: 15px;
 
         background:
-            rgba(10,25,35,0.57);
+            rgba(10,20,25,0.50);
 
         border:
             1px solid
-            rgba(110,209,220,0.38);
+            rgba(112,214,222,0.42);
 
-        color: #f0f7f9;
+        color: white;
 
-        line-height: 1.6;
+        line-height: 1.55;
 
         backdrop-filter:
-            blur(10px);
+            blur(8px);
 
         -webkit-backdrop-filter:
-            blur(10px);
+            blur(8px);
 
         box-shadow:
-            0 10px 28px
-            rgba(0,0,0,0.20);
+            0 8px 24px
+            rgba(0,0,0,0.18);
 
     }}
 
@@ -781,7 +768,9 @@ else:
 
         text-align: center;
 
-        margin-top: 25px;
+        margin-top: 22px;
+
+        margin-bottom: 15px;
 
     }}
 
@@ -795,24 +784,24 @@ else:
         color: white;
 
         background:
-            rgba(28,154,170,0.92);
+            rgba(22, 156, 171, 0.95);
 
         border:
             1px solid
-            rgba(255,255,255,0.22);
+            rgba(255,255,255,0.28);
 
         border-radius: 13px;
 
         padding:
-            16px 30px;
+            15px 29px;
 
         font-size: 16px;
 
         font-weight: 700;
 
         box-shadow:
-            0 8px 24px
-            rgba(0,0,0,0.28);
+            0 8px 22px
+            rgba(0,0,0,0.25);
 
         transition:
             all 0.25s ease;
@@ -826,11 +815,11 @@ else:
             translateY(-3px);
 
         background:
-            rgba(41,181,196,0.98);
+            rgba(42, 187, 199, 1);
 
         box-shadow:
-            0 12px 30px
-            rgba(0,0,0,0.32);
+            0 12px 28px
+            rgba(0,0,0,0.30);
 
     }}
 
@@ -846,13 +835,15 @@ else:
 
         font-weight: 700;
 
-        margin-top: 35px;
+        margin-top: 32px;
 
         margin-bottom: 20px;
 
+        color: white;
+
         text-shadow:
-            0 3px 10px
-            rgba(0,0,0,0.45);
+            0 3px 9px
+            rgba(0,0,0,0.70);
 
     }}
 
@@ -864,7 +855,7 @@ else:
         grid-template-columns:
             repeat(3, 1fr);
 
-        gap: 18px;
+        gap: 17px;
 
     }}
 
@@ -878,25 +869,25 @@ else:
         color: white;
 
         background:
-            rgba(9,26,37,0.59);
+            rgba(10,20,25,0.50);
 
         border:
             1px solid
-            rgba(255,255,255,0.22);
+            rgba(255,255,255,0.24);
 
-        border-radius: 18px;
+        border-radius: 17px;
 
-        padding: 24px;
+        padding: 23px;
 
         backdrop-filter:
-            blur(11px);
+            blur(8px);
 
         -webkit-backdrop-filter:
-            blur(11px);
+            blur(8px);
 
         box-shadow:
-            0 10px 26px
-            rgba(0,0,0,0.25);
+            0 9px 24px
+            rgba(0,0,0,0.22);
 
         transition:
             all 0.25s ease;
@@ -910,14 +901,14 @@ else:
             translateY(-5px);
 
         background:
-            rgba(40,155,169,0.29);
+            rgba(32,150,161,0.32);
 
         border-color:
-            #65cbd5;
+            #71d9df;
 
         box-shadow:
-            0 15px 32px
-            rgba(0,0,0,0.30);
+            0 14px 30px
+            rgba(0,0,0,0.28);
 
     }}
 
@@ -930,6 +921,8 @@ else:
 
         margin-bottom: 9px;
 
+        color: white;
+
     }}
 
 
@@ -939,7 +932,7 @@ else:
 
         line-height: 1.5;
 
-        color: #dce9ed;
+        color: #f0f0f0;
 
     }}
 
@@ -954,23 +947,20 @@ else:
         .grid-procesos,
         .opciones {{
 
-            grid-template-columns:
-                1fr;
+            grid-template-columns: 1fr;
 
         }}
 
         #info-mina,
         #decision-mina {{
 
-            padding:
-                28px 24px;
+            padding: 26px 22px;
 
         }}
 
         .titulo-mina {{
 
-            font-size:
-                34px;
+            font-size: 33px;
 
         }}
 
@@ -984,9 +974,9 @@ else:
     <div class="experiencia">
 
 
-        <!-- =================================================
-             VIDEO CORDILLERA → MINA
-        ================================================== -->
+        <!-- ===========================================
+             VIDEO
+        ============================================ -->
 
         <div id="pantalla-video">
 
@@ -1017,9 +1007,9 @@ else:
 
 
 
-        <!-- =================================================
-             PANTALLA INFORMATIVA
-        ================================================== -->
+        <!-- ===========================================
+             INFORMACIÓN MINERA
+        ============================================ -->
 
         <div id="info-mina">
 
@@ -1069,13 +1059,13 @@ else:
 
                 <strong>💡 Concepto clave:</strong>
 
-                una mayor eficiencia de recuperación y
+                una mayor eficiencia en la recuperación y
                 recirculación disminuye la necesidad de
                 incorporar agua fresca al proceso.
 
-                Como consecuencia, una mayor cantidad de agua
-                puede permanecer disponible para continuar
-                aguas abajo en la cuenca.
+                Esto reduce el consumo neto de agua de la
+                operación y permite conservar una mayor
+                disponibilidad del recurso en la cuenca.
 
             </div>
 
@@ -1102,9 +1092,9 @@ else:
 
 
 
-        <!-- =================================================
-             PANTALLA DE DECISIÓN
-        ================================================== -->
+        <!-- ===========================================
+             DECISIÓN
+        ============================================ -->
 
         <div id="decision-mina">
 
@@ -1148,8 +1138,6 @@ else:
             <div class="opciones">
 
 
-                <!-- ALTA -->
-
                 <a
                     class="opcion"
                     href="?decision_mina=alta"
@@ -1175,8 +1163,6 @@ else:
 
 
 
-                <!-- MEDIA -->
-
                 <a
                     class="opcion"
                     href="?decision_mina=media"
@@ -1200,8 +1186,6 @@ else:
                 </a>
 
 
-
-                <!-- BAJA -->
 
                 <a
                     class="opcion"
@@ -1239,10 +1223,6 @@ else:
     <script>
 
 
-    // ==================================================
-    // REFERENCIAS
-    // ==================================================
-
     const video =
         document.getElementById(
             "video-rio"
@@ -1274,10 +1254,7 @@ else:
 
 
 
-    // ==================================================
     // CUANDO TERMINA EL VIDEO
-    // ==================================================
-
     video.addEventListener(
         "ended",
         function() {{
@@ -1293,10 +1270,7 @@ else:
 
 
 
-    // ==================================================
     // PASAR DE INFORMACIÓN A DECISIÓN
-    // ==================================================
-
     botonDecision.addEventListener(
         "click",
         function(event) {{
@@ -1324,13 +1298,13 @@ else:
 
     st.components.v1.html(
         html,
-        height=820,
+        height=1050,
         scrolling=False
     )
 
 
 # ==================================================
-# LEER DECISIÓN DEL USUARIO
+# LEER DECISIÓN
 # ==================================================
 
 decision = st.query_params.get(
@@ -1340,7 +1314,6 @@ decision = st.query_params.get(
 
 if decision:
 
-    # Evitar aplicar la misma decisión dos veces
     decision_anterior = st.session_state.get(
         "decision_mina"
     )
@@ -1352,9 +1325,9 @@ if decision:
         ] = decision
 
 
-        # ----------------------------------------------
+        # ==================================================
         # MODIFICACIÓN PROVISORIA DEL CAUDAL
-        # ----------------------------------------------
+        # ==================================================
 
         if decision == "alta":
 
@@ -1380,7 +1353,6 @@ if decision:
             )
 
 
-    # Limpiar parámetros de URL
     st.query_params.clear()
 
 
