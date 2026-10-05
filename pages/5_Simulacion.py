@@ -386,7 +386,7 @@ else:
 
         width: 100%;
 
-        min-height: 900px;
+        height: 900px;
 
         position: relative;
 
@@ -412,9 +412,11 @@ else:
 
         width: 100%;
 
-        height: 780px;
+        height: 900px;
 
         position: relative;
+
+        overflow: hidden;
 
         background: black;
 
@@ -423,11 +425,19 @@ else:
 
     #video-rio {{
 
+        position: absolute;
+
+        top: 0;
+
+        left: 0;
+
         width: 100%;
 
         height: 100%;
 
         object-fit: cover;
+
+        object-position: center;
 
         display: block;
 
@@ -463,6 +473,8 @@ else:
 
         font-weight: 600;
 
+        z-index: 5;
+
     }}
 
 
@@ -476,7 +488,9 @@ else:
 
         display: none;
 
-        min-height: 900px;
+        width: 100%;
+
+        height: 900px;
 
         box-sizing: border-box;
 
@@ -499,6 +513,8 @@ else:
 
         animation:
             aparecer 0.8s ease;
+
+        overflow-y: auto;
 
     }}
 
@@ -761,30 +777,36 @@ else:
 
 
     /* ==================================================
-       BOTÓN CONTINUAR
+       BOTONES
     ================================================== */
 
-    .boton-centro {{
+    .botones-navegacion {{
 
-        text-align: center;
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        gap: 14px;
 
         margin-top: 22px;
 
         margin-bottom: 15px;
 
+        flex-wrap: wrap;
+
     }}
 
 
-    .btn-continuar {{
+    .btn-continuar,
+    .btn-secundario {{
 
         display: inline-block;
 
         text-decoration: none;
 
         color: white;
-
-        background:
-            rgba(22, 156, 171, 0.95);
 
         border:
             1px solid
@@ -793,7 +815,7 @@ else:
         border-radius: 13px;
 
         padding:
-            15px 29px;
+            15px 25px;
 
         font-size: 16px;
 
@@ -805,6 +827,16 @@ else:
 
         transition:
             all 0.25s ease;
+
+        cursor: pointer;
+
+    }}
+
+
+    .btn-continuar {{
+
+        background:
+            rgba(22, 156, 171, 0.95);
 
     }}
 
@@ -820,6 +852,31 @@ else:
         box-shadow:
             0 12px 28px
             rgba(0,0,0,0.30);
+
+    }}
+
+
+    .btn-secundario {{
+
+        background:
+            rgba(10, 20, 25, 0.58);
+
+        backdrop-filter:
+            blur(8px);
+
+        -webkit-backdrop-filter:
+            blur(8px);
+
+    }}
+
+
+    .btn-secundario:hover {{
+
+        transform:
+            translateY(-3px);
+
+        background:
+            rgba(255,255,255,0.16);
 
     }}
 
@@ -1044,12 +1101,9 @@ else:
 
             <div class="grid-procesos">
 
-
                 {tradicional_html}
 
-
                 {moderno_html}
-
 
             </div>
 
@@ -1071,7 +1125,18 @@ else:
 
 
 
-            <div class="boton-centro">
+            <div class="botones-navegacion">
+
+
+                <a
+                    href="#"
+                    id="btn-repetir"
+                    class="btn-secundario"
+                >
+
+                    ↻ Volver a reproducir la simulación
+
+                </a>
 
 
                 <a
@@ -1145,9 +1210,7 @@ else:
                 >
 
                     <strong>
-
                         ♻️ Alta recirculación
-
                     </strong>
 
                     <span>
@@ -1170,9 +1233,7 @@ else:
                 >
 
                     <strong>
-
                         ⚖️ Recirculación intermedia
-
                     </strong>
 
                     <span>
@@ -1194,9 +1255,7 @@ else:
                 >
 
                     <strong>
-
                         💧 Baja recirculación
-
                     </strong>
 
                     <span>
@@ -1213,6 +1272,35 @@ else:
             </div>
 
 
+
+            <div class="botones-navegacion">
+
+
+                <a
+                    href="#"
+                    id="btn-volver-info"
+                    class="btn-secundario"
+                >
+
+                    ← Volver a la información
+
+                </a>
+
+
+                <a
+                    href="#"
+                    id="btn-repetir-decision"
+                    class="btn-secundario"
+                >
+
+                    ↻ Reproducir nuevamente el recorrido
+
+                </a>
+
+
+            </div>
+
+
         </div>
 
 
@@ -1222,6 +1310,10 @@ else:
 
     <script>
 
+
+    // ==================================================
+    // REFERENCIAS
+    // ==================================================
 
     const video =
         document.getElementById(
@@ -1253,13 +1345,60 @@ else:
         );
 
 
+    const botonRepetir =
+        document.getElementById(
+            "btn-repetir"
+        );
 
+
+    const botonVolverInfo =
+        document.getElementById(
+            "btn-volver-info"
+        );
+
+
+    const botonRepetirDecision =
+        document.getElementById(
+            "btn-repetir-decision"
+        );
+
+
+
+    // ==================================================
+    // FUNCIÓN PARA REPRODUCIR DESDE EL PRINCIPIO
+    // ==================================================
+
+    function reproducirDesdeInicio() {{
+
+        infoMina.style.display =
+            "none";
+
+        decisionMina.style.display =
+            "none";
+
+        pantallaVideo.style.display =
+            "block";
+
+        video.currentTime = 0;
+
+        video.play();
+
+    }}
+
+
+
+    // ==================================================
     // CUANDO TERMINA EL VIDEO
+    // ==================================================
+
     video.addEventListener(
         "ended",
         function() {{
 
             pantallaVideo.style.display =
+                "none";
+
+            decisionMina.style.display =
                 "none";
 
             infoMina.style.display =
@@ -1270,7 +1409,10 @@ else:
 
 
 
-    // PASAR DE INFORMACIÓN A DECISIÓN
+    // ==================================================
+    // INFORMACIÓN → DECISIÓN
+    // ==================================================
+
     botonDecision.addEventListener(
         "click",
         function(event) {{
@@ -1287,6 +1429,61 @@ else:
     );
 
 
+
+    // ==================================================
+    // INFORMACIÓN → REPETIR VIDEO
+    // ==================================================
+
+    botonRepetir.addEventListener(
+        "click",
+        function(event) {{
+
+            event.preventDefault();
+
+            reproducirDesdeInicio();
+
+        }}
+    );
+
+
+
+    // ==================================================
+    // DECISIÓN → INFORMACIÓN
+    // ==================================================
+
+    botonVolverInfo.addEventListener(
+        "click",
+        function(event) {{
+
+            event.preventDefault();
+
+            decisionMina.style.display =
+                "none";
+
+            infoMina.style.display =
+                "block";
+
+        }}
+    );
+
+
+
+    // ==================================================
+    // DECISIÓN → REPETIR VIDEO
+    // ==================================================
+
+    botonRepetirDecision.addEventListener(
+        "click",
+        function(event) {{
+
+            event.preventDefault();
+
+            reproducirDesdeInicio();
+
+        }}
+    );
+
+
     </script>
 
     """
@@ -1298,7 +1495,7 @@ else:
 
     st.components.v1.html(
         html,
-        height=1050,
+        height=920,
         scrolling=False
     )
 
