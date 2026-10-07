@@ -27,10 +27,13 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 # ============================================================
 
 def file_to_data_uri(file_path: Path):
+
     if file_path is None or not file_path.exists():
         return None
 
-    mime_type, _ = mimetypes.guess_type(str(file_path))
+    mime_type, _ = mimetypes.guess_type(
+        str(file_path)
+    )
 
     if mime_type is None:
         mime_type = "application/octet-stream"
@@ -42,11 +45,10 @@ def file_to_data_uri(file_path: Path):
     return f"data:{mime_type};base64,{encoded}"
 
 
-def buscar_archivo(carpeta: Path, extensiones):
-    """
-    Busca recursivamente el primer archivo
-    con una de las extensiones indicadas.
-    """
+def buscar_archivo(
+    carpeta: Path,
+    extensiones
+):
 
     if not carpeta.exists():
         return None
@@ -54,28 +56,36 @@ def buscar_archivo(carpeta: Path, extensiones):
     encontrados = []
 
     for archivo in carpeta.rglob("*"):
+
         if (
             archivo.is_file()
-            and archivo.suffix.lower() in extensiones
+            and archivo.suffix.lower()
+            in extensiones
         ):
-            encontrados.append(archivo)
+            encontrados.append(
+                archivo
+            )
 
     if not encontrados:
         return None
 
-    return sorted(encontrados)[0]
+    return sorted(
+        encontrados
+    )[0]
 
 
-def buscar_por_prefijo(carpeta: Path, prefijo: str):
-    """
-    Busca un archivo cuyo nombre empiece
-    por un determinado prefijo.
-    """
+def buscar_por_prefijo(
+    carpeta: Path,
+    prefijo: str
+):
 
     if not carpeta.exists():
         return None
 
-    for archivo in sorted(carpeta.rglob("*")):
+    for archivo in sorted(
+        carpeta.rglob("*")
+    ):
+
         if (
             archivo.is_file()
             and archivo.stem.lower().startswith(
@@ -95,13 +105,16 @@ def crear_tarjeta_proceso(
 ):
 
     if imagen:
+
         bloque_imagen = f"""
         <img
             src="{imagen}"
             class="foto-proceso"
         >
         """
+
     else:
+
         bloque_imagen = """
         <div class="placeholder-foto">
             Imagen no disponible
@@ -142,13 +155,16 @@ def crear_tarjeta_dique(
 ):
 
     if imagen:
+
         bloque_imagen = f"""
         <img
             src="{imagen}"
             class="foto-card-dique"
         >
         """
+
     else:
+
         bloque_imagen = """
         <div class="placeholder-card-dique">
             Imagen no disponible
@@ -156,6 +172,7 @@ def crear_tarjeta_dique(
         """
 
     if activo:
+
         boton = f"""
         <button
             class="btn-explorar"
@@ -164,7 +181,9 @@ def crear_tarjeta_dique(
             Explorar dique →
         </button>
         """
+
     else:
+
         boton = f"""
         <button
             class="btn-explorar deshabilitado"
@@ -209,13 +228,17 @@ escenario = st.session_state.get(
     "escenario_seleccionado"
 )
 
+
 if not escenario:
 
     st.warning(
         "Primero debes seleccionar un escenario."
     )
 
-    if st.button("← Volver al simulador"):
+    if st.button(
+        "← Volver al simulador"
+    ):
+
         st.switch_page(
             "pages/1_Simulador.py"
         )
@@ -229,7 +252,9 @@ if not escenario:
 
 if escenario != "Superavitario":
 
-    st.title("🌊 Simulación Hídrica")
+    st.title(
+        "🌊 Simulación Hídrica"
+    )
 
     st.markdown(
         f"### Escenario inicial: **{escenario}**"
@@ -241,6 +266,7 @@ if escenario != "Superavitario":
     )
 
     if st.button("← Volver"):
+
         st.switch_page(
             "pages/1_Simulador.py"
         )
@@ -260,13 +286,17 @@ video_1_path = (
     / "Superavitario.mp4"
 )
 
+
 if not video_1_path.exists():
 
     st.error(
         "No se encontró el video Cordillera → Mina."
     )
 
-    st.code(str(video_1_path))
+    st.code(
+        str(video_1_path)
+    )
+
     st.stop()
 
 
@@ -281,10 +311,12 @@ carpeta_video_2 = (
     / "02_Mina_Diques"
 )
 
+
 video_2_path = (
     carpeta_video_2
     / "Mina_Diques.mp4"
 )
+
 
 if not video_2_path.exists():
 
@@ -297,6 +329,7 @@ if not video_2_path.exists():
             ".m4v"
         }
     )
+
 
 if video_2_path is None:
 
@@ -320,6 +353,7 @@ img_moderno_path = (
     / "metodo_moderno_recirculacion.jpg"
 )
 
+
 img_tradicional_path = (
     BASE_DIR
     / "assets"
@@ -327,6 +361,7 @@ img_tradicional_path = (
     / "mina"
     / "metodo_tradicional_abierto.jpg"
 )
+
 
 fondo_mina_path = (
     BASE_DIR
@@ -348,15 +383,18 @@ DIQUES_DIR = (
     / "Diques"
 )
 
+
 CARACOLES_DIR = (
     DIQUES_DIR
     / "Caracoles"
 )
 
+
 PUNTA_NEGRA_DIR = (
     DIQUES_DIR
     / "Punta_Negra"
 )
+
 
 ULLUM_DIR = (
     DIQUES_DIR
@@ -373,10 +411,12 @@ caracoles_menu_path = (
     / "caracoles_menu.jpg"
 )
 
+
 punta_negra_menu_path = (
     PUNTA_NEGRA_DIR
     / "punta_negra_menu.jpg"
 )
+
 
 ullum_menu_path = (
     ULLUM_DIR
@@ -392,6 +432,7 @@ punta_negra_detalle_path = (
     PUNTA_NEGRA_DIR
     / "punta_negra_detalle.jpg"
 )
+
 
 if not punta_negra_detalle_path.exists():
 
@@ -410,31 +451,39 @@ COMPONENTES_DIR = (
     / "Componentes"
 )
 
+
 componentes_paths = {
+
     "01": buscar_por_prefijo(
         COMPONENTES_DIR,
         "01_"
     ),
+
     "02": buscar_por_prefijo(
         COMPONENTES_DIR,
         "02_"
     ),
+
     "03": buscar_por_prefijo(
         COMPONENTES_DIR,
         "03_"
     ),
+
     "04": buscar_por_prefijo(
         COMPONENTES_DIR,
         "04_"
     ),
+
     "05": buscar_por_prefijo(
         COMPONENTES_DIR,
         "05_"
     ),
+
     "06": buscar_por_prefijo(
         COMPONENTES_DIR,
         "06_"
     ),
+
     "07": buscar_por_prefijo(
         COMPONENTES_DIR,
         "07_"
@@ -443,40 +492,48 @@ componentes_paths = {
 
 
 # ============================================================
-# CONVERTIR A DATA URI
+# CONVERTIR ARCHIVOS
 # ============================================================
 
 video_1_data = file_to_data_uri(
     video_1_path
 )
 
+
 video_2_data = file_to_data_uri(
     video_2_path
 )
+
 
 img_moderno_data = file_to_data_uri(
     img_moderno_path
 )
 
+
 img_tradicional_data = file_to_data_uri(
     img_tradicional_path
 )
+
 
 fondo_mina_data = file_to_data_uri(
     fondo_mina_path
 )
 
+
 caracoles_menu_data = file_to_data_uri(
     caracoles_menu_path
 )
+
 
 punta_negra_menu_data = file_to_data_uri(
     punta_negra_menu_path
 )
 
+
 ullum_menu_data = file_to_data_uri(
     ullum_menu_path
 )
+
 
 punta_negra_detalle_data = file_to_data_uri(
     punta_negra_detalle_path
@@ -490,74 +547,107 @@ punta_negra_detalle_data = file_to_data_uri(
 componentes_punta_negra = {
 
     "01": {
+
         "nombre": "Obra de toma",
+
         "imagen": file_to_data_uri(
             componentes_paths["01"]
         ) or "",
+
         "texto": ""
+
     },
 
+
     "02": {
+
         "nombre": "Aliviadero",
+
         "imagen": file_to_data_uri(
             componentes_paths["02"]
         ) or "",
+
         "texto": ""
+
     },
 
+
     "03": {
+
         "nombre": "Casa de máquinas",
+
         "imagen": file_to_data_uri(
             componentes_paths["03"]
         ) or "",
+
         "texto": ""
+
     },
 
+
     "04": {
+
         "nombre": "Subestación",
+
         "imagen": file_to_data_uri(
             componentes_paths["04"]
         ) or "",
+
         "texto": ""
+
     },
 
+
     "05": {
+
         "nombre": "Descargador de fondo",
+
         "imagen": file_to_data_uri(
             componentes_paths["05"]
         ) or "",
+
         "texto": ""
+
     },
 
+
     "06": {
+
         "nombre": "Presa",
+
         "imagen": file_to_data_uri(
             componentes_paths["06"]
         ) or "",
+
         "texto": ""
+
     },
 
+
     "07": {
+
         "nombre": "Embalse",
+
         "imagen": file_to_data_uri(
             componentes_paths["07"]
         ) or "",
+
         "texto": ""
+
     }
 
 }
 
 
 # ============================================================
-# POSICIÓN DE HOTSPOTS PUNTA NEGRA
+# POSICIÓN INICIAL DE HOTSPOTS
 # ============================================================
 #
-# Coordenadas iniciales en porcentaje.
-# Si después vemos que alguno está desplazado,
-# solamente modificamos x / y.
+# Ahora la imagen se muestra COMPLETA,
+# sin recorte con object-fit: cover.
 #
-# x = posición horizontal
-# y = posición vertical
+# Después podemos ajustar estos valores
+# visualmente de a uno si hace falta.
 #
 # ============================================================
 
@@ -601,8 +691,12 @@ HOTSPOTS_PUNTA_NEGRA = {
 }
 
 
-# Añadimos las coordenadas a los datos
-for numero, posicion in HOTSPOTS_PUNTA_NEGRA.items():
+# Añadir coordenadas
+# a cada componente.
+
+for numero, posicion in (
+    HOTSPOTS_PUNTA_NEGRA.items()
+):
 
     componentes_punta_negra[
         numero
@@ -623,9 +717,14 @@ componentes_punta_negra_json = json.dumps(
 # ESTADO STREAMLIT
 # ============================================================
 
-if "experiencia_iniciada" not in st.session_state:
+if (
+    "experiencia_iniciada"
+    not in st.session_state
+):
 
-    st.session_state.experiencia_iniciada = False
+    st.session_state.experiencia_iniciada = (
+        False
+    )
 
 
 # ============================================================
@@ -635,6 +734,7 @@ if "experiencia_iniciada" not in st.session_state:
 st.title(
     "🌊 Simulación Hídrica"
 )
+
 
 st.markdown(
     f"### Escenario inicial: **{escenario}**"
@@ -663,6 +763,7 @@ if not st.session_state.experiencia_iniciada:
         [1, 2, 1]
     )
 
+
     with col2:
 
         if st.button(
@@ -671,7 +772,10 @@ if not st.session_state.experiencia_iniciada:
             use_container_width=True
         ):
 
-            st.session_state.experiencia_iniciada = True
+            st.session_state.experiencia_iniciada = (
+                True
+            )
+
             st.rerun()
 
 
@@ -682,7 +786,7 @@ if not st.session_state.experiencia_iniciada:
 else:
 
     # ========================================================
-    # TARJETAS MINA
+    # TARJETA MINA TRADICIONAL
     # ========================================================
 
     tradicional_html = crear_tarjeta_proceso(
@@ -703,6 +807,10 @@ else:
 
     )
 
+
+    # ========================================================
+    # TARJETA MINA MODERNA
+    # ========================================================
 
     moderno_html = crear_tarjeta_proceso(
 
@@ -822,25 +930,37 @@ else:
 ========================================================= */
 
 body {
+
     margin: 0;
+
     background: #0d1820;
+
     font-family:
         Arial,
         Helvetica,
         sans-serif;
+
 }
 
 
 .experiencia {
+
     width: 100%;
+
     height: 900px;
+
     position: relative;
+
     overflow: hidden;
+
     border-radius: 18px;
+
     background: #0d1820;
+
     box-shadow:
         0 18px 45px
         rgba(0,0,0,0.22);
+
 }
 
 
@@ -850,40 +970,66 @@ body {
 ========================================================= */
 
 .pantalla-video {
+
     width: 100%;
+
     height: 900px;
+
     position: relative;
+
     overflow: hidden;
+
     background: black;
+
 }
 
 
 .video-recorrido {
+
     position: absolute;
+
     inset: 0;
+
     width: 100%;
+
     height: 100%;
+
     object-fit: cover;
+
     object-position: center;
+
 }
 
 
 .etiqueta-video {
+
     position: absolute;
+
     top: 30px;
+
     left: 35px;
-    padding: 12px 20px;
+
+    padding:
+        12px 20px;
+
     color: white;
+
     background:
         rgba(0,0,0,0.48);
+
     border:
         1px solid
         rgba(255,255,255,0.18);
+
     border-radius: 12px;
+
     backdrop-filter:
         blur(7px);
+
     font-size: 18px;
+
     font-weight: 700;
+
 }
 
 
@@ -893,27 +1039,42 @@ body {
 ========================================================= */
 
 .pantalla-contenido {
+
     display: none;
+
     width: 100%;
+
     height: 900px;
+
     box-sizing: border-box;
-    padding: 35px 38px;
+
+    padding:
+        35px 38px;
+
     color: white;
+
     overflow-y: auto;
+
     animation:
         aparecer 0.50s ease;
+
 }
 
 
 .pantalla-mina {
+
     background:
         __FONDO_MINA__;
+
     background-size: cover;
+
     background-position: center;
+
 }
 
 
 @keyframes aparecer {
+
     from {
         opacity: 0;
     }
@@ -921,6 +1082,7 @@ body {
     to {
         opacity: 1;
     }
+
 }
 
 
@@ -930,37 +1092,57 @@ body {
 ========================================================= */
 
 .titulo-etapa {
+
     font-size: 14px;
+
     letter-spacing: 2.4px;
+
     color: #69d6dd;
+
     font-weight: 700;
+
     margin-bottom: 10px;
+
     text-shadow:
         0 2px 7px
         rgba(0,0,0,0.60);
+
 }
 
 
 .titulo-principal {
+
     font-size: 42px;
+
     font-weight: 800;
+
     margin-bottom: 12px;
+
     color: white;
+
     text-shadow:
         0 3px 10px
         rgba(0,0,0,0.70);
+
 }
 
 
 .descripcion {
+
     font-size: 17px;
+
     line-height: 1.6;
+
     max-width: 1050px;
+
     margin-bottom: 24px;
+
     color: white;
+
     text-shadow:
         0 2px 7px
         rgba(0,0,0,0.80);
+
 }
 
 
@@ -970,201 +1152,301 @@ body {
 ========================================================= */
 
 .grid-procesos {
+
     display: grid;
+
     grid-template-columns:
         repeat(2,1fr);
+
     gap: 18px;
+
     margin-top: 18px;
+
     margin-bottom: 20px;
+
 }
 
 
 .card-proceso {
+
     background:
         rgba(12,22,27,0.52);
+
     border:
         1px solid
         rgba(255,255,255,0.24);
+
     border-radius: 17px;
+
     overflow: hidden;
+
     backdrop-filter:
         blur(8px);
+
 }
 
 
 .foto-proceso {
+
     width: 100%;
+
     height: 200px;
+
     object-fit: cover;
+
 }
 
 
 .placeholder-foto {
+
     height: 200px;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
 }
 
 
 .card-proceso-body {
+
     padding:
         17px 20px 19px;
+
 }
 
 
 .card-subtitle {
+
     font-size: 12px;
+
     letter-spacing: 1.5px;
+
     color: #75dce2;
+
     font-weight: 700;
+
     margin-bottom: 7px;
+
 }
 
 
 .card-title {
+
     font-size: 23px;
+
     font-weight: 750;
+
     margin-bottom: 10px;
+
 }
 
 
 .card-text {
+
     font-size: 15px;
+
     line-height: 1.5;
+
     color: #f3f3f3;
+
 }
 
 
 .info-clave {
+
     margin-top: 10px;
+
     padding:
         16px 20px;
+
     border-radius: 15px;
+
     background:
         rgba(10,20,25,0.52);
+
     border:
         1px solid
         rgba(112,214,222,0.42);
+
     line-height: 1.55;
+
 }
 
 
 
 /* =========================================================
-   BOTONES GENERALES
+   BOTONES
 ========================================================= */
 
 .botones-navegacion {
+
     display: flex;
+
     justify-content: center;
+
     gap: 14px;
+
     margin-top: 22px;
+
     flex-wrap: wrap;
+
 }
 
 
 .btn-principal,
 .btn-secundario {
+
     border:
         1px solid
         rgba(255,255,255,0.28);
+
     border-radius: 13px;
+
     padding:
         15px 25px;
+
     color: white;
+
     font-size: 16px;
+
     font-weight: 700;
+
     cursor: pointer;
+
     transition: 0.25s;
+
 }
 
 
 .btn-principal {
+
     background:
         rgba(22,156,171,0.95);
+
 }
 
 
 .btn-principal:hover {
+
     transform:
         translateY(-3px);
+
     background:
         rgba(42,187,199,1);
+
 }
 
 
 .btn-secundario {
+
     background:
         rgba(10,20,25,0.62);
+
 }
 
 
 .btn-secundario:hover {
+
     background:
         rgba(255,255,255,0.16);
+
 }
 
 
 
 /* =========================================================
-   DECISIÓN MINA
+   DECISIONES MINA
 ========================================================= */
 
 .pregunta {
+
     font-size: 25px;
+
     font-weight: 700;
+
     margin-top: 32px;
+
     margin-bottom: 20px;
+
 }
 
 
 .opciones {
+
     display: grid;
+
     grid-template-columns:
         repeat(3,1fr);
+
     gap: 17px;
+
 }
 
 
 .opcion {
+
     width: 100%;
+
     box-sizing: border-box;
+
     text-align: left;
+
     color: white;
+
     background:
         rgba(10,20,25,0.58);
+
     border:
         1px solid
         rgba(255,255,255,0.24);
+
     border-radius: 17px;
+
     padding: 23px;
+
     cursor: pointer;
+
     transition: 0.25s;
+
 }
 
 
 .opcion:hover {
+
     transform:
         translateY(-5px);
+
     background:
         rgba(32,150,161,0.36);
+
     border-color:
         #71d9df;
+
 }
 
 
 .opcion strong {
+
     display: block;
+
     font-size: 20px;
+
     margin-bottom: 9px;
+
 }
 
 
 .opcion span {
+
     display: block;
+
     font-size: 15px;
+
     line-height: 1.5;
+
 }
 
 
@@ -1174,27 +1456,42 @@ body {
 ========================================================= */
 
 .resultado-grid {
+
     display: grid;
+
     grid-template-columns:
         0.85fr 1.15fr;
+
     gap: 38px;
+
     align-items: center;
+
     margin-top: 25px;
+
 }
 
 
 .donut-wrapper {
+
     display: flex;
+
     justify-content: center;
+
 }
 
 
 .donut {
+
     width: 315px;
+
     height: 315px;
+
     border-radius: 50%;
+
     background:
+
         conic-gradient(
+
             #e9a23b
             0%
             calc(var(--consumo) * 1%),
@@ -1202,102 +1499,159 @@ body {
             #4dc1d1
             calc(var(--consumo) * 1%)
             100%
+
         );
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     position: relative;
+
 }
 
 
 .donut::before {
+
     content: "";
+
     width: 205px;
+
     height: 205px;
+
     background:
         rgba(7,19,26,0.94);
+
     border-radius: 50%;
+
     position: absolute;
+
 }
 
 
 .donut-centro {
+
     position: relative;
+
     z-index: 3;
+
     text-align: center;
+
 }
 
 
 .donut-numero {
+
     font-size: 54px;
+
     font-weight: 800;
+
 }
 
 
 .donut-texto {
+
     margin-top: 8px;
+
     font-size: 15px;
+
     color: #cdebf0;
+
     max-width: 140px;
+
 }
 
 
 .metricas {
+
     display: grid;
+
     grid-template-columns:
         repeat(3,1fr);
+
     gap: 12px;
+
     margin-bottom: 18px;
+
 }
 
 
 .metrica {
+
     background:
         rgba(9,22,29,0.60);
+
     border:
         1px solid
         rgba(255,255,255,0.18);
+
     padding: 18px;
+
     border-radius: 14px;
+
 }
 
 
 .metrica-numero {
+
     font-size: 31px;
+
     font-weight: 800;
+
 }
 
 
 .metrica-label {
+
     font-size: 13px;
+
     color: #cde0e5;
+
     margin-top: 4px;
+
 }
 
 
 .resultado-explicacion {
+
     background:
         rgba(9,22,29,0.59);
+
     border:
         1px solid
         rgba(255,255,255,0.19);
+
     border-radius: 16px;
+
     padding: 21px;
+
     line-height: 1.6;
+
 }
 
 
 .modelo-educativo {
+
     margin-top: 18px;
-    padding: 14px 17px;
+
+    padding:
+        14px 17px;
+
     border-radius: 12px;
+
     font-size: 13px;
+
     line-height: 1.5;
+
     background:
         rgba(0,0,0,0.40);
+
     border:
         1px solid
         rgba(255,255,255,0.16);
+
 }
 
 
@@ -1307,6 +1661,7 @@ body {
 ========================================================= */
 
 #menu-diques {
+
     background:
         linear-gradient(
             135deg,
@@ -1314,14 +1669,20 @@ body {
             #0d3041 48%,
             #12516a 100%
         );
+
 }
 
 
 .recorrido-diques {
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     gap: 10px;
+
     flex-wrap: wrap;
 
     margin:
@@ -1338,29 +1699,40 @@ body {
     border:
         1px solid
         rgba(255,255,255,0.12);
+
 }
 
 
 .nodo-recorrido {
+
     font-size: 14px;
+
     font-weight: 700;
+
 }
 
 
 .flecha-recorrido {
+
     color: #63d2df;
+
 }
 
 
 .grid-diques {
+
     display: grid;
+
     grid-template-columns:
         repeat(3,1fr);
+
     gap: 18px;
+
 }
 
 
 .card-dique {
+
     overflow: hidden;
 
     background:
@@ -1377,68 +1749,99 @@ body {
         rgba(0,0,0,0.25);
 
     transition: 0.25s;
+
 }
 
 
 .card-dique:hover {
+
     transform:
         translateY(-5px);
 
     border-color:
         rgba(99,210,223,0.65);
+
 }
 
 
 .foto-card-dique,
 .placeholder-card-dique {
+
     width: 100%;
+
     height: 210px;
+
     object-fit: cover;
+
 }
 
 
 .placeholder-card-dique {
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
 }
 
 
 .card-dique-body {
-    padding: 18px 18px 20px;
+
+    padding:
+        18px 18px 20px;
+
 }
 
 
 .card-dique-kicker {
+
     font-size: 10px;
+
     letter-spacing: 1.5px;
+
     color: #69d6dd;
+
     margin-bottom: 6px;
+
 }
 
 
 .card-dique-title {
+
     font-size: 24px;
+
     font-weight: 800;
+
     margin-bottom: 8px;
+
 }
 
 
 .card-dique-text {
+
     min-height: 45px;
+
     font-size: 14px;
+
     line-height: 1.45;
+
     color: #dce8ec;
+
 }
 
 
 .btn-explorar {
+
     margin-top: 15px;
+
     width: 100%;
 
     padding: 12px;
 
     border: none;
+
     border-radius: 11px;
 
     background:
@@ -1447,35 +1850,43 @@ body {
     color: white;
 
     font-size: 14px;
+
     font-weight: 700;
 
     cursor: pointer;
 
     transition: 0.2s;
+
 }
 
 
 .btn-explorar:hover {
+
     background:
         rgba(48,194,208,1);
+
 }
 
 
 .btn-explorar.deshabilitado {
+
     background:
         rgba(255,255,255,0.10);
 
     color:
         rgba(255,255,255,0.70);
+
 }
 
 
 .mensaje-proximamente {
+
     display: none;
 
     margin-top: 20px;
 
-    padding: 14px 18px;
+    padding:
+        14px 18px;
 
     border-radius: 13px;
 
@@ -1487,6 +1898,7 @@ body {
     border:
         1px solid
         rgba(255,255,255,0.15);
+
 }
 
 
@@ -1496,24 +1908,34 @@ body {
 ========================================================= */
 
 #explorador-punta-negra {
+
     background:
         linear-gradient(
             135deg,
             #071720,
             #0c2c3a
         );
+
 }
 
 
 .explorador-top {
+
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-start;
+
     gap: 20px;
+
 }
 
 
 .btn-volver {
+
     border:
         1px solid
         rgba(255,255,255,0.20);
@@ -1531,20 +1953,26 @@ body {
     cursor: pointer;
 
     font-weight: 700;
+
 }
 
 
 .indicadores-dique {
+
     display: flex;
+
     gap: 10px;
+
     flex-wrap: wrap;
 
     margin:
         12px 0 20px;
+
 }
 
 
 .indicador {
+
     padding:
         10px 14px;
 
@@ -1556,32 +1984,50 @@ body {
     border:
         1px solid
         rgba(255,255,255,0.13);
+
 }
 
 
 .indicador strong {
+
     display: block;
+
     font-size: 18px;
+
 }
 
 
 .indicador span {
+
     font-size: 11px;
+
     color: #cbdde3;
+
 }
 
 
 .explorador-grid {
+
     display: grid;
+
     grid-template-columns:
         minmax(0,1.55fr)
         minmax(280px,0.65fr);
 
     gap: 18px;
+
+    align-items: start;
+
 }
 
 
+
+/* =========================================================
+   FOTO DE DETALLE + HOTSPOTS
+========================================================= */
+
 .mapa-hotspots {
+
     position: relative;
 
     width: 100%;
@@ -1595,24 +2041,40 @@ body {
     border:
         1px solid
         rgba(255,255,255,0.14);
+
 }
 
 
+/*
+IMPORTANTE:
+
+La imagen ya NO tiene altura fija
+ni object-fit: cover.
+
+Así se muestra completa y los hotspots
+se calculan sobre la fotografía real.
+*/
+
 .img-detalle {
+
     width: 100%;
-    height: 570px;
-    object-fit: cover;
+
+    height: auto;
+
     display: block;
+
 }
 
 
 .hotspot {
+
     position: absolute;
 
     transform:
         translate(-50%,-50%);
 
     width: 46px;
+
     height: 46px;
 
     border-radius: 50%;
@@ -1637,20 +2099,24 @@ body {
         0.22s;
 
     z-index: 5;
+
 }
 
 
 .hotspot:hover {
+
     transform:
         translate(-50%,-50%)
         scale(1.12);
 
     background:
         #2bb9c8;
+
 }
 
 
 .hotspot.activo {
+
     background:
         #37c6d5;
 
@@ -1664,6 +2130,7 @@ body {
     box-shadow:
         0 0 0 7px
         rgba(55,198,213,0.18);
+
 }
 
 
@@ -1673,6 +2140,7 @@ body {
 ========================================================= */
 
 .panel-componente {
+
     min-height: 570px;
 
     box-sizing: border-box;
@@ -1690,15 +2158,20 @@ body {
 
     backdrop-filter:
         blur(10px);
+
 }
 
 
 .panel-inicial {
+
     min-height: 570px;
 
     display: flex;
+
     flex-direction: column;
+
     justify-content: center;
+
     align-items: center;
 
     padding: 30px;
@@ -1708,29 +2181,41 @@ body {
     text-align: center;
 
     color: #d8e7eb;
+
 }
 
 
 .icono-explorar {
+
     font-size: 50px;
+
     margin-bottom: 14px;
+
 }
 
 
 .panel-activo {
+
     display: none;
+
 }
 
 
 .imagen-componente {
+
     width: 100%;
+
     height: 245px;
+
     object-fit: cover;
+
     display: block;
+
 }
 
 
 .numero-componente {
+
     margin:
         20px 22px 4px;
 
@@ -1741,20 +2226,24 @@ body {
     letter-spacing: 1.8px;
 
     font-weight: 800;
+
 }
 
 
 .titulo-componente {
+
     margin:
         0 22px;
 
     font-size: 25px;
 
     font-weight: 800;
+
 }
 
 
 .texto-componente {
+
     margin:
         18px 22px 25px;
 
@@ -1771,21 +2260,22 @@ body {
     line-height: 1.55;
 
     color: #dce8ec;
+
 }
 
 
 
 /* =========================================================
-   CONTINUAR SIMULACIÓN
+   CONTINUAR
 ========================================================= */
 
 .panel-continuar {
+
     display: none;
 
     margin-top: 20px;
 
-    padding:
-        18px;
+    padding: 18px;
 
     text-align: center;
 
@@ -1797,6 +2287,7 @@ body {
     border:
         1px solid
         rgba(99,210,223,0.35);
+
 }
 
 
@@ -1812,30 +2303,40 @@ body {
     .resultado-grid,
     .grid-diques,
     .explorador-grid {
+
         grid-template-columns:
             1fr;
+
     }
 
 
     .metricas {
+
         grid-template-columns:
             1fr;
+
     }
 
 
     .titulo-principal {
+
         font-size: 32px;
+
     }
 
 
-    .img-detalle {
-        height: 430px;
-    }
+    /*
+    IMPORTANTE:
+    ya no definimos altura fija
+    para .img-detalle.
+    */
 
 
     .panel-componente,
     .panel-inicial {
+
         min-height: auto;
+
     }
 
 }
@@ -1980,6 +2481,7 @@ body {
             class="opcion"
             onclick="seleccionarDecision('alta')"
         >
+
             <strong>
                 ♻️ Alta recirculación · 80 %
             </strong>
@@ -1987,6 +2489,7 @@ body {
             <span>
                 Consumo neto aproximado: 5 %.
             </span>
+
         </button>
 
 
@@ -1994,6 +2497,7 @@ body {
             class="opcion"
             onclick="seleccionarDecision('media')"
         >
+
             <strong>
                 ⚖️ Recirculación intermedia · 60 %
             </strong>
@@ -2001,6 +2505,7 @@ body {
             <span>
                 Consumo neto aproximado: 10 %.
             </span>
+
         </button>
 
 
@@ -2008,6 +2513,7 @@ body {
             class="opcion"
             onclick="seleccionarDecision('nula')"
         >
+
             <strong>
                 💧 Sin recirculación · 0 %
             </strong>
@@ -2015,6 +2521,7 @@ body {
             <span>
                 Consumo neto aproximado: 25 %.
             </span>
+
         </button>
 
     </div>
@@ -2180,6 +2687,7 @@ body {
             <div class="modelo-educativo">
 
                 ℹ️ Modelo educativo simplificado.
+
                 Los porcentajes son normalizados
                 para representar la relación entre
                 consumo y recuperación.
@@ -2322,7 +2830,8 @@ body {
     <div
         id="mensaje-proximamente"
         class="mensaje-proximamente"
-    ></div>
+    >
+    </div>
 
 
     <div class="botones-navegacion">
@@ -2400,18 +2909,41 @@ body {
     <div class="indicadores-dique">
 
         <div class="indicador">
-            <strong>118,4 m</strong>
-            <span>Altura aproximada de presa</span>
+
+            <strong>
+                118,4 m
+            </strong>
+
+            <span>
+                Altura aproximada de presa
+            </span>
+
         </div>
 
-        <div class="indicador">
-            <strong>500 hm³</strong>
-            <span>Capacidad aproximada</span>
-        </div>
 
         <div class="indicador">
-            <strong>300 GWh/año</strong>
-            <span>Generación aproximada</span>
+
+            <strong>
+                500 hm³
+            </strong>
+
+            <span>
+                Capacidad aproximada
+            </span>
+
+        </div>
+
+
+        <div class="indicador">
+
+            <strong>
+                300 GWh/año
+            </strong>
+
+            <span>
+                Generación aproximada
+            </span>
+
         </div>
 
     </div>
@@ -2496,7 +3028,7 @@ body {
 
 
 
-        <!-- PANEL COMPONENTE -->
+        <!-- PANEL DEL COMPONENTE -->
 
         <div class="panel-componente">
 
@@ -2574,7 +3106,7 @@ body {
 
 
 // ==========================================================
-// DATOS PUNTA NEGRA
+// COMPONENTES PUNTA NEGRA
 // ==========================================================
 
 const componentesPuntaNegra =
@@ -2582,7 +3114,8 @@ const componentesPuntaNegra =
 
 
 //
-// Aplicamos posición de cada hotspot.
+// Ubicación porcentual
+// de los hotspots.
 //
 Object.entries(
     componentesPuntaNegra
@@ -2611,7 +3144,7 @@ Object.entries(
 
 
 // ==========================================================
-// ESTADO DE LA SIMULACIÓN
+// ESTADO SIMULACIÓN
 // ==========================================================
 
 let decisionActual = null;
@@ -2668,7 +3201,7 @@ function ocultarTodo() {
 
 
 // ==========================================================
-// REFERENCIAS VIDEOS
+// VIDEOS
 // ==========================================================
 
 const video1 =
@@ -2745,7 +3278,9 @@ function mostrarDecisionMina() {
 }
 
 
-function seleccionarDecision(tipo) {
+function seleccionarDecision(
+    tipo
+) {
 
 
     if (tipo === "alta") {
@@ -2765,7 +3300,9 @@ function seleccionarDecision(tipo) {
     }
 
 
-    else if (tipo === "media") {
+    else if (
+        tipo === "media"
+    ) {
 
         decisionActual =
             "Recirculación intermedia";
@@ -2782,7 +3319,9 @@ function seleccionarDecision(tipo) {
     }
 
 
-    else if (tipo === "nula") {
+    else if (
+        tipo === "nula"
+    ) {
 
         decisionActual =
             "Sin recirculación";
@@ -2878,7 +3417,7 @@ function mostrarResultadoMina() {
 
 
 // ==========================================================
-// VIDEO 2 · MINA → DIQUES
+// VIDEO 2
 // ==========================================================
 
 function reproducirVideo2() {
@@ -2923,7 +3462,9 @@ function mostrarMenuDiques() {
 }
 
 
-function explorarDique(dique) {
+function explorarDique(
+    dique
+) {
 
     if (
         dique ===
@@ -2942,7 +3483,9 @@ function explorarDique(dique) {
 }
 
 
-function mostrarProximamente(nombre) {
+function mostrarProximamente(
+    nombre
+) {
 
     const panel =
         document.getElementById(
@@ -2969,7 +3512,9 @@ function mostrarProximamente(nombre) {
 // HOTSPOTS PUNTA NEGRA
 // ==========================================================
 
-function seleccionarComponente(numero) {
+function seleccionarComponente(
+    numero
+) {
 
 
     const dato =
@@ -2983,7 +3528,7 @@ function seleccionarComponente(numero) {
     }
 
 
-    // Quitar hotspot activo anterior
+    // Quitar selección anterior
 
     document.querySelectorAll(
         ".hotspot"
@@ -2998,7 +3543,7 @@ function seleccionarComponente(numero) {
     );
 
 
-    // Activar hotspot seleccionado
+    // Activar punto seleccionado
 
     const hotspotActivo =
         document.querySelector(
@@ -3017,7 +3562,7 @@ function seleccionarComponente(numero) {
     }
 
 
-    // Ocultar panel inicial
+    // Ocultar mensaje inicial
 
     document.getElementById(
         "panel-inicial"
@@ -3025,7 +3570,7 @@ function seleccionarComponente(numero) {
         "none";
 
 
-    // Mostrar panel activo
+    // Mostrar ficha
 
     const panelActivo =
         document.getElementById(
@@ -3037,7 +3582,7 @@ function seleccionarComponente(numero) {
         "block";
 
 
-    // Foto componente
+    // Imagen pequeña
 
     const imagen =
         document.getElementById(
@@ -3045,7 +3590,9 @@ function seleccionarComponente(numero) {
         );
 
 
-    if (dato.imagen) {
+    if (
+        dato.imagen
+    ) {
 
         imagen.src =
             dato.imagen;
@@ -3068,7 +3615,8 @@ function seleccionarComponente(numero) {
     document.getElementById(
         "numero-componente"
     ).textContent =
-        numero + " · COMPONENTE";
+        numero +
+        " · COMPONENTE";
 
 
     // Nombre
@@ -3080,7 +3628,7 @@ function seleccionarComponente(numero) {
 
 
     // Texto
-    // Por ahora queda vacío tal como acordamos.
+    // Por ahora lo dejamos vacío.
 
     document.getElementById(
         "texto-componente"
@@ -3125,7 +3673,7 @@ function continuarSimulacion() {
 
 
     # ========================================================
-    # REEMPLAZAR VARIABLES
+    # REEMPLAZOS
     # ========================================================
 
     html = html_template
