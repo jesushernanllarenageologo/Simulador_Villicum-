@@ -212,6 +212,7 @@ def construir_componentes(
                 else ""
             ),
 
+            # Por ahora dejamos los textos vacíos.
             "texto": "",
 
             "x": coordenadas[numero]["x"],
@@ -368,7 +369,7 @@ fondo_mina_path = (
 
 
 # ============================================================
-# DIQUES
+# CARPETAS DIQUES
 # ============================================================
 
 DIQUES_DIR = (
@@ -398,7 +399,7 @@ ULLUM_DIR = (
 
 
 # ============================================================
-# MENÚ DE DIQUES
+# IMÁGENES MENÚ
 # ============================================================
 
 caracoles_menu_path = (
@@ -420,7 +421,7 @@ ullum_menu_path = (
 
 
 # ============================================================
-# IMÁGENES DE DETALLE
+# IMÁGENES LIMPIAS PARA HOTSPOTS
 # ============================================================
 
 caracoles_detalle_path = (
@@ -442,7 +443,7 @@ ullum_detalle_path = (
 
 
 # ============================================================
-# COMPONENTES · PUNTA NEGRA
+# PUNTA NEGRA
 # ============================================================
 
 PUNTA_NEGRA_COMPONENTES = {
@@ -463,7 +464,7 @@ PUNTA_NEGRA_COMPONENTES = {
 }
 
 
-# Punta Negra ya quedó calibrado.
+# Ya calibrado previamente.
 HOTSPOTS_PUNTA_NEGRA = {
 
     "01": {
@@ -504,7 +505,7 @@ HOTSPOTS_PUNTA_NEGRA = {
 
 
 # ============================================================
-# COMPONENTES · CARACOLES
+# CARACOLES
 # ============================================================
 
 CARACOLES_COMPONENTES = {
@@ -526,30 +527,31 @@ CARACOLES_COMPONENTES = {
 
 
 # ============================================================
-# HOTSPOTS CARACOLES · CORREGIDOS
+# HOTSPOTS CARACOLES
 # ============================================================
 #
-# Calculados usando el ancho COMPLETO
-# de caracoles_hotspots_ref.jpg.
+# IMPORTANTE:
 #
-# Antes estaban todos demasiado a la derecha.
+# Estas coordenadas corresponden a la NUEVA
+# caracoles_detalle.jpg que coincide exactamente
+# con caracoles_hotspots_ref.jpg.
 #
 # ============================================================
 
 HOTSPOTS_CARACOLES = {
 
     "01": {
-        "x": 56.4,
-        "y": 84.9
+        "x": 56.5,
+        "y": 85.0
     },
 
     "02": {
-        "x": 50.7,
+        "x": 50.6,
         "y": 64.2
     },
 
     "03": {
-        "x": 50.7,
+        "x": 50.6,
         "y": 49.2
     },
 
@@ -559,12 +561,12 @@ HOTSPOTS_CARACOLES = {
     },
 
     "05": {
-        "x": 21.3,
+        "x": 21.2,
         "y": 76.1
     },
 
     "06": {
-        "x": 8.3,
+        "x": 8.2,
         "y": 31.1
     },
 
@@ -576,7 +578,7 @@ HOTSPOTS_CARACOLES = {
 
 
 # ============================================================
-# COMPONENTES · ULLUM
+# ULLUM
 # ============================================================
 
 ULLUM_COMPONENTES = {
@@ -598,13 +600,13 @@ ULLUM_COMPONENTES = {
 
 
 # ============================================================
-# HOTSPOTS ULLUM · CORREGIDOS
+# HOTSPOTS ULLUM
 # ============================================================
 #
-# El hotspot 08 se elimina.
+# Se mantienen los valores que ya quedaron
+# aproximadamente 8/10.
 #
-# Las Y estaban prácticamente bien.
-# El error principal estaba en las X.
+# 08 Quebrada de Ullum está eliminado.
 #
 # ============================================================
 
@@ -648,7 +650,7 @@ HOTSPOTS_ULLUM = {
 
 
 # ============================================================
-# CREAR DATOS DE COMPONENTES
+# CREAR COMPONENTES
 # ============================================================
 
 punta_negra_componentes = construir_componentes(
@@ -682,7 +684,7 @@ ullum_componentes = construir_componentes(
 
 
 # ============================================================
-# CONVERTIR ARCHIVOS
+# CONVERTIR ARCHIVOS A DATA URI
 # ============================================================
 
 video_1_data = file_to_data_uri(
@@ -806,10 +808,7 @@ diques_interactivos_json = json.dumps(
 # ESTADO STREAMLIT
 # ============================================================
 
-if (
-    "experiencia_iniciada"
-    not in st.session_state
-):
+if "experiencia_iniciada" not in st.session_state:
 
     st.session_state.experiencia_iniciada = False
 
@@ -889,7 +888,6 @@ else:
         """,
 
         imagen=img_tradicional_data
-
     )
 
 
@@ -908,7 +906,6 @@ else:
         """,
 
         imagen=img_moderno_data
-
     )
 
 
@@ -989,7 +986,7 @@ else:
 
 
     # ========================================================
-    # HTML
+    # HTML + CSS + JAVASCRIPT
     # ========================================================
 
     html_template = """
@@ -1832,7 +1829,7 @@ body {
 
 
 /* =========================================================
-   EXPLORADOR GENÉRICO
+   EXPLORADOR
 ========================================================= */
 
 #explorador-dique {
@@ -1987,7 +1984,8 @@ body {
         0 4px 18px
         rgba(0,0,0,0.38);
 
-    transition: 0.22s;
+    transition:
+        0.22s;
 
     z-index: 5;
 
@@ -2026,7 +2024,7 @@ body {
 
 
 /* =========================================================
-   PANEL COMPONENTE
+   PANEL DEL COMPONENTE
 ========================================================= */
 
 .panel-componente {
@@ -2251,7 +2249,7 @@ body {
 
 
 <!-- =====================================================
-     INFO MINA
+     INFORMACIÓN MINA
 ===================================================== -->
 
 <div
@@ -2606,7 +2604,7 @@ body {
 
 
 <!-- =====================================================
-     VIDEO 2
+     VIDEO 2 · MINA → EMBALSES
 ===================================================== -->
 
 <div
@@ -3011,7 +3009,7 @@ video1.addEventListener(
 
 
 // ==========================================================
-// INFO MINA
+// INFORMACIÓN MINA
 // ==========================================================
 
 function mostrarInfoMina() {
@@ -3212,7 +3210,7 @@ function mostrarMenuDiques() {
 
 
 // ==========================================================
-// EXPLORADOR
+// EXPLORADOR DE DIQUES
 // ==========================================================
 
 function explorarDique(clave) {
@@ -3261,6 +3259,8 @@ function explorarDique(clave) {
         dique.detalle;
 
 
+    // Reset del panel derecho
+
     document.getElementById(
         "panel-inicial"
     ).style.display =
@@ -3273,6 +3273,8 @@ function explorarDique(clave) {
         "none";
 
 
+    // Limpiar hotspots anteriores
+
     const contenedor =
         document.getElementById(
             "contenedor-hotspots"
@@ -3282,6 +3284,8 @@ function explorarDique(clave) {
     contenedor.innerHTML =
         "";
 
+
+    // Crear hotspots
 
     Object.entries(
         dique.componentes
@@ -3368,6 +3372,8 @@ function seleccionarComponente(
     }
 
 
+    // Quitar hotspot activo anterior
+
     document.querySelectorAll(
         ".hotspot"
     ).forEach(
@@ -3380,6 +3386,8 @@ function seleccionarComponente(
         }
     );
 
+
+    // Activar actual
 
     const activo =
         document.querySelector(
@@ -3397,6 +3405,8 @@ function seleccionarComponente(
 
     }
 
+
+    // Cambiar panel lateral
 
     document.getElementById(
         "panel-inicial"
@@ -3416,6 +3426,7 @@ function seleccionarComponente(
         );
 
 
+    // Si tiene imagen:
     if (dato.imagen) {
 
         imagen.src =
@@ -3426,6 +3437,7 @@ function seleccionarComponente(
 
     }
 
+    // Si NO tiene imagen:
     else {
 
         imagen.src =
@@ -3450,6 +3462,8 @@ function seleccionarComponente(
         dato.nombre;
 
 
+    // Todavía dejamos el texto vacío.
+
     document.getElementById(
         "texto-componente"
     ).textContent =
@@ -3459,7 +3473,7 @@ function seleccionarComponente(
 
 
 // ==========================================================
-// CONTINUAR
+// CONTINUAR SIMULACIÓN
 // ==========================================================
 
 function continuarSimulacion() {
