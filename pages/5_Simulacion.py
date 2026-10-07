@@ -7,7 +7,7 @@ from core.state_manager import init_session_state
 
 
 # ============================================================
-# CONFIGURACIÓN GENERAL
+# CONFIGURACIÓN
 # ============================================================
 
 st.set_page_config(
@@ -22,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 
 
 # ============================================================
-# FUNCIONES AUXILIARES
+# FUNCIONES
 # ============================================================
 
 def file_to_data_uri(file_path: Path):
 
-    if not file_path.exists():
+    if file_path is None or not file_path.exists():
         return None
 
     mime_type, _ = mimetypes.guess_type(str(file_path))
@@ -42,6 +42,32 @@ def file_to_data_uri(file_path: Path):
     return f"data:{mime_type};base64,{encoded}"
 
 
+def buscar_archivo(carpeta: Path, extensiones):
+
+    """
+    Busca recursivamente el primer archivo
+    que tenga alguna de las extensiones indicadas.
+    """
+
+    if not carpeta.exists():
+        return None
+
+    archivos = []
+
+    for archivo in carpeta.rglob("*"):
+
+        if (
+            archivo.is_file()
+            and archivo.suffix.lower() in extensiones
+        ):
+            archivos.append(archivo)
+
+    if not archivos:
+        return None
+
+    return sorted(archivos)[0]
+
+
 def crear_tarjeta_proceso(
     titulo,
     subtitulo,
@@ -51,7 +77,7 @@ def crear_tarjeta_proceso(
 
     if imagen:
 
-        contenido_imagen = f"""
+        bloque_imagen = f"""
         <img
             src="{imagen}"
             class="foto-proceso"
@@ -60,7 +86,7 @@ def crear_tarjeta_proceso(
 
     else:
 
-        contenido_imagen = """
+        bloque_imagen = """
         <div class="placeholder-foto">
             Imagen no disponible
         </div>
@@ -69,7 +95,7 @@ def crear_tarjeta_proceso(
     return f"""
     <div class="card-proceso">
 
-        {contenido_imagen}
+        {bloque_imagen}
 
         <div class="card-proceso-body">
 
@@ -82,6 +108,50 @@ def crear_tarjeta_proceso(
             </div>
 
             <div class="card-text">
+                {texto}
+            </div>
+
+        </div>
+
+    </div>
+    """
+
+
+def crear_tarjeta_dique(
+    titulo,
+    texto,
+    imagen
+):
+
+    if imagen:
+
+        bloque_imagen = f"""
+        <img
+            src="{imagen}"
+            class="foto-dique"
+        >
+        """
+
+    else:
+
+        bloque_imagen = """
+        <div class="placeholder-dique">
+            Imagen no disponible
+        </div>
+        """
+
+    return f"""
+    <div class="card-dique">
+
+        {bloque_imagen}
+
+        <div class="dique-contenido">
+
+            <div class="dique-titulo">
+                {titulo}
+            </div>
+
+            <div class="dique-texto">
                 {texto}
             </div>
 
@@ -128,8 +198,8 @@ if escenario != "Superavitario":
     )
 
     st.info(
-        f"El escenario {escenario} todavía no tiene "
-        "cargada la experiencia audiovisual."
+        f"El escenario {escenario} todavía no "
+        "tiene cargada la experiencia audiovisual."
     )
 
     if st.button("← Volver"):
@@ -142,10 +212,10 @@ if escenario != "Superavitario":
 
 
 # ============================================================
-# RUTAS
+# VIDEO 1 · CORDILLERA → MINA
 # ============================================================
 
-video_path = (
+video_1_path = (
     BASE_DIR
     / "assets"
     / "videos"
@@ -153,6 +223,65 @@ video_path = (
     / "Superavitario.mp4"
 )
 
+
+if not video_1_path.exists():
+
+    st.error(
+        "No se encontró el video Cordillera → Mina."
+    )
+
+    st.code(str(video_1_path))
+
+    st.stop()
+
+
+# ============================================================
+# VIDEO 2 · MINA → DIQUES
+# ============================================================
+
+carpeta_video_2 = (
+    BASE_DIR
+    / "assets"
+    / "videos"
+    / "02_Mina_Diques"
+)
+
+
+# Primero intenta encontrar Mina_Diques.mp4
+video_2_path = (
+    carpeta_video_2
+    / "Mina_Diques.mp4"
+)
+
+
+# Si no existe con ese nombre,
+# busca automáticamente el primer video.
+if not video_2_path.exists():
+
+    video_2_path = buscar_archivo(
+        carpeta_video_2,
+        {
+            ".mp4",
+            ".webm",
+            ".mov",
+            ".m4v"
+        }
+    )
+
+
+if video_2_path is None:
+
+    st.error(
+        "No se encontró ningún video "
+        "dentro de assets/videos/02_Mina_Diques/"
+    )
+
+    st.stop()
+
+
+# ============================================================
+# IMÁGENES MINA
+# ============================================================
 
 img_moderno_path = (
     BASE_DIR
@@ -182,40 +311,84 @@ fondo_mina_path = (
 
 
 # ============================================================
-# COMPROBAR VIDEO
+# IMÁGENES DIQUES
 # ============================================================
 
-if not video_path.exists():
+carpeta_diques = (
+    BASE_DIR
+    / "assets"
+    / "images"
+    / "Diques"
+)
 
-    st.error(
-        "No se encontró el video Superavitario.mp4"
-    )
 
-    st.code(
-        str(video_path)
-    )
+img_caracoles_path = buscar_archivo(
+    carpeta_diques / "Caracoles",
+    {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp"
+    }
+)
 
-    st.stop()
+
+img_punta_negra_path = buscar_archivo(
+    carpeta_diques / "Punta_Negra",
+    {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp"
+    }
+)
+
+
+img_ullum_path = buscar_archivo(
+    carpeta_diques / "Ullum",
+    {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp"
+    }
+)
 
 
 # ============================================================
 # CONVERTIR ARCHIVOS
 # ============================================================
 
-video_data_uri = file_to_data_uri(
-    video_path
+video_1_data = file_to_data_uri(
+    video_1_path
 )
 
-img_moderno_data_uri = file_to_data_uri(
+video_2_data = file_to_data_uri(
+    video_2_path
+)
+
+img_moderno_data = file_to_data_uri(
     img_moderno_path
 )
 
-img_tradicional_data_uri = file_to_data_uri(
+img_tradicional_data = file_to_data_uri(
     img_tradicional_path
 )
 
-fondo_mina_data_uri = file_to_data_uri(
+fondo_mina_data = file_to_data_uri(
     fondo_mina_path
+)
+
+img_caracoles_data = file_to_data_uri(
+    img_caracoles_path
+)
+
+img_punta_negra_data = file_to_data_uri(
+    img_punta_negra_path
+)
+
+img_ullum_data = file_to_data_uri(
+    img_ullum_path
 )
 
 
@@ -242,7 +415,7 @@ st.markdown(
 
 
 # ============================================================
-# PANTALLA DE INICIO
+# PANTALLA INICIAL
 # ============================================================
 
 if not st.session_state.experiencia_iniciada:
@@ -251,8 +424,8 @@ if not st.session_state.experiencia_iniciada:
         """
         La cuenca inicia con una **alta disponibilidad hídrica**.
 
-        El recorrido comenzará en la **Cordillera de los Andes**
-        y seguirá el curso del **Río San Juan** hasta la primera
+        El recorrido comienza en la **Cordillera de los Andes**
+        y sigue el curso del **Río San Juan** hasta la primera
         parada del simulador: **la actividad minera**.
         """
     )
@@ -282,9 +455,9 @@ if not st.session_state.experiencia_iniciada:
 
 else:
 
-    # ========================================================
-    # TARJETAS
-    # ========================================================
+    # --------------------------------------------------------
+    # TARJETAS MINA
+    # --------------------------------------------------------
 
     tradicional_html = crear_tarjeta_proceso(
 
@@ -300,7 +473,7 @@ else:
         Esto incrementa el consumo neto de agua fresca.
         """,
 
-        imagen=img_tradicional_data_uri
+        imagen=img_tradicional_data
 
     )
 
@@ -312,23 +485,69 @@ else:
         subtitulo="GESTIÓN HÍDRICA MODERNA",
 
         texto="""
-        Mediante sistemas de recuperación, parte del agua
-        utilizada puede ser captada, tratada y reutilizada
-        nuevamente dentro del proceso.
+        Mediante sistemas de recuperación,
+        parte del agua utilizada puede ser captada,
+        tratada y reutilizada nuevamente dentro del proceso.
 
         Esto reduce la necesidad de incorporar agua fresca.
         """,
 
-        imagen=img_moderno_data_uri
+        imagen=img_moderno_data
+
+    )
+
+
+    # --------------------------------------------------------
+    # TARJETAS DIQUES
+    # --------------------------------------------------------
+
+    caracoles_html = crear_tarjeta_dique(
+
+        titulo="Dique Caracoles",
+
+        texto="""
+        Forma parte del sistema de regulación del Río San Juan
+        y permite almacenar agua proveniente de la cuenca alta.
+        """,
+
+        imagen=img_caracoles_data
+
+    )
+
+
+    punta_negra_html = crear_tarjeta_dique(
+
+        titulo="Dique Punta Negra",
+
+        texto="""
+        Integra el sistema de embalses y participa en la
+        regulación del agua que continúa hacia el valle.
+        """,
+
+        imagen=img_punta_negra_data
+
+    )
+
+
+    ullum_html = crear_tarjeta_dique(
+
+        titulo="Dique de Ullum",
+
+        texto="""
+        Es una etapa clave antes de la distribución del agua
+        hacia los distintos usos de la cuenca baja.
+        """,
+
+        imagen=img_ullum_data
 
     )
 
 
     # ========================================================
-    # FONDO
+    # FONDO MINA
     # ========================================================
 
-    if fondo_mina_data_uri:
+    if fondo_mina_data:
 
         fondo_css = f"""
         linear-gradient(
@@ -337,7 +556,7 @@ else:
             rgba(0,0,0,0.34) 48%,
             rgba(0,0,0,0.20) 100%
         ),
-        url("{fondo_mina_data_uri}")
+        url("{fondo_mina_data}")
         """
 
     else:
@@ -352,946 +571,504 @@ else:
 
 
     # ========================================================
-    # HTML COMPLETO
+    # HTML
     # ========================================================
 
     html_template = """
 
 <style>
 
-
-/* =========================================================
-   GENERAL
-========================================================= */
-
 body {
-
     margin: 0;
-
     background: #101820;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    font-family: Arial, Helvetica, sans-serif;
 }
-
 
 .experiencia {
-
     width: 100%;
-
     height: 900px;
-
     position: relative;
-
     border-radius: 18px;
-
     overflow: hidden;
-
     background: #101820;
-
-    box-shadow:
-        0 18px 45px
-        rgba(0,0,0,0.20);
-
+    box-shadow: 0 18px 45px rgba(0,0,0,0.20);
 }
 
 
+/* =======================================================
+   VIDEOS
+======================================================= */
 
-/* =========================================================
-   VIDEO
-========================================================= */
-
-#pantalla-video {
-
+.pantalla-video {
     width: 100%;
-
     height: 900px;
-
     position: relative;
-
     overflow: hidden;
-
     background: black;
-
 }
 
-
-#video-rio {
-
+.video-recorrido {
     position: absolute;
-
-    top: 0;
-
-    left: 0;
-
+    inset: 0;
     width: 100%;
-
     height: 100%;
-
     object-fit: cover;
-
     object-position: center;
-
-    display: block;
-
 }
-
 
 .etiqueta-video {
-
     position: absolute;
-
     top: 30px;
-
     left: 35px;
-
     padding: 12px 20px;
-
-    background:
-        rgba(0,0,0,0.48);
-
     color: white;
-
-    border:
-        1px solid
-        rgba(255,255,255,0.18);
-
+    background: rgba(0,0,0,0.48);
+    border: 1px solid rgba(255,255,255,0.18);
     border-radius: 12px;
-
     backdrop-filter: blur(7px);
-
-    -webkit-backdrop-filter:
-        blur(7px);
-
     font-size: 18px;
-
-    font-weight: 600;
-
+    font-weight: 700;
 }
 
 
+/* =======================================================
+   PANTALLAS GENERALES
+======================================================= */
 
-/* =========================================================
-   PANTALLAS
-========================================================= */
-
-#info-mina,
-#decision-mina,
-#resultado-mina {
-
+.pantalla-contenido {
     display: none;
-
     width: 100%;
-
     height: 900px;
-
     box-sizing: border-box;
-
-    padding:
-        35px 38px;
-
+    padding: 35px 38px;
     color: white;
-
-    background:
-        __FONDO__;
-
-    background-size:
-        cover;
-
-    background-position:
-        center;
-
-    background-repeat:
-        no-repeat;
-
     overflow-y: auto;
-
-    animation:
-        aparecer 0.55s ease;
-
+    animation: aparecer 0.55s ease;
 }
 
+.pantalla-mina {
+    background:
+        __FONDO_MINA__;
+    background-size: cover;
+    background-position: center;
+}
 
 @keyframes aparecer {
-
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 
-
-/* =========================================================
+/* =======================================================
    TÍTULOS
-========================================================= */
+======================================================= */
 
 .titulo-etapa {
-
     font-size: 14px;
-
     letter-spacing: 2.4px;
-
     color: #69d6dd;
-
     font-weight: 700;
-
     margin-bottom: 10px;
-
-    text-shadow:
-        0 2px 7px
-        rgba(0,0,0,0.55);
-
+    text-shadow: 0 2px 7px rgba(0,0,0,0.60);
 }
 
-
-.titulo-mina {
-
+.titulo-principal {
     font-size: 42px;
-
     font-weight: 800;
-
     margin-bottom: 12px;
-
     color: white;
-
-    text-shadow:
-        0 3px 10px
-        rgba(0,0,0,0.65);
-
+    text-shadow: 0 3px 10px rgba(0,0,0,0.70);
 }
-
 
 .descripcion {
-
     font-size: 17px;
-
     line-height: 1.6;
-
     max-width: 1050px;
-
-    color: white;
-
     margin-bottom: 24px;
-
-    text-shadow:
-        0 2px 7px
-        rgba(0,0,0,0.80);
-
+    color: white;
+    text-shadow: 0 2px 7px rgba(0,0,0,0.80);
 }
 
 
-
-/* =========================================================
-   TARJETAS INFORMATIVAS
-========================================================= */
+/* =======================================================
+   TARJETAS MINA
+======================================================= */
 
 .grid-procesos {
-
     display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
+    grid-template-columns: repeat(2, 1fr);
     gap: 18px;
-
     margin-top: 18px;
-
     margin-bottom: 20px;
-
 }
-
 
 .card-proceso {
-
-    background:
-        rgba(12,22,27,0.52);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.24);
-
+    background: rgba(12,22,27,0.52);
+    border: 1px solid rgba(255,255,255,0.24);
     border-radius: 17px;
-
     overflow: hidden;
-
-    backdrop-filter:
-        blur(8px);
-
-    -webkit-backdrop-filter:
-        blur(8px);
-
-    box-shadow:
-        0 10px 25px
-        rgba(0,0,0,0.22);
-
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.22);
 }
-
 
 .foto-proceso {
-
     width: 100%;
-
     height: 200px;
-
     object-fit: cover;
-
-    display: block;
-
 }
-
 
 .placeholder-foto {
-
     height: 200px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
-    background:
-        rgba(255,255,255,0.10);
-
+    background: rgba(255,255,255,0.10);
 }
-
 
 .card-proceso-body {
-
-    padding:
-        17px 20px 19px 20px;
-
+    padding: 17px 20px 19px;
 }
-
 
 .card-subtitle {
-
     font-size: 12px;
-
     letter-spacing: 1.5px;
-
     color: #75dce2;
-
     font-weight: 700;
-
     margin-bottom: 7px;
-
 }
-
 
 .card-title {
-
     font-size: 23px;
-
     font-weight: 750;
-
     margin-bottom: 10px;
-
 }
-
 
 .card-text {
-
     font-size: 15px;
-
     line-height: 1.5;
-
     color: #f3f3f3;
-
 }
 
 
-
-/* =========================================================
+/* =======================================================
    CONCEPTO CLAVE
-========================================================= */
+======================================================= */
 
 .info-clave {
-
     margin-top: 10px;
-
-    padding:
-        16px 20px;
-
+    padding: 16px 20px;
     border-radius: 15px;
-
-    background:
-        rgba(10,20,25,0.52);
-
-    border:
-        1px solid
-        rgba(112,214,222,0.42);
-
+    background: rgba(10,20,25,0.52);
+    border: 1px solid rgba(112,214,222,0.42);
     line-height: 1.55;
-
-    backdrop-filter:
-        blur(8px);
-
+    backdrop-filter: blur(8px);
 }
 
 
-
-/* =========================================================
-   BOTONES DE NAVEGACIÓN
-========================================================= */
+/* =======================================================
+   BOTONES
+======================================================= */
 
 .botones-navegacion {
-
     display: flex;
-
     justify-content: center;
-
-    align-items: center;
-
     gap: 14px;
-
     margin-top: 22px;
-
     flex-wrap: wrap;
-
 }
-
 
 .btn-principal,
 .btn-secundario {
-
-    border:
-        1px solid
-        rgba(255,255,255,0.28);
-
+    border: 1px solid rgba(255,255,255,0.28);
     border-radius: 13px;
-
-    padding:
-        15px 25px;
-
+    padding: 15px 25px;
     color: white;
-
     font-size: 16px;
-
     font-weight: 700;
-
     cursor: pointer;
-
-    transition:
-        0.25s;
-
+    transition: 0.25s;
 }
-
 
 .btn-principal {
-
-    background:
-        rgba(22,156,171,0.95);
-
+    background: rgba(22,156,171,0.95);
 }
-
 
 .btn-principal:hover {
-
-    transform:
-        translateY(-3px);
-
-    background:
-        rgba(42,187,199,1);
-
+    transform: translateY(-3px);
+    background: rgba(42,187,199,1);
 }
-
 
 .btn-secundario {
-
-    background:
-        rgba(10,20,25,0.62);
-
+    background: rgba(10,20,25,0.62);
 }
-
 
 .btn-secundario:hover {
-
-    transform:
-        translateY(-3px);
-
-    background:
-        rgba(255,255,255,0.16);
-
+    transform: translateY(-3px);
+    background: rgba(255,255,255,0.16);
 }
 
 
-
-/* =========================================================
-   DECISIONES
-========================================================= */
+/* =======================================================
+   DECISIÓN MINA
+======================================================= */
 
 .pregunta {
-
     font-size: 25px;
-
     font-weight: 700;
-
     margin-top: 32px;
-
     margin-bottom: 20px;
-
-    text-shadow:
-        0 3px 9px
-        rgba(0,0,0,0.70);
-
 }
-
 
 .opciones {
-
     display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
+    grid-template-columns: repeat(3,1fr);
     gap: 17px;
-
 }
-
 
 .opcion {
-
-    display: block;
-
     width: 100%;
-
     box-sizing: border-box;
-
     text-align: left;
-
     color: white;
-
-    background:
-        rgba(10,20,25,0.58);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.24);
-
+    background: rgba(10,20,25,0.58);
+    border: 1px solid rgba(255,255,255,0.24);
     border-radius: 17px;
-
     padding: 23px;
-
-    backdrop-filter:
-        blur(8px);
-
-    -webkit-backdrop-filter:
-        blur(8px);
-
-    box-shadow:
-        0 9px 24px
-        rgba(0,0,0,0.22);
-
-    transition:
-        0.25s;
-
+    backdrop-filter: blur(8px);
     cursor: pointer;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    transition: 0.25s;
+    font-family: Arial, Helvetica, sans-serif;
 }
-
 
 .opcion:hover {
-
-    transform:
-        translateY(-5px);
-
-    background:
-        rgba(32,150,161,0.36);
-
-    border-color:
-        #71d9df;
-
+    transform: translateY(-5px);
+    background: rgba(32,150,161,0.36);
+    border-color: #71d9df;
 }
-
 
 .opcion strong {
-
     display: block;
-
     font-size: 20px;
-
     margin-bottom: 9px;
-
 }
-
 
 .opcion span {
-
     display: block;
-
     font-size: 15px;
-
     line-height: 1.5;
-
-    color: #f0f0f0;
-
 }
 
 
-
-/* =========================================================
-   RESULTADO
-========================================================= */
+/* =======================================================
+   RESULTADO MINA
+======================================================= */
 
 .resultado-grid {
-
     display: grid;
-
-    grid-template-columns:
-        0.85fr 1.15fr;
-
+    grid-template-columns: 0.85fr 1.15fr;
     gap: 38px;
-
     align-items: center;
-
     margin-top: 25px;
-
 }
-
 
 .donut-wrapper {
-
     display: flex;
-
     justify-content: center;
-
-    align-items: center;
-
 }
-
 
 .donut {
-
     width: 315px;
-
     height: 315px;
-
     border-radius: 50%;
-
     background:
-
         conic-gradient(
-
-            #e9a23b
-            0%
-            calc(var(--consumo) * 1%),
-
-            #4dc1d1
-            calc(var(--consumo) * 1%)
-            100%
-
+            #e9a23b 0% calc(var(--consumo) * 1%),
+            #4dc1d1 calc(var(--consumo) * 1%) 100%
         );
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
-    box-shadow:
-        0 18px 45px
-        rgba(0,0,0,0.30);
-
     position: relative;
-
+    box-shadow: 0 18px 45px rgba(0,0,0,0.30);
 }
-
 
 .donut::before {
-
     content: "";
-
     width: 205px;
-
     height: 205px;
-
-    background:
-        rgba(7,19,26,0.94);
-
+    background: rgba(7,19,26,0.94);
     border-radius: 50%;
-
     position: absolute;
-
-    border:
-        1px solid
-        rgba(255,255,255,0.12);
-
 }
-
 
 .donut-centro {
-
     position: relative;
-
     z-index: 3;
-
     text-align: center;
-
 }
-
 
 .donut-numero {
-
     font-size: 54px;
-
     font-weight: 800;
-
-    line-height: 1;
-
 }
-
 
 .donut-texto {
-
     margin-top: 8px;
-
     font-size: 15px;
-
     color: #cdebf0;
-
     max-width: 140px;
-
 }
-
-
-.leyenda {
-
-    display: flex;
-
-    justify-content: center;
-
-    gap: 25px;
-
-    margin-top: 18px;
-
-    font-size: 14px;
-
-}
-
-
-.punto {
-
-    width: 12px;
-
-    height: 12px;
-
-    display: inline-block;
-
-    border-radius: 3px;
-
-    margin-right: 6px;
-
-}
-
-
-.punto-consumo {
-
-    background:
-        #e9a23b;
-
-}
-
-
-.punto-restante {
-
-    background:
-        #4dc1d1;
-
-}
-
-
-
-/* =========================================================
-   MÉTRICAS
-========================================================= */
 
 .metricas {
-
     display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
+    grid-template-columns: repeat(3,1fr);
     gap: 12px;
-
     margin-bottom: 18px;
-
 }
-
 
 .metrica {
-
-    background:
-        rgba(9,22,29,0.60);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.18);
-
+    background: rgba(9,22,29,0.60);
+    border: 1px solid rgba(255,255,255,0.18);
     padding: 18px;
-
     border-radius: 14px;
-
-    backdrop-filter:
-        blur(8px);
-
 }
-
 
 .metrica-numero {
-
     font-size: 31px;
-
     font-weight: 800;
-
 }
-
 
 .metrica-label {
-
     font-size: 13px;
-
     color: #cde0e5;
-
     margin-top: 4px;
-
 }
-
 
 .resultado-explicacion {
-
-    background:
-        rgba(9,22,29,0.59);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.19);
-
+    background: rgba(9,22,29,0.59);
+    border: 1px solid rgba(255,255,255,0.19);
     border-radius: 16px;
-
     padding: 21px;
-
     line-height: 1.6;
-
-    backdrop-filter:
-        blur(8px);
-
 }
-
 
 .modelo-educativo {
-
     margin-top: 18px;
-
-    padding:
-        14px 17px;
-
+    padding: 14px 17px;
     border-radius: 12px;
-
     font-size: 13px;
-
     line-height: 1.5;
-
-    background:
-        rgba(0,0,0,0.40);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.16);
-
-    color: #dce7ea;
-
+    background: rgba(0,0,0,0.40);
+    border: 1px solid rgba(255,255,255,0.16);
 }
 
 
+/* =======================================================
+   DIQUES
+======================================================= */
 
-/* =========================================================
-   MENSAJE SIGUIENTE TRAMO
-========================================================= */
+#info-diques {
+    background:
+        linear-gradient(
+            135deg,
+            #102533 0%,
+            #17394a 50%,
+            #1e5367 100%
+        );
+}
 
-.siguiente-panel {
+.grid-diques {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 18px;
+    margin-top: 28px;
+}
 
+.card-dique {
+    background: rgba(5,18,27,0.62);
+    border: 1px solid rgba(255,255,255,0.20);
+    border-radius: 18px;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+    transition: 0.25s;
+}
+
+.card-dique:hover {
+    transform: translateY(-5px);
+    border-color: #6bd5df;
+}
+
+.foto-dique,
+.placeholder-dique {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+}
+
+.placeholder-dique {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.08);
+}
+
+.dique-contenido {
+    padding: 20px;
+}
+
+.dique-titulo {
+    font-size: 23px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.dique-texto {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #e8f2f5;
+}
+
+.estado-caudal {
+    margin-top: 25px;
+    padding: 18px 22px;
+    border-radius: 15px;
+    background: rgba(5,18,27,0.58);
+    border: 1px solid rgba(107,213,223,0.35);
+    font-size: 16px;
+    line-height: 1.55;
+}
+
+.aviso-proxima-decision {
     display: none;
-
     margin-top: 18px;
-
-    padding: 18px;
-
+    padding: 17px;
+    border-radius: 14px;
     text-align: center;
-
-    border-radius: 13px;
-
-    background:
-        rgba(76,193,209,0.18);
-
-    border:
-        1px solid
-        rgba(76,193,209,0.45);
-
+    background: rgba(107,213,223,0.14);
+    border: 1px solid rgba(107,213,223,0.38);
 }
 
 
-
-/* =========================================================
+/* =======================================================
    RESPONSIVE
-========================================================= */
+======================================================= */
 
 @media (max-width: 900px) {
 
     .grid-procesos,
     .opciones,
-    .resultado-grid {
-
-        grid-template-columns:
-            1fr;
-
+    .resultado-grid,
+    .grid-diques {
+        grid-template-columns: 1fr;
     }
-
 
     .metricas {
-
-        grid-template-columns:
-            1fr;
-
+        grid-template-columns: 1fr;
     }
 
-
-    .titulo-mina {
-
+    .titulo-principal {
         font-size: 33px;
-
-    }
-
-
-    .donut {
-
-        width: 250px;
-
-        height: 250px;
-
-    }
-
-
-    .donut::before {
-
-        width: 165px;
-
-        height: 165px;
-
     }
 
 }
@@ -1304,30 +1081,25 @@ body {
 
 
 <!-- =====================================================
-     VIDEO
+     VIDEO 1 · CORDILLERA → MINA
 ===================================================== -->
 
-<div id="pantalla-video">
+<div
+    id="video-1-screen"
+    class="pantalla-video"
+>
 
     <video
-        id="video-rio"
+        id="video-1"
+        class="video-recorrido"
         autoplay
         muted
         playsinline
-    >
-
-        <source
-            src="__VIDEO_DATA__"
-            type="video/mp4"
-        >
-
-    </video>
-
+        src="__VIDEO_1__"
+    ></video>
 
     <div class="etiqueta-video">
-
         🏔️ Cordillera → Mina
-
     </div>
 
 </div>
@@ -1335,24 +1107,21 @@ body {
 
 
 <!-- =====================================================
-     INFORMACIÓN
+     INFORMACIÓN MINA
 ===================================================== -->
 
-<div id="info-mina">
+<div
+    id="info-mina"
+    class="pantalla-contenido pantalla-mina"
+>
 
     <div class="titulo-etapa">
-
         PARADA 1 · CUENCA ALTA
-
     </div>
 
-
-    <div class="titulo-mina">
-
+    <div class="titulo-principal">
         ⛏️ Gestión del agua en la actividad minera
-
     </div>
-
 
     <div class="descripcion">
 
@@ -1366,7 +1135,6 @@ body {
 
     </div>
 
-
     <div class="grid-procesos">
 
         __TRADICIONAL__
@@ -1375,7 +1143,6 @@ body {
 
     </div>
 
-
     <div class="info-clave">
 
         <strong>💡 Concepto clave:</strong>
@@ -1383,31 +1150,22 @@ body {
         una mayor eficiencia en recuperación y recirculación
         disminuye la necesidad de incorporar agua fresca.
 
-        Por lo tanto, el consumo neto de la operación puede
-        reducirse significativamente.
-
     </div>
-
 
     <div class="botones-navegacion">
 
         <button
-            id="btn-repetir-info"
+            id="btn-repetir-1-info"
             class="btn-secundario"
         >
-
-            ↻ Volver a reproducir la simulación
-
+            ↻ Reproducir recorrido
         </button>
-
 
         <button
             id="btn-ir-decision"
             class="btn-principal"
         >
-
-            Continuar a la toma de decisión →
-
+            Continuar a la decisión →
         </button>
 
     </div>
@@ -1417,46 +1175,37 @@ body {
 
 
 <!-- =====================================================
-     DECISIÓN
+     DECISIÓN MINA
 ===================================================== -->
 
-<div id="decision-mina">
+<div
+    id="decision-mina"
+    class="pantalla-contenido pantalla-mina"
+>
 
     <div class="titulo-etapa">
-
         PARADA 1 · DECISIÓN
-
     </div>
 
-
-    <div class="titulo-mina">
-
+    <div class="titulo-principal">
         ♻️ ¿Cómo gestionarías el agua?
-
     </div>
-
 
     <div class="descripcion">
 
-        Para este modelo educativo se considera que
-        el proceso requiere un volumen equivalente al
-        <strong>25 % del caudal inicial</strong>.
+        Para este modelo educativo se considera
+        una demanda equivalente al 25 % del caudal inicial.
 
-        La cantidad realmente consumida dependerá de
-        cuánto de ese volumen pueda recuperarse y reutilizarse.
+        La cantidad realmente consumida dependerá
+        de cuánto pueda recuperarse y recircularse.
 
     </div>
-
 
     <div class="pregunta">
-
         Seleccioná una estrategia
-
     </div>
 
-
     <div class="opciones">
-
 
         <button
             class="opcion"
@@ -1464,22 +1213,15 @@ body {
         >
 
             <strong>
-
                 ♻️ Alta recirculación · 80 %
-
             </strong>
 
             <span>
-
-                Alta recuperación y reutilización.
-
-                El consumo neto equivalente será
-                aproximadamente 5 % del caudal inicial.
-
+                Consumo neto equivalente:
+                aproximadamente 5 %.
             </span>
 
         </button>
-
 
 
         <button
@@ -1488,22 +1230,15 @@ body {
         >
 
             <strong>
-
                 ⚖️ Recirculación intermedia · 60 %
-
             </strong>
 
             <span>
-
-                Recuperación parcial.
-
-                El consumo neto equivalente será
-                aproximadamente 10 % del caudal inicial.
-
+                Consumo neto equivalente:
+                aproximadamente 10 %.
             </span>
 
         </button>
-
 
 
         <button
@@ -1512,25 +1247,17 @@ body {
         >
 
             <strong>
-
                 💧 Sin recirculación · 0 %
-
             </strong>
 
             <span>
-
-                Todo el requerimiento se cubre
-                mediante nuevos aportes.
-
-                El consumo neto equivalente será 25 %.
-
+                Consumo neto equivalente:
+                25 %.
             </span>
 
         </button>
 
-
     </div>
-
 
     <div class="botones-navegacion">
 
@@ -1538,19 +1265,14 @@ body {
             id="btn-volver-info"
             class="btn-secundario"
         >
-
             ← Volver a la información
-
         </button>
 
-
         <button
-            id="btn-repetir-decision"
+            id="btn-repetir-1-decision"
             class="btn-secundario"
         >
-
             ↻ Reproducir recorrido
-
         </button>
 
     </div>
@@ -1560,24 +1282,21 @@ body {
 
 
 <!-- =====================================================
-     RESULTADO
+     RESULTADO MINA
 ===================================================== -->
 
-<div id="resultado-mina">
+<div
+    id="resultado-mina"
+    class="pantalla-contenido pantalla-mina"
+>
 
     <div class="titulo-etapa">
-
         RESULTADO · PARADA 1
-
     </div>
 
-
-    <div class="titulo-mina">
-
+    <div class="titulo-principal">
         📊 Impacto de tu decisión
-
     </div>
-
 
     <div class="descripcion">
 
@@ -1587,28 +1306,15 @@ body {
             -
         </strong>
 
-        <br>
-
-        La visualización muestra la relación entre
-        recirculación, consumo neto y disponibilidad
-        de agua para continuar aguas abajo.
-
     </div>
-
 
 
     <div class="resultado-grid">
 
 
-        <!-- =========================================
-             DONUT
-        ========================================== -->
-
         <div>
 
-
             <div class="donut-wrapper">
-
 
                 <div
                     id="donut"
@@ -1618,82 +1324,29 @@ body {
 
                     <div class="donut-centro">
 
-
                         <div
                             id="donut-restante"
                             class="donut-numero"
                         >
-
                             95%
-
                         </div>
-
 
                         <div class="donut-texto">
-
-                            continúa disponible
-                            aguas abajo
-
+                            continúa disponible aguas abajo
                         </div>
-
 
                     </div>
 
-
                 </div>
-
 
             </div>
-
-
-
-            <div class="leyenda">
-
-
-                <div>
-
-                    <span
-                        class="
-                            punto
-                            punto-restante
-                        "
-                    ></span>
-
-                    Caudal restante
-
-                </div>
-
-
-                <div>
-
-                    <span
-                        class="
-                            punto
-                            punto-consumo
-                        "
-                    ></span>
-
-                    Consumo neto
-
-                </div>
-
-
-            </div>
-
 
         </div>
 
 
-
-        <!-- =========================================
-             DATOS
-        ========================================== -->
-
         <div>
 
-
             <div class="metricas">
-
 
                 <div class="metrica">
 
@@ -1701,19 +1354,14 @@ body {
                         id="metrica-recirculacion"
                         class="metrica-numero"
                     >
-
                         80%
-
                     </div>
 
                     <div class="metrica-label">
-
                         Recirculación
-
                     </div>
 
                 </div>
-
 
 
                 <div class="metrica">
@@ -1722,19 +1370,14 @@ body {
                         id="metrica-consumo"
                         class="metrica-numero"
                     >
-
                         -5%
-
                     </div>
 
                     <div class="metrica-label">
-
-                        Consumo neto simulado
-
+                        Consumo neto
                     </div>
 
                 </div>
-
 
 
                 <div class="metrica">
@@ -1743,55 +1386,36 @@ body {
                         id="metrica-restante"
                         class="metrica-numero"
                     >
-
                         95%
-
                     </div>
 
                     <div class="metrica-label">
-
                         Caudal disponible
-
                     </div>
 
                 </div>
 
-
             </div>
-
 
 
             <div class="resultado-explicacion">
 
-                <strong>
-                    ¿Qué ocurrió?
-                </strong>
+                El proceso utiliza agua,
+                pero parte de ella puede recuperarse
+                y volver al circuito.
 
                 <br><br>
 
-                El proceso requiere un volumen equivalente
-                al <strong>25 %</strong> del caudal inicial.
-
-                <br><br>
-
-                Con una recirculación del
-
-                <strong id="texto-recirculacion">
-                    80 %
-                </strong>,
-
-                parte del agua utilizada vuelve
-                al circuito.
-
-                <br><br>
-
-                El consumo neto equivalente resulta en
+                Con la estrategia seleccionada,
+                el consumo neto representa
 
                 <strong id="texto-consumo">
                     5 %
                 </strong>
 
-                del caudal inicial.
+                del caudal inicial normalizado.
+
+                <br><br>
 
                 Por lo tanto,
 
@@ -1799,10 +1423,10 @@ body {
                     95 %
                 </strong>
 
-                continúa disponible aguas abajo.
+                continúa disponible para seguir
+                hacia el sistema de embalses.
 
             </div>
-
 
 
             <div class="modelo-educativo">
@@ -1811,16 +1435,14 @@ body {
                     ℹ️ Modelo educativo simplificado:
                 </strong>
 
-                estos porcentajes son valores normalizados
-                utilizados para visualizar la relación
-                entre demanda, recuperación y consumo neto.
+                los porcentajes se utilizan para visualizar
+                la relación entre demanda, recuperación
+                y consumo neto.
 
-                No representan directamente el porcentaje
-                real del caudal del Río San Juan utilizado
-                por una operación minera específica.
+                No representan directamente el porcentaje real
+                del Río San Juan utilizado por una mina específica.
 
             </div>
-
 
         </div>
 
@@ -1828,53 +1450,160 @@ body {
     </div>
 
 
-
     <div class="botones-navegacion">
-
 
         <button
             id="btn-cambiar-decision"
             class="btn-secundario"
         >
-
             ← Cambiar decisión
-
         </button>
-
 
         <button
-            id="btn-repetir-resultado"
+            id="btn-repetir-1-resultado"
             class="btn-secundario"
         >
-
             ↻ Reproducir recorrido
-
         </button>
-
 
         <button
             id="btn-continuar-diques"
             class="btn-principal"
         >
-
             Continuar hacia los diques →
-
         </button>
-
 
     </div>
 
+</div>
+
+
+
+<!-- =====================================================
+     VIDEO 2 · MINA → DIQUES
+===================================================== -->
+
+<div
+    id="video-2-screen"
+    class="pantalla-video"
+    style="display:none;"
+>
+
+    <video
+        id="video-2"
+        class="video-recorrido"
+        muted
+        playsinline
+        src="__VIDEO_2__"
+    ></video>
+
+    <div class="etiqueta-video">
+        🌊 Mina → Sistema de embalses
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     INFORMACIÓN DIQUES
+===================================================== -->
+
+<div
+    id="info-diques"
+    class="pantalla-contenido"
+>
+
+    <div class="titulo-etapa">
+        PARADA 2 · SISTEMA DE EMBALSES
+    </div>
+
+    <div class="titulo-principal">
+        🏞️ Regulación y almacenamiento del agua
+    </div>
+
+    <div class="descripcion">
+
+        El agua continúa su recorrido hacia el sistema
+        de embalses del Río San Juan.
+
+        Los diques permiten almacenar y regular el recurso
+        antes de su posterior distribución hacia la cuenca baja.
+
+    </div>
+
+
+    <div class="grid-diques">
+
+        __CARACOLES__
+
+        __PUNTA_NEGRA__
+
+        __ULLUM__
+
+    </div>
+
+
+    <div class="estado-caudal">
+
+        🌊 <strong>Estado actual del recorrido:</strong>
+
+        luego de la decisión tomada en la mina,
+        permanece disponible aproximadamente
+
+        <strong id="caudal-llegada-diques">
+            95 %
+        </strong>
+
+        del caudal inicial normalizado.
+
+    </div>
+
+
+    <div class="botones-navegacion">
+
+        <button
+            id="btn-volver-resultado-mina"
+            class="btn-secundario"
+        >
+            ← Volver al resultado de la mina
+        </button>
+
+        <button
+            id="btn-repetir-2"
+            class="btn-secundario"
+        >
+            ↻ Reproducir Mina → Diques
+        </button>
+
+        <button
+            id="btn-proxima-decision"
+            class="btn-principal"
+        >
+            Continuar →
+        </button>
+
+    </div>
 
 
     <div
-        id="siguiente-panel"
-        class="siguiente-panel"
+        id="aviso-proxima-decision"
+        class="aviso-proxima-decision"
     >
+
+        ✅ Llegaste a la <strong>Parada 2</strong>.
+
+        <br><br>
+
+        El próximo paso será definir
+        la decisión de operación de los embalses
+        y cómo esa decisión modificará
+        el agua disponible aguas abajo.
 
     </div>
 
-
 </div>
+
 
 
 </div>
@@ -1885,7 +1614,7 @@ body {
 
 
 // ==========================================================
-// VARIABLES DE LA DECISIÓN
+// VARIABLES DEL ESTADO
 // ==========================================================
 
 let decisionActual = null;
@@ -1896,151 +1625,175 @@ let consumoActual = 0;
 
 let restanteActual = 100;
 
-let videoSiguiente = "";
-
-
 
 // ==========================================================
-// ELEMENTOS
+// PANTALLAS
 // ==========================================================
 
-const video =
-    document.getElementById(
-        "video-rio"
-    );
-
-
-const pantallaVideo =
-    document.getElementById(
-        "pantalla-video"
-    );
-
+const video1Screen =
+    document.getElementById("video-1-screen");
 
 const infoMina =
-    document.getElementById(
-        "info-mina"
-    );
-
+    document.getElementById("info-mina");
 
 const decisionMina =
-    document.getElementById(
-        "decision-mina"
-    );
-
+    document.getElementById("decision-mina");
 
 const resultadoMina =
-    document.getElementById(
-        "resultado-mina"
-    );
+    document.getElementById("resultado-mina");
 
+const video2Screen =
+    document.getElementById("video-2-screen");
+
+const infoDiques =
+    document.getElementById("info-diques");
 
 
 // ==========================================================
-// FUNCIONES DE NAVEGACIÓN
+// VIDEOS
+// ==========================================================
+
+const video1 =
+    document.getElementById("video-1");
+
+const video2 =
+    document.getElementById("video-2");
+
+
+// ==========================================================
+// OCULTAR TODO
 // ==========================================================
 
 function ocultarTodo() {
 
-    pantallaVideo.style.display =
-        "none";
+    video1Screen.style.display = "none";
 
-    infoMina.style.display =
-        "none";
+    infoMina.style.display = "none";
 
-    decisionMina.style.display =
-        "none";
+    decisionMina.style.display = "none";
 
-    resultadoMina.style.display =
-        "none";
+    resultadoMina.style.display = "none";
 
-}
+    video2Screen.style.display = "none";
 
-
-function mostrarVideo() {
-
-    ocultarTodo();
-
-    pantallaVideo.style.display =
-        "block";
+    infoDiques.style.display = "none";
 
 }
-
-
-function mostrarInformacion() {
-
-    ocultarTodo();
-
-    infoMina.style.display =
-        "block";
-
-}
-
-
-function mostrarDecision() {
-
-    ocultarTodo();
-
-    decisionMina.style.display =
-        "block";
-
-}
-
-
-function mostrarResultado() {
-
-    ocultarTodo();
-
-    resultadoMina.style.display =
-        "block";
-
-}
-
 
 
 // ==========================================================
-// REPETIR VIDEO
+// MOSTRAR PANTALLAS
 // ==========================================================
 
-function reproducirDesdeInicio() {
+function mostrarInfoMina() {
 
-    mostrarVideo();
+    ocultarTodo();
 
-    video.currentTime = 0;
+    infoMina.style.display = "block";
 
-    const reproduccion =
-        video.play();
+}
 
-    if (
-        reproduccion !== undefined
-    ) {
 
-        reproduccion.catch(
-            function(error) {
+function mostrarDecisionMina() {
 
-                console.log(
-                    "Autoplay bloqueado:",
-                    error
-                );
+    ocultarTodo();
 
-            }
-        );
+    decisionMina.style.display = "block";
+
+}
+
+
+function mostrarResultadoMina() {
+
+    ocultarTodo();
+
+    resultadoMina.style.display = "block";
+
+}
+
+
+function mostrarInfoDiques() {
+
+    ocultarTodo();
+
+    infoDiques.style.display = "block";
+
+    document.getElementById(
+        "caudal-llegada-diques"
+    ).textContent =
+        restanteActual + " %";
+
+}
+
+
+// ==========================================================
+// REPRODUCIR VIDEO 1
+// ==========================================================
+
+function reproducirVideo1() {
+
+    ocultarTodo();
+
+    video1Screen.style.display = "block";
+
+    video1.currentTime = 0;
+
+    video1.play();
+
+}
+
+
+// ==========================================================
+// REPRODUCIR VIDEO 2
+// ==========================================================
+
+function reproducirVideo2() {
+
+    ocultarTodo();
+
+    video2Screen.style.display = "block";
+
+    video2.currentTime = 0;
+
+    video2.play();
+
+}
+
+
+// ==========================================================
+// FIN VIDEO 1
+// ==========================================================
+
+video1.addEventListener(
+    "ended",
+    function() {
+
+        mostrarInfoMina();
 
     }
-
-}
-
+);
 
 
 // ==========================================================
-// DECISIONES
+// FIN VIDEO 2
+// ==========================================================
+
+video2.addEventListener(
+    "ended",
+    function() {
+
+        mostrarInfoDiques();
+
+    }
+);
+
+
+// ==========================================================
+// DECISIÓN MINA
 // ==========================================================
 
 function seleccionarDecision(tipo) {
 
-
-    // ------------------------------------------------------
-    // ALTA
-    // ------------------------------------------------------
 
     if (tipo === "alta") {
 
@@ -2056,15 +1809,8 @@ function seleccionarDecision(tipo) {
         restanteActual =
             95;
 
-        videoSiguiente =
-            "Caudal_alto.mp4";
-
     }
 
-
-    // ------------------------------------------------------
-    // MEDIA
-    // ------------------------------------------------------
 
     else if (tipo === "media") {
 
@@ -2080,15 +1826,8 @@ function seleccionarDecision(tipo) {
         restanteActual =
             90;
 
-        videoSiguiente =
-            "Caudal_medio.mp4";
-
     }
 
-
-    // ------------------------------------------------------
-    // NULA
-    // ------------------------------------------------------
 
     else if (tipo === "nula") {
 
@@ -2104,22 +1843,14 @@ function seleccionarDecision(tipo) {
         restanteActual =
             75;
 
-        videoSiguiente =
-            "Caudal_bajo.mp4";
-
     }
 
 
-    // ------------------------------------------------------
-    // ACTUALIZAR INTERFAZ
-    // ------------------------------------------------------
-
     actualizarResultado();
 
-    mostrarResultado();
+    mostrarResultadoMina();
 
 }
-
 
 
 // ==========================================================
@@ -2168,12 +1899,6 @@ function actualizarResultado() {
 
 
     document.getElementById(
-        "texto-recirculacion"
-    ).textContent =
-        recirculacionActual + " %";
-
-
-    document.getElementById(
         "texto-consumo"
     ).textContent =
         consumoActual + " %";
@@ -2184,33 +1909,11 @@ function actualizarResultado() {
     ).textContent =
         restanteActual + " %";
 
-
-    document.getElementById(
-        "siguiente-panel"
-    ).style.display =
-        "none";
-
 }
 
 
-
 // ==========================================================
-// FIN DEL VIDEO
-// ==========================================================
-
-video.addEventListener(
-    "ended",
-    function() {
-
-        mostrarInformacion();
-
-    }
-);
-
-
-
-// ==========================================================
-// BOTONES INFORMACIÓN
+// BOTONES MINA
 // ==========================================================
 
 document.getElementById(
@@ -2219,81 +1922,55 @@ document.getElementById(
     "click",
     function() {
 
-        mostrarDecision();
+        mostrarDecisionMina();
 
     }
 );
 
 
 document.getElementById(
-    "btn-repetir-info"
+    "btn-repetir-1-info"
 ).addEventListener(
     "click",
-    function() {
-
-        reproducirDesdeInicio();
-
-    }
+    reproducirVideo1
 );
 
-
-
-// ==========================================================
-// BOTONES DECISIÓN
-// ==========================================================
 
 document.getElementById(
     "btn-volver-info"
 ).addEventListener(
     "click",
-    function() {
-
-        mostrarInformacion();
-
-    }
+    mostrarInfoMina
 );
 
 
 document.getElementById(
-    "btn-repetir-decision"
+    "btn-repetir-1-decision"
 ).addEventListener(
     "click",
-    function() {
-
-        reproducirDesdeInicio();
-
-    }
+    reproducirVideo1
 );
 
-
-
-// ==========================================================
-// BOTONES RESULTADO
-// ==========================================================
 
 document.getElementById(
     "btn-cambiar-decision"
 ).addEventListener(
     "click",
-    function() {
-
-        mostrarDecision();
-
-    }
+    mostrarDecisionMina
 );
 
 
 document.getElementById(
-    "btn-repetir-resultado"
+    "btn-repetir-1-resultado"
 ).addEventListener(
     "click",
-    function() {
-
-        reproducirDesdeInicio();
-
-    }
+    reproducirVideo1
 );
 
+
+// ==========================================================
+// RESULTADO → VIDEO 2
+// ==========================================================
 
 document.getElementById(
     "btn-continuar-diques"
@@ -2301,56 +1978,48 @@ document.getElementById(
     "click",
     function() {
 
-        const panel =
-            document.getElementById(
-                "siguiente-panel"
-            );
+        reproducirVideo2();
+
+    }
+);
 
 
-        panel.innerHTML =
+// ==========================================================
+// BOTONES DIQUES
+// ==========================================================
 
-            "✅ Decisión registrada." +
-
-            "<br><br>" +
-
-            "Caudal disponible: " +
-
-            "<strong>" +
-            restanteActual +
-            "%</strong>" +
-
-            "<br><br>" +
-
-            "El siguiente tramo utilizará: " +
-
-            "<strong>" +
-
-            "02_Mina_Diques/" +
-            videoSiguiente +
-
-            "</strong>";
+document.getElementById(
+    "btn-volver-resultado-mina"
+).addEventListener(
+    "click",
+    mostrarResultadoMina
+);
 
 
-        panel.style.display =
+document.getElementById(
+    "btn-repetir-2"
+).addEventListener(
+    "click",
+    reproducirVideo2
+);
+
+
+document.getElementById(
+    "btn-proxima-decision"
+).addEventListener(
+    "click",
+    function() {
+
+        document.getElementById(
+            "aviso-proxima-decision"
+        ).style.display =
             "block";
-
-
-        panel.scrollIntoView({
-
-            behavior:
-                "smooth",
-
-            block:
-                "nearest"
-
-        });
 
     }
 );
 
 
 </script>
-
 """
 
 
@@ -2362,14 +2031,20 @@ document.getElementById(
 
 
     html = html.replace(
-        "__FONDO__",
+        "__FONDO_MINA__",
         fondo_css
     )
 
 
     html = html.replace(
-        "__VIDEO_DATA__",
-        video_data_uri or ""
+        "__VIDEO_1__",
+        video_1_data or ""
+    )
+
+
+    html = html.replace(
+        "__VIDEO_2__",
+        video_2_data or ""
     )
 
 
@@ -2385,8 +2060,26 @@ document.getElementById(
     )
 
 
+    html = html.replace(
+        "__CARACOLES__",
+        caracoles_html
+    )
+
+
+    html = html.replace(
+        "__PUNTA_NEGRA__",
+        punta_negra_html
+    )
+
+
+    html = html.replace(
+        "__ULLUM__",
+        ullum_html
+    )
+
+
     # ========================================================
-    # MOSTRAR
+    # MOSTRAR COMPONENTE
     # ========================================================
 
     st.components.v1.html(
