@@ -59,19 +59,14 @@ def buscar_archivo(
 
         if (
             archivo.is_file()
-            and archivo.suffix.lower()
-            in extensiones
+            and archivo.suffix.lower() in extensiones
         ):
-            encontrados.append(
-                archivo
-            )
+            encontrados.append(archivo)
 
     if not encontrados:
         return None
 
-    return sorted(
-        encontrados
-    )[0]
+    return sorted(encontrados)[0]
 
 
 def buscar_por_prefijo(
@@ -403,7 +398,7 @@ ULLUM_DIR = (
 
 
 # ============================================================
-# IMÁGENES MENÚ
+# IMÁGENES MENÚ DIQUES
 # ============================================================
 
 caracoles_menu_path = (
@@ -640,59 +635,58 @@ componentes_punta_negra = {
 
 
 # ============================================================
-# POSICIÓN INICIAL DE HOTSPOTS
+# POSICIONES CORREGIDAS DE LOS HOTSPOTS
 # ============================================================
 #
-# Ahora la imagen se muestra COMPLETA,
-# sin recorte con object-fit: cover.
+# Estas coordenadas están ajustadas para
+# punta_negra_detalle.jpg que estás usando ahora.
 #
-# Después podemos ajustar estos valores
-# visualmente de a uno si hace falta.
+# x = porcentaje desde la izquierda
+# y = porcentaje desde arriba
 #
 # ============================================================
 
 HOTSPOTS_PUNTA_NEGRA = {
 
     "01": {
-        "x": 86,
-        "y": 37
+        "x": 60.2,
+        "y": 58.1
     },
 
     "02": {
-        "x": 88,
-        "y": 53
+        "x": 55.6,
+        "y": 67.1
     },
 
     "03": {
-        "x": 80,
-        "y": 63
+        "x": 61.4,
+        "y": 86.2
     },
 
     "04": {
-        "x": 88,
-        "y": 74
+        "x": 63.6,
+        "y": 94.0
     },
 
     "05": {
-        "x": 48,
-        "y": 82
+        "x": 31.5,
+        "y": 83.0
     },
 
     "06": {
-        "x": 50,
-        "y": 56
+        "x": 33.8,
+        "y": 65.2
     },
 
     "07": {
-        "x": 57,
-        "y": 23
+        "x": 38.4,
+        "y": 45.1
     }
 
 }
 
 
-# Añadir coordenadas
-# a cada componente.
+# Añadir coordenadas a cada componente
 
 for numero, posicion in (
     HOTSPOTS_PUNTA_NEGRA.items()
@@ -917,7 +911,7 @@ else:
 
 
     # ========================================================
-    # HTML
+    # HTML PRINCIPAL
     # ========================================================
 
     html_template = """
@@ -1009,8 +1003,7 @@ body {
 
     left: 35px;
 
-    padding:
-        12px 20px;
+    padding: 12px 20px;
 
     color: white;
 
@@ -1048,8 +1041,7 @@ body {
 
     box-sizing: border-box;
 
-    padding:
-        35px 38px;
+    padding: 35px 38px;
 
     color: white;
 
@@ -1103,10 +1095,6 @@ body {
 
     margin-bottom: 10px;
 
-    text-shadow:
-        0 2px 7px
-        rgba(0,0,0,0.60);
-
 }
 
 
@@ -1119,10 +1107,6 @@ body {
     margin-bottom: 12px;
 
     color: white;
-
-    text-shadow:
-        0 3px 10px
-        rgba(0,0,0,0.70);
 
 }
 
@@ -1138,10 +1122,6 @@ body {
     margin-bottom: 24px;
 
     color: white;
-
-    text-shadow:
-        0 2px 7px
-        rgba(0,0,0,0.80);
 
 }
 
@@ -1179,9 +1159,6 @@ body {
     border-radius: 17px;
 
     overflow: hidden;
-
-    backdrop-filter:
-        blur(8px);
 
 }
 
@@ -1316,8 +1293,6 @@ body {
 
     cursor: pointer;
 
-    transition: 0.25s;
-
 }
 
 
@@ -1329,29 +1304,10 @@ body {
 }
 
 
-.btn-principal:hover {
-
-    transform:
-        translateY(-3px);
-
-    background:
-        rgba(42,187,199,1);
-
-}
-
-
 .btn-secundario {
 
     background:
         rgba(10,20,25,0.62);
-
-}
-
-
-.btn-secundario:hover {
-
-    background:
-        rgba(255,255,255,0.16);
 
 }
 
@@ -1408,22 +1364,6 @@ body {
     padding: 23px;
 
     cursor: pointer;
-
-    transition: 0.25s;
-
-}
-
-
-.opcion:hover {
-
-    transform:
-        translateY(-5px);
-
-    background:
-        rgba(32,150,161,0.36);
-
-    border-color:
-        #71d9df;
 
 }
 
@@ -1648,10 +1588,6 @@ body {
     background:
         rgba(0,0,0,0.40);
 
-    border:
-        1px solid
-        rgba(255,255,255,0.16);
-
 }
 
 
@@ -1695,10 +1631,6 @@ body {
 
     background:
         rgba(255,255,255,0.06);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.12);
 
 }
 
@@ -1744,23 +1676,6 @@ body {
 
     border-radius: 18px;
 
-    box-shadow:
-        0 14px 32px
-        rgba(0,0,0,0.25);
-
-    transition: 0.25s;
-
-}
-
-
-.card-dique:hover {
-
-    transform:
-        translateY(-5px);
-
-    border-color:
-        rgba(99,210,223,0.65);
-
 }
 
 
@@ -1772,17 +1687,6 @@ body {
     height: 210px;
 
     object-fit: cover;
-
-}
-
-
-.placeholder-card-dique {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
 
 }
 
@@ -1855,16 +1759,6 @@ body {
 
     cursor: pointer;
 
-    transition: 0.2s;
-
-}
-
-
-.btn-explorar:hover {
-
-    background:
-        rgba(48,194,208,1);
-
 }
 
 
@@ -1894,10 +1788,6 @@ body {
 
     background:
         rgba(255,255,255,0.07);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.15);
 
 }
 
@@ -2023,7 +1913,7 @@ body {
 
 
 /* =========================================================
-   FOTO DE DETALLE + HOTSPOTS
+   FOTO DETALLE + HOTSPOTS
 ========================================================= */
 
 .mapa-hotspots {
@@ -2044,16 +1934,6 @@ body {
 
 }
 
-
-/*
-IMPORTANTE:
-
-La imagen ya NO tiene altura fija
-ni object-fit: cover.
-
-Así se muestra completa y los hotspots
-se calculan sobre la fotografía real.
-*/
 
 .img-detalle {
 
@@ -2155,9 +2035,6 @@ se calculan sobre la fotografía real.
     border:
         1px solid
         rgba(255,255,255,0.13);
-
-    backdrop-filter:
-        blur(10px);
 
 }
 
@@ -2323,13 +2200,6 @@ se calculan sobre la fotografía real.
         font-size: 32px;
 
     }
-
-
-    /*
-    IMPORTANTE:
-    ya no definimos altura fija
-    para .img-detalle.
-    */
 
 
     .panel-componente,
@@ -2952,8 +2822,6 @@ se calculan sobre la fotografía real.
     <div class="explorador-grid">
 
 
-        <!-- FOTO + HOTSPOTS -->
-
         <div class="mapa-hotspots">
 
             <img
@@ -3027,8 +2895,6 @@ se calculan sobre la fotografía real.
         </div>
 
 
-
-        <!-- PANEL DEL COMPONENTE -->
 
         <div class="panel-componente">
 
@@ -3113,10 +2979,10 @@ const componentesPuntaNegra =
     __COMPONENTES_PUNTA_NEGRA__;
 
 
-//
-// Ubicación porcentual
-// de los hotspots.
-//
+// ==========================================================
+// COLOCAR HOTSPOTS
+// ==========================================================
+
 Object.entries(
     componentesPuntaNegra
 ).forEach(
@@ -3144,7 +3010,7 @@ Object.entries(
 
 
 // ==========================================================
-// ESTADO SIMULACIÓN
+// ESTADO DE LA SIMULACIÓN
 // ==========================================================
 
 let decisionActual = null;
@@ -3229,7 +3095,8 @@ function reproducirVideo1() {
     ).style.display =
         "block";
 
-    video1.currentTime = 0;
+    video1.currentTime =
+        0;
 
     video1.play();
 
@@ -3369,37 +3236,44 @@ function actualizarResultadoMina() {
     document.getElementById(
         "donut-restante"
     ).textContent =
-        restanteActual + "%";
+        restanteActual +
+        "%";
 
 
     document.getElementById(
         "metrica-recirculacion"
     ).textContent =
-        recirculacionActual + "%";
+        recirculacionActual +
+        "%";
 
 
     document.getElementById(
         "metrica-consumo"
     ).textContent =
-        "-" + consumoActual + "%";
+        "-" +
+        consumoActual +
+        "%";
 
 
     document.getElementById(
         "metrica-restante"
     ).textContent =
-        restanteActual + "%";
+        restanteActual +
+        "%";
 
 
     document.getElementById(
         "texto-consumo"
     ).textContent =
-        consumoActual + " %";
+        consumoActual +
+        " %";
 
 
     document.getElementById(
         "texto-restante"
     ).textContent =
-        restanteActual + " %";
+        restanteActual +
+        " %";
 
 }
 
@@ -3429,7 +3303,8 @@ function reproducirVideo2() {
     ).style.display =
         "block";
 
-    video2.currentTime = 0;
+    video2.currentTime =
+        0;
 
     video2.play();
 
@@ -3509,7 +3384,7 @@ function mostrarProximamente(
 
 
 // ==========================================================
-// HOTSPOTS PUNTA NEGRA
+// HOTSPOTS
 // ==========================================================
 
 function seleccionarComponente(
@@ -3528,8 +3403,6 @@ function seleccionarComponente(
     }
 
 
-    // Quitar selección anterior
-
     document.querySelectorAll(
         ".hotspot"
     ).forEach(
@@ -3542,8 +3415,6 @@ function seleccionarComponente(
         }
     );
 
-
-    // Activar punto seleccionado
 
     const hotspotActivo =
         document.querySelector(
@@ -3562,15 +3433,11 @@ function seleccionarComponente(
     }
 
 
-    // Ocultar mensaje inicial
-
     document.getElementById(
         "panel-inicial"
     ).style.display =
         "none";
 
-
-    // Mostrar ficha
 
     const panelActivo =
         document.getElementById(
@@ -3581,8 +3448,6 @@ function seleccionarComponente(
     panelActivo.style.display =
         "block";
 
-
-    // Imagen pequeña
 
     const imagen =
         document.getElementById(
@@ -3610,8 +3475,6 @@ function seleccionarComponente(
     }
 
 
-    // Número
-
     document.getElementById(
         "numero-componente"
     ).textContent =
@@ -3619,16 +3482,11 @@ function seleccionarComponente(
         " · COMPONENTE";
 
 
-    // Nombre
-
     document.getElementById(
         "titulo-componente"
     ).textContent =
         dato.nombre;
 
-
-    // Texto
-    // Por ahora lo dejamos vacío.
 
     document.getElementById(
         "texto-componente"
@@ -3639,7 +3497,7 @@ function seleccionarComponente(
 
 
 // ==========================================================
-// CONTINUAR SIMULACIÓN
+// CONTINUAR
 // ==========================================================
 
 function continuarSimulacion() {
