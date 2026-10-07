@@ -31,9 +31,7 @@ def file_to_data_uri(file_path: Path):
     if file_path is None or not file_path.exists():
         return None
 
-    mime_type, _ = mimetypes.guess_type(
-        str(file_path)
-    )
+    mime_type, _ = mimetypes.guess_type(str(file_path))
 
     if mime_type is None:
         mime_type = "application/octet-stream"
@@ -45,10 +43,7 @@ def file_to_data_uri(file_path: Path):
     return f"data:{mime_type};base64,{encoded}"
 
 
-def buscar_archivo(
-    carpeta: Path,
-    extensiones
-):
+def buscar_archivo(carpeta: Path, extensiones):
 
     if not carpeta.exists():
         return None
@@ -69,17 +64,12 @@ def buscar_archivo(
     return sorted(encontrados)[0]
 
 
-def buscar_por_prefijo(
-    carpeta: Path,
-    prefijo: str
-):
+def buscar_por_prefijo(carpeta: Path, prefijo: str):
 
     if not carpeta.exists():
         return None
 
-    for archivo in sorted(
-        carpeta.rglob("*")
-    ):
+    for archivo in sorted(carpeta.rglob("*")):
 
         if (
             archivo.is_file()
@@ -145,8 +135,7 @@ def crear_tarjeta_dique(
     identificador,
     nombre,
     subtitulo,
-    imagen,
-    activo=True
+    imagen
 ):
 
     if imagen:
@@ -164,28 +153,6 @@ def crear_tarjeta_dique(
         <div class="placeholder-card-dique">
             Imagen no disponible
         </div>
-        """
-
-    if activo:
-
-        boton = f"""
-        <button
-            class="btn-explorar"
-            onclick="explorarDique('{identificador}')"
-        >
-            Explorar dique →
-        </button>
-        """
-
-    else:
-
-        boton = f"""
-        <button
-            class="btn-explorar deshabilitado"
-            onclick="mostrarProximamente('{nombre}')"
-        >
-            Explorar dique
-        </button>
         """
 
     return f"""
@@ -207,7 +174,12 @@ def crear_tarjeta_dique(
                 {subtitulo}
             </div>
 
-            {boton}
+            <button
+                class="btn-explorar"
+                onclick="explorarDique('{identificador}')"
+            >
+                Explorar dique →
+            </button>
 
         </div>
 
@@ -215,8 +187,44 @@ def crear_tarjeta_dique(
     """
 
 
+def construir_componentes(
+    carpeta_componentes: Path,
+    definiciones,
+    coordenadas
+):
+
+    componentes = {}
+
+    for numero, nombre in definiciones.items():
+
+        archivo = buscar_por_prefijo(
+            carpeta_componentes,
+            f"{numero}_"
+        )
+
+        componentes[numero] = {
+
+            "nombre": nombre,
+
+            "imagen": (
+                file_to_data_uri(archivo)
+                if archivo
+                else ""
+            ),
+
+            # Por ahora lo dejamos vacío.
+            "texto": "",
+
+            "x": coordenadas[numero]["x"],
+
+            "y": coordenadas[numero]["y"]
+        }
+
+    return componentes
+
+
 # ============================================================
-# ESCENARIO SELECCIONADO
+# ESCENARIO
 # ============================================================
 
 escenario = st.session_state.get(
@@ -230,9 +238,7 @@ if not escenario:
         "Primero debes seleccionar un escenario."
     )
 
-    if st.button(
-        "← Volver al simulador"
-    ):
+    if st.button("← Volver al simulador"):
 
         st.switch_page(
             "pages/1_Simulador.py"
@@ -247,17 +253,15 @@ if not escenario:
 
 if escenario != "Superavitario":
 
-    st.title(
-        "🌊 Simulación Hídrica"
-    )
+    st.title("🌊 Simulación Hídrica")
 
     st.markdown(
         f"### Escenario inicial: **{escenario}**"
     )
 
     st.info(
-        f"El escenario {escenario} todavía no "
-        "tiene cargada la experiencia audiovisual."
+        f"El escenario {escenario} todavía "
+        "no tiene cargada la experiencia audiovisual."
     )
 
     if st.button("← Volver"):
@@ -288,9 +292,7 @@ if not video_1_path.exists():
         "No se encontró el video Cordillera → Mina."
     )
 
-    st.code(
-        str(video_1_path)
-    )
+    st.code(str(video_1_path))
 
     st.stop()
 
@@ -299,7 +301,7 @@ if not video_1_path.exists():
 # VIDEO 2 · MINA → DIQUES
 # ============================================================
 
-carpeta_video_2 = (
+VIDEO_2_DIR = (
     BASE_DIR
     / "assets"
     / "videos"
@@ -308,7 +310,7 @@ carpeta_video_2 = (
 
 
 video_2_path = (
-    carpeta_video_2
+    VIDEO_2_DIR
     / "Mina_Diques.mp4"
 )
 
@@ -316,7 +318,7 @@ video_2_path = (
 if not video_2_path.exists():
 
     video_2_path = buscar_archivo(
-        carpeta_video_2,
+        VIDEO_2_DIR,
         {
             ".mp4",
             ".webm",
@@ -337,38 +339,37 @@ if video_2_path is None:
 
 
 # ============================================================
-# IMÁGENES MINA
+# MINA
 # ============================================================
 
-img_moderno_path = (
+MINA_DIR = (
     BASE_DIR
     / "assets"
     / "images"
     / "mina"
+)
+
+
+img_moderno_path = (
+    MINA_DIR
     / "metodo_moderno_recirculacion.jpg"
 )
 
 
 img_tradicional_path = (
-    BASE_DIR
-    / "assets"
-    / "images"
-    / "mina"
+    MINA_DIR
     / "metodo_tradicional_abierto.jpg"
 )
 
 
 fondo_mina_path = (
-    BASE_DIR
-    / "assets"
-    / "images"
-    / "mina"
+    MINA_DIR
     / "fondo_mina.jpg"
 )
 
 
 # ============================================================
-# CARPETAS DIQUES
+# DIQUES
 # ============================================================
 
 DIQUES_DIR = (
@@ -398,7 +399,7 @@ ULLUM_DIR = (
 
 
 # ============================================================
-# IMÁGENES MENÚ DIQUES
+# MENÚ DE DIQUES
 # ============================================================
 
 caracoles_menu_path = (
@@ -420,8 +421,14 @@ ullum_menu_path = (
 
 
 # ============================================================
-# IMAGEN DETALLE PUNTA NEGRA
+# IMÁGENES DE DETALLE
 # ============================================================
+
+caracoles_detalle_path = (
+    CARACOLES_DIR
+    / "caracoles_detalle.jpg"
+)
+
 
 punta_negra_detalle_path = (
     PUNTA_NEGRA_DIR
@@ -429,61 +436,232 @@ punta_negra_detalle_path = (
 )
 
 
-if not punta_negra_detalle_path.exists():
-
-    punta_negra_detalle_path = buscar_por_prefijo(
-        PUNTA_NEGRA_DIR,
-        "punta_negra_detalle"
-    )
-
-
-# ============================================================
-# COMPONENTES PUNTA NEGRA
-# ============================================================
-
-COMPONENTES_DIR = (
-    PUNTA_NEGRA_DIR
-    / "Componentes"
+ullum_detalle_path = (
+    ULLUM_DIR
+    / "ullum_detalle.jpg"
 )
 
 
-componentes_paths = {
+# ============================================================
+# COMPONENTES · PUNTA NEGRA
+# ============================================================
 
-    "01": buscar_por_prefijo(
-        COMPONENTES_DIR,
-        "01_"
-    ),
+PUNTA_NEGRA_COMPONENTES = {
 
-    "02": buscar_por_prefijo(
-        COMPONENTES_DIR,
-        "02_"
-    ),
+    "01": "Obra de toma",
 
-    "03": buscar_por_prefijo(
-        COMPONENTES_DIR,
-        "03_"
-    ),
+    "02": "Aliviadero",
 
-    "04": buscar_por_prefijo(
-        COMPONENTES_DIR,
-        "04_"
-    ),
+    "03": "Casa de máquinas",
 
-    "05": buscar_por_prefijo(
-        COMPONENTES_DIR,
-        "05_"
-    ),
+    "04": "Subestación",
 
-    "06": buscar_por_prefijo(
-        COMPONENTES_DIR,
-        "06_"
-    ),
+    "05": "Descargador de fondo",
 
-    "07": buscar_por_prefijo(
-        COMPONENTES_DIR,
-        "07_"
-    ),
+    "06": "Presa",
+
+    "07": "Embalse"
 }
+
+
+HOTSPOTS_PUNTA_NEGRA = {
+
+    "01": {
+        "x": 60.2,
+        "y": 58.1
+    },
+
+    "02": {
+        "x": 55.6,
+        "y": 67.1
+    },
+
+    "03": {
+        "x": 61.4,
+        "y": 86.2
+    },
+
+    "04": {
+        "x": 63.6,
+        "y": 94.0
+    },
+
+    "05": {
+        "x": 31.5,
+        "y": 83.0
+    },
+
+    "06": {
+        "x": 33.8,
+        "y": 65.2
+    },
+
+    "07": {
+        "x": 38.4,
+        "y": 45.1
+    }
+}
+
+
+# ============================================================
+# COMPONENTES · CARACOLES
+# ============================================================
+
+CARACOLES_COMPONENTES = {
+
+    "01": "Embalse",
+
+    "02": "Pantalla de hormigón",
+
+    "03": "Coronamiento",
+
+    "04": "Aliviadero",
+
+    "05": "Casa de máquinas",
+
+    "06": "Camino de acceso",
+
+    "07": "Río San Juan"
+}
+
+
+HOTSPOTS_CARACOLES = {
+
+    "01": {
+        "x": 77.8,
+        "y": 85.4
+    },
+
+    "02": {
+        "x": 70.1,
+        "y": 64.3
+    },
+
+    "03": {
+        "x": 69.8,
+        "y": 49.4
+    },
+
+    "04": {
+        "x": 25.3,
+        "y": 57.6
+    },
+
+    "05": {
+        "x": 29.6,
+        "y": 76.8
+    },
+
+    "06": {
+        "x": 11.7,
+        "y": 31.4
+    },
+
+    "07": {
+        "x": 57.4,
+        "y": 9.8
+    }
+}
+
+
+# ============================================================
+# COMPONENTES · ULLUM
+# ============================================================
+#
+# El hotspot 08 (Quebrada de Ullum)
+# NO se incluye.
+#
+# ============================================================
+
+ULLUM_COMPONENTES = {
+
+    "01": "Embalse (Lago de Ullum)",
+
+    "02": "Presa de materiales sueltos",
+
+    "03": "Coronamiento",
+
+    "04": "Vertedero / Aliviadero",
+
+    "05": "Central hidroeléctrica",
+
+    "06": "Descargador de fondo",
+
+    "07": "Río San Juan"
+}
+
+
+HOTSPOTS_ULLUM = {
+
+    "01": {
+        "x": 22.5,
+        "y": 12.5
+    },
+
+    "02": {
+        "x": 38.5,
+        "y": 27.8
+    },
+
+    "03": {
+        "x": 52.6,
+        "y": 13.8
+    },
+
+    "04": {
+        "x": 73.4,
+        "y": 20.0
+    },
+
+    "05": {
+        "x": 84.2,
+        "y": 32.8
+    },
+
+    "06": {
+        "x": 70.8,
+        "y": 50.0
+    },
+
+    "07": {
+        "x": 55.0,
+        "y": 75.9
+    }
+}
+
+
+# ============================================================
+# CREAR DATOS DE COMPONENTES
+# ============================================================
+
+punta_negra_componentes = construir_componentes(
+
+    PUNTA_NEGRA_DIR / "Componentes",
+
+    PUNTA_NEGRA_COMPONENTES,
+
+    HOTSPOTS_PUNTA_NEGRA
+)
+
+
+caracoles_componentes = construir_componentes(
+
+    CARACOLES_DIR / "Componentes",
+
+    CARACOLES_COMPONENTES,
+
+    HOTSPOTS_CARACOLES
+)
+
+
+ullum_componentes = construir_componentes(
+
+    ULLUM_DIR / "Componentes",
+
+    ULLUM_COMPONENTES,
+
+    HOTSPOTS_ULLUM
+)
 
 
 # ============================================================
@@ -530,179 +708,67 @@ ullum_menu_data = file_to_data_uri(
 )
 
 
+caracoles_detalle_data = file_to_data_uri(
+    caracoles_detalle_path
+) or ""
+
+
 punta_negra_detalle_data = file_to_data_uri(
     punta_negra_detalle_path
-)
+) or ""
+
+
+ullum_detalle_data = file_to_data_uri(
+    ullum_detalle_path
+) or ""
 
 
 # ============================================================
-# DATOS COMPONENTES PUNTA NEGRA
+# BASE DE DATOS DE LOS 3 DIQUES
 # ============================================================
 
-componentes_punta_negra = {
+DIQUES_INTERACTIVOS = {
 
-    "01": {
+    "caracoles": {
 
-        "nombre": "Obra de toma",
+        "nombre": "Complejo Hidroeléctrico Los Caracoles",
 
-        "imagen": file_to_data_uri(
-            componentes_paths["01"]
-        ) or "",
+        "etiqueta": "LOS CARACOLES",
 
-        "texto": ""
+        "detalle": caracoles_detalle_data,
 
+        "componentes": caracoles_componentes
     },
 
 
-    "02": {
+    "punta_negra": {
 
-        "nombre": "Aliviadero",
+        "nombre": "Complejo Hidroeléctrico Punta Negra",
 
-        "imagen": file_to_data_uri(
-            componentes_paths["02"]
-        ) or "",
+        "etiqueta": "PUNTA NEGRA",
 
-        "texto": ""
+        "detalle": punta_negra_detalle_data,
 
+        "componentes": punta_negra_componentes
     },
 
 
-    "03": {
+    "ullum": {
 
-        "nombre": "Casa de máquinas",
+        "nombre": "Complejo Hidroeléctrico Dique de Ullum",
 
-        "imagen": file_to_data_uri(
-            componentes_paths["03"]
-        ) or "",
+        "etiqueta": "ULLUM",
 
-        "texto": ""
+        "detalle": ullum_detalle_data,
 
-    },
-
-
-    "04": {
-
-        "nombre": "Subestación",
-
-        "imagen": file_to_data_uri(
-            componentes_paths["04"]
-        ) or "",
-
-        "texto": ""
-
-    },
-
-
-    "05": {
-
-        "nombre": "Descargador de fondo",
-
-        "imagen": file_to_data_uri(
-            componentes_paths["05"]
-        ) or "",
-
-        "texto": ""
-
-    },
-
-
-    "06": {
-
-        "nombre": "Presa",
-
-        "imagen": file_to_data_uri(
-            componentes_paths["06"]
-        ) or "",
-
-        "texto": ""
-
-    },
-
-
-    "07": {
-
-        "nombre": "Embalse",
-
-        "imagen": file_to_data_uri(
-            componentes_paths["07"]
-        ) or "",
-
-        "texto": ""
-
+        "componentes": ullum_componentes
     }
 
 }
 
 
-# ============================================================
-# POSICIONES CORREGIDAS DE LOS HOTSPOTS
-# ============================================================
-#
-# Estas coordenadas están ajustadas para
-# punta_negra_detalle.jpg que estás usando ahora.
-#
-# x = porcentaje desde la izquierda
-# y = porcentaje desde arriba
-#
-# ============================================================
-
-HOTSPOTS_PUNTA_NEGRA = {
-
-    "01": {
-        "x": 60.2,
-        "y": 58.1
-    },
-
-    "02": {
-        "x": 55.6,
-        "y": 67.1
-    },
-
-    "03": {
-        "x": 61.4,
-        "y": 86.2
-    },
-
-    "04": {
-        "x": 63.6,
-        "y": 94.0
-    },
-
-    "05": {
-        "x": 31.5,
-        "y": 83.0
-    },
-
-    "06": {
-        "x": 33.8,
-        "y": 65.2
-    },
-
-    "07": {
-        "x": 38.4,
-        "y": 45.1
-    }
-
-}
-
-
-# Añadir coordenadas a cada componente
-
-for numero, posicion in (
-    HOTSPOTS_PUNTA_NEGRA.items()
-):
-
-    componentes_punta_negra[
-        numero
-    ]["x"] = posicion["x"]
-
-    componentes_punta_negra[
-        numero
-    ]["y"] = posicion["y"]
-
-
-componentes_punta_negra_json = json.dumps(
-    componentes_punta_negra,
+diques_interactivos_json = json.dumps(
+    DIQUES_INTERACTIVOS,
     ensure_ascii=False
 )
 
@@ -716,9 +782,7 @@ if (
     not in st.session_state
 ):
 
-    st.session_state.experiencia_iniciada = (
-        False
-    )
+    st.session_state.experiencia_iniciada = False
 
 
 # ============================================================
@@ -766,21 +830,19 @@ if not st.session_state.experiencia_iniciada:
             use_container_width=True
         ):
 
-            st.session_state.experiencia_iniciada = (
-                True
-            )
+            st.session_state.experiencia_iniciada = True
 
             st.rerun()
 
 
 # ============================================================
-# EXPERIENCIA PRINCIPAL
+# EXPERIENCIA
 # ============================================================
 
 else:
 
     # ========================================================
-    # TARJETA MINA TRADICIONAL
+    # TARJETAS MINA
     # ========================================================
 
     tradicional_html = crear_tarjeta_proceso(
@@ -801,10 +863,6 @@ else:
 
     )
 
-
-    # ========================================================
-    # TARJETA MINA MODERNA
-    # ========================================================
 
     moderno_html = crear_tarjeta_proceso(
 
@@ -836,14 +894,11 @@ else:
         nombre="Los Caracoles",
 
         subtitulo="""
-        Primer gran aprovechamiento del sistema
-        en el recorrido aguas abajo.
+        Explorá los principales componentes
+        del aprovechamiento hidroeléctrico.
         """,
 
-        imagen=caracoles_menu_data,
-
-        activo=False
-
+        imagen=caracoles_menu_data
     )
 
 
@@ -855,13 +910,10 @@ else:
 
         subtitulo="""
         Explorá sus principales componentes
-        y cómo se integran dentro del aprovechamiento.
+        y cómo se distribuyen dentro del complejo.
         """,
 
-        imagen=punta_negra_menu_data,
-
-        activo=True
-
+        imagen=punta_negra_menu_data
     )
 
 
@@ -872,14 +924,11 @@ else:
         nombre="Quebrada de Ullum",
 
         subtitulo="""
-        Último gran aprovechamiento antes
-        del ingreso hacia la cuenca baja.
+        Explorá la presa, el embalse
+        y las principales obras hidráulicas.
         """,
 
-        imagen=ullum_menu_data,
-
-        activo=False
-
+        imagen=ullum_menu_data
     )
 
 
@@ -911,7 +960,7 @@ else:
 
 
     # ========================================================
-    # HTML PRINCIPAL
+    # HTML
     # ========================================================
 
     html_template = """
@@ -960,7 +1009,7 @@ body {
 
 
 /* =========================================================
-   VIDEOS
+   VIDEO
 ========================================================= */
 
 .pantalla-video {
@@ -1003,7 +1052,8 @@ body {
 
     left: 35px;
 
-    padding: 12px 20px;
+    padding:
+        12px 20px;
 
     color: white;
 
@@ -1016,8 +1066,7 @@ body {
 
     border-radius: 12px;
 
-    backdrop-filter:
-        blur(7px);
+    backdrop-filter: blur(7px);
 
     font-size: 18px;
 
@@ -1041,14 +1090,15 @@ body {
 
     box-sizing: border-box;
 
-    padding: 35px 38px;
+    padding:
+        35px 38px;
 
     color: white;
 
     overflow-y: auto;
 
     animation:
-        aparecer 0.50s ease;
+        aparecer 0.5s ease;
 
 }
 
@@ -1121,8 +1171,6 @@ body {
 
     margin-bottom: 24px;
 
-    color: white;
-
 }
 
 
@@ -1136,7 +1184,7 @@ body {
     display: grid;
 
     grid-template-columns:
-        repeat(2,1fr);
+        repeat(2, 1fr);
 
     gap: 18px;
 
@@ -1314,7 +1362,7 @@ body {
 
 
 /* =========================================================
-   DECISIONES MINA
+   DECISIÓN MINA
 ========================================================= */
 
 .pregunta {
@@ -1632,6 +1680,17 @@ body {
     background:
         rgba(255,255,255,0.06);
 
+    border:
+        1px solid
+        rgba(255,255,255,0.12);
+
+}
+
+
+.flecha-recorrido {
+
+    color: #63d2df;
+
 }
 
 
@@ -1640,13 +1699,6 @@ body {
     font-size: 14px;
 
     font-weight: 700;
-
-}
-
-
-.flecha-recorrido {
-
-    color: #63d2df;
 
 }
 
@@ -1762,42 +1814,12 @@ body {
 }
 
 
-.btn-explorar.deshabilitado {
-
-    background:
-        rgba(255,255,255,0.10);
-
-    color:
-        rgba(255,255,255,0.70);
-
-}
-
-
-.mensaje-proximamente {
-
-    display: none;
-
-    margin-top: 20px;
-
-    padding:
-        14px 18px;
-
-    border-radius: 13px;
-
-    text-align: center;
-
-    background:
-        rgba(255,255,255,0.07);
-
-}
-
-
 
 /* =========================================================
-   EXPLORADOR PUNTA NEGRA
+   EXPLORADOR GENÉRICO
 ========================================================= */
 
-#explorador-punta-negra {
+#explorador-dique {
 
     background:
         linear-gradient(
@@ -1847,51 +1869,27 @@ body {
 }
 
 
-.indicadores-dique {
-
-    display: flex;
-
-    gap: 10px;
-
-    flex-wrap: wrap;
+.guia-explorador {
 
     margin:
-        12px 0 20px;
-
-}
-
-
-.indicador {
+        5px 0 18px;
 
     padding:
-        10px 14px;
+        11px 15px;
 
     border-radius: 12px;
 
     background:
-        rgba(255,255,255,0.07);
+        rgba(255,255,255,0.06);
 
     border:
         1px solid
-        rgba(255,255,255,0.13);
+        rgba(255,255,255,0.11);
 
-}
+    color:
+        #d5e7ec;
 
-
-.indicador strong {
-
-    display: block;
-
-    font-size: 18px;
-
-}
-
-
-.indicador span {
-
-    font-size: 11px;
-
-    color: #cbdde3;
+    font-size: 14px;
 
 }
 
@@ -1913,7 +1911,7 @@ body {
 
 
 /* =========================================================
-   FOTO DETALLE + HOTSPOTS
+   FOTO + HOTSPOTS
 ========================================================= */
 
 .mapa-hotspots {
@@ -2021,7 +2019,7 @@ body {
 
 .panel-componente {
 
-    min-height: 570px;
+    min-height: 520px;
 
     box-sizing: border-box;
 
@@ -2041,7 +2039,7 @@ body {
 
 .panel-inicial {
 
-    min-height: 570px;
+    min-height: 520px;
 
     display: flex;
 
@@ -2064,7 +2062,7 @@ body {
 
 .icono-explorar {
 
-    font-size: 50px;
+    font-size: 48px;
 
     margin-bottom: 14px;
 
@@ -2082,7 +2080,7 @@ body {
 
     width: 100%;
 
-    height: 245px;
+    height: 235px;
 
     object-fit: cover;
 
@@ -2181,16 +2179,14 @@ body {
     .grid-diques,
     .explorador-grid {
 
-        grid-template-columns:
-            1fr;
+        grid-template-columns: 1fr;
 
     }
 
 
     .metricas {
 
-        grid-template-columns:
-            1fr;
+        grid-template-columns: 1fr;
 
     }
 
@@ -2267,11 +2263,11 @@ body {
     <div class="descripcion">
 
         Antes de tomar una decisión,
-        observá cómo distintas formas
-        de gestión modifican el consumo
-        neto de agua.
+        observá cómo distintas formas de gestión
+        modifican el consumo neto de agua.
 
     </div>
+
 
     <div class="grid-procesos">
 
@@ -2281,15 +2277,16 @@ body {
 
     </div>
 
+
     <div class="info-clave">
 
         <strong>💡 Concepto clave:</strong>
 
-        una mayor recuperación y
-        recirculación reduce la necesidad
-        de incorporar agua fresca.
+        una mayor recuperación y recirculación
+        reduce la necesidad de incorporar agua fresca.
 
     </div>
+
 
     <div class="botones-navegacion">
 
@@ -2341,9 +2338,11 @@ body {
 
     </div>
 
+
     <div class="pregunta">
         Seleccioná una estrategia
     </div>
+
 
     <div class="opciones">
 
@@ -2395,6 +2394,7 @@ body {
         </button>
 
     </div>
+
 
     <div class="botones-navegacion">
 
@@ -2479,7 +2479,9 @@ body {
 
         <div>
 
+
             <div class="metricas">
+
 
                 <div class="metrica">
 
@@ -2528,6 +2530,7 @@ body {
 
                 </div>
 
+
             </div>
 
 
@@ -2566,6 +2569,7 @@ body {
 
         </div>
 
+
     </div>
 
 
@@ -2592,7 +2596,7 @@ body {
 
 
 <!-- =====================================================
-     VIDEO 2 · MINA → DIQUES
+     VIDEO 2
 ===================================================== -->
 
 <div
@@ -2618,7 +2622,7 @@ body {
 
 
 <!-- =====================================================
-     MENÚ DIQUES
+     MENÚ DE DIQUES
 ===================================================== -->
 
 <div
@@ -2639,8 +2643,8 @@ body {
         Los principales aprovechamientos
         funcionan de manera encadenada.
 
-        El agua liberada en uno continúa
-        su recorrido hacia el siguiente.
+        Podés explorar cada dique antes
+        de continuar con la simulación.
 
     </div>
 
@@ -2697,13 +2701,6 @@ body {
     </div>
 
 
-    <div
-        id="mensaje-proximamente"
-        class="mensaje-proximamente"
-    >
-    </div>
-
-
     <div class="botones-navegacion">
 
         <button
@@ -2728,13 +2725,12 @@ body {
         class="panel-continuar"
     >
 
-        ✅ Centro interactivo completado.
+        ✅ Exploración de los embalses disponible.
 
         <br><br>
 
         El próximo paso será incorporar
-        la información sobre gestión de los
-        embalses y la decisión de operación.
+        la decisión de gestión de los embalses.
 
     </div>
 
@@ -2743,11 +2739,11 @@ body {
 
 
 <!-- =====================================================
-     EXPLORADOR PUNTA NEGRA
+     EXPLORADOR GENÉRICO DE DIQUES
 ===================================================== -->
 
 <div
-    id="explorador-punta-negra"
+    id="explorador-dique"
     class="pantalla-contenido"
 >
 
@@ -2755,12 +2751,18 @@ body {
 
         <div>
 
-            <div class="titulo-etapa">
-                EXPLORADOR · PUNTA NEGRA
+            <div
+                id="explorador-etiqueta"
+                class="titulo-etapa"
+            >
+                EXPLORADOR
             </div>
 
-            <div class="titulo-principal">
-                Complejo Hidroeléctrico Punta Negra
+            <div
+                id="explorador-titulo"
+                class="titulo-principal"
+            >
+                Complejo Hidroeléctrico
             </div>
 
         </div>
@@ -2776,45 +2778,10 @@ body {
     </div>
 
 
-    <div class="indicadores-dique">
+    <div class="guia-explorador">
 
-        <div class="indicador">
-
-            <strong>
-                118,4 m
-            </strong>
-
-            <span>
-                Altura aproximada de presa
-            </span>
-
-        </div>
-
-
-        <div class="indicador">
-
-            <strong>
-                500 hm³
-            </strong>
-
-            <span>
-                Capacidad aproximada
-            </span>
-
-        </div>
-
-
-        <div class="indicador">
-
-            <strong>
-                300 GWh/año
-            </strong>
-
-            <span>
-                Generación aproximada
-            </span>
-
-        </div>
+        Seleccioná uno de los puntos numerados
+        para conocer cada componente del aprovechamiento.
 
     </div>
 
@@ -2822,79 +2789,30 @@ body {
     <div class="explorador-grid">
 
 
-        <div class="mapa-hotspots">
+        <!-- FOTO GRANDE -->
+
+        <div
+            id="mapa-hotspots"
+            class="mapa-hotspots"
+        >
 
             <img
-                src="__PUNTA_NEGRA_DETALLE__"
+                id="imagen-detalle-dique"
                 class="img-detalle"
+                src=""
             >
 
 
-            <button
-                class="hotspot"
-                data-numero="01"
-                onclick="seleccionarComponente('01')"
+            <div
+                id="contenedor-hotspots"
             >
-                01
-            </button>
-
-
-            <button
-                class="hotspot"
-                data-numero="02"
-                onclick="seleccionarComponente('02')"
-            >
-                02
-            </button>
-
-
-            <button
-                class="hotspot"
-                data-numero="03"
-                onclick="seleccionarComponente('03')"
-            >
-                03
-            </button>
-
-
-            <button
-                class="hotspot"
-                data-numero="04"
-                onclick="seleccionarComponente('04')"
-            >
-                04
-            </button>
-
-
-            <button
-                class="hotspot"
-                data-numero="05"
-                onclick="seleccionarComponente('05')"
-            >
-                05
-            </button>
-
-
-            <button
-                class="hotspot"
-                data-numero="06"
-                onclick="seleccionarComponente('06')"
-            >
-                06
-            </button>
-
-
-            <button
-                class="hotspot"
-                data-numero="07"
-                onclick="seleccionarComponente('07')"
-            >
-                07
-            </button>
+            </div>
 
         </div>
 
 
+
+        <!-- PANEL LATERAL -->
 
         <div class="panel-componente">
 
@@ -2912,9 +2830,9 @@ body {
                     Explorá el aprovechamiento
                 </strong>
 
-                <br>
+                <br><br>
 
-                Seleccioná uno de los puntos
+                Tocá uno de los círculos
                 numerados sobre la fotografía.
 
             </div>
@@ -2925,6 +2843,7 @@ body {
                 id="panel-activo"
                 class="panel-activo"
             >
+
 
                 <img
                     id="imagen-componente"
@@ -2953,6 +2872,7 @@ body {
                 >
                 </div>
 
+
             </div>
 
 
@@ -2972,45 +2892,15 @@ body {
 
 
 // ==========================================================
-// COMPONENTES PUNTA NEGRA
+// BASE DE DATOS DIQUES
 // ==========================================================
 
-const componentesPuntaNegra =
-    __COMPONENTES_PUNTA_NEGRA__;
-
-
-// ==========================================================
-// COLOCAR HOTSPOTS
-// ==========================================================
-
-Object.entries(
-    componentesPuntaNegra
-).forEach(
-    function([numero, dato]) {
-
-        const hotspot =
-            document.querySelector(
-                '.hotspot[data-numero="' +
-                numero +
-                '"]'
-            );
-
-        if (hotspot) {
-
-            hotspot.style.left =
-                dato.x + "%";
-
-            hotspot.style.top =
-                dato.y + "%";
-
-        }
-
-    }
-);
+const diquesInteractivos =
+    __DIQUES_INTERACTIVOS__;
 
 
 // ==========================================================
-// ESTADO DE LA SIMULACIÓN
+// ESTADO
 // ==========================================================
 
 let decisionActual = null;
@@ -3020,6 +2910,8 @@ let recirculacionActual = 0;
 let consumoActual = 0;
 
 let restanteActual = 100;
+
+let diqueActual = null;
 
 
 // ==========================================================
@@ -3040,7 +2932,7 @@ const pantallas = [
 
     "menu-diques",
 
-    "explorador-punta-negra"
+    "explorador-dique"
 
 ];
 
@@ -3095,8 +2987,7 @@ function reproducirVideo1() {
     ).style.display =
         "block";
 
-    video1.currentTime =
-        0;
+    video1.currentTime = 0;
 
     video1.play();
 
@@ -3114,7 +3005,7 @@ video1.addEventListener(
 
 
 // ==========================================================
-// INFO MINA
+// INFORMACIÓN MINA
 // ==========================================================
 
 function mostrarInfoMina() {
@@ -3145,9 +3036,7 @@ function mostrarDecisionMina() {
 }
 
 
-function seleccionarDecision(
-    tipo
-) {
+function seleccionarDecision(tipo) {
 
 
     if (tipo === "alta") {
@@ -3155,52 +3044,39 @@ function seleccionarDecision(
         decisionActual =
             "Alta recirculación";
 
-        recirculacionActual =
-            80;
+        recirculacionActual = 80;
 
-        consumoActual =
-            5;
+        consumoActual = 5;
 
-        restanteActual =
-            95;
+        restanteActual = 95;
 
     }
 
 
-    else if (
-        tipo === "media"
-    ) {
+    else if (tipo === "media") {
 
         decisionActual =
             "Recirculación intermedia";
 
-        recirculacionActual =
-            60;
+        recirculacionActual = 60;
 
-        consumoActual =
-            10;
+        consumoActual = 10;
 
-        restanteActual =
-            90;
+        restanteActual = 90;
 
     }
 
 
-    else if (
-        tipo === "nula"
-    ) {
+    else if (tipo === "nula") {
 
         decisionActual =
             "Sin recirculación";
 
-        recirculacionActual =
-            0;
+        recirculacionActual = 0;
 
-        consumoActual =
-            25;
+        consumoActual = 25;
 
-        restanteActual =
-            75;
+        restanteActual = 75;
 
     }
 
@@ -3236,44 +3112,37 @@ function actualizarResultadoMina() {
     document.getElementById(
         "donut-restante"
     ).textContent =
-        restanteActual +
-        "%";
+        restanteActual + "%";
 
 
     document.getElementById(
         "metrica-recirculacion"
     ).textContent =
-        recirculacionActual +
-        "%";
+        recirculacionActual + "%";
 
 
     document.getElementById(
         "metrica-consumo"
     ).textContent =
-        "-" +
-        consumoActual +
-        "%";
+        "-" + consumoActual + "%";
 
 
     document.getElementById(
         "metrica-restante"
     ).textContent =
-        restanteActual +
-        "%";
+        restanteActual + "%";
 
 
     document.getElementById(
         "texto-consumo"
     ).textContent =
-        consumoActual +
-        " %";
+        consumoActual + " %";
 
 
     document.getElementById(
         "texto-restante"
     ).textContent =
-        restanteActual +
-        " %";
+        restanteActual + " %";
 
 }
 
@@ -3303,8 +3172,7 @@ function reproducirVideo2() {
     ).style.display =
         "block";
 
-    video2.currentTime =
-        0;
+    video2.currentTime = 0;
 
     video2.play();
 
@@ -3337,54 +3205,140 @@ function mostrarMenuDiques() {
 }
 
 
-function explorarDique(
-    dique
-) {
+// ==========================================================
+// EXPLORAR DIQUE
+// ==========================================================
 
-    if (
-        dique ===
-        "punta_negra"
-    ) {
+function explorarDique(clave) {
 
-        ocultarTodo();
 
-        document.getElementById(
-            "explorador-punta-negra"
-        ).style.display =
-            "block";
+    const dique =
+        diquesInteractivos[
+            clave
+        ];
 
+
+    if (!dique) {
+        return;
     }
 
-}
+
+    diqueActual =
+        clave;
 
 
-function mostrarProximamente(
-    nombre
-) {
+    ocultarTodo();
 
-    const panel =
+
+    document.getElementById(
+        "explorador-dique"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "explorador-etiqueta"
+    ).textContent =
+        "EXPLORADOR · " +
+        dique.etiqueta;
+
+
+    document.getElementById(
+        "explorador-titulo"
+    ).textContent =
+        dique.nombre;
+
+
+    document.getElementById(
+        "imagen-detalle-dique"
+    ).src =
+        dique.detalle;
+
+
+    // Reset panel lateral
+
+    document.getElementById(
+        "panel-inicial"
+    ).style.display =
+        "flex";
+
+
+    document.getElementById(
+        "panel-activo"
+    ).style.display =
+        "none";
+
+
+    // Limpiar hotspots previos
+
+    const contenedor =
         document.getElementById(
-            "mensaje-proximamente"
+            "contenedor-hotspots"
         );
 
 
-    panel.innerHTML =
-        "<strong>" +
-        nombre +
-        "</strong>" +
-        "<br>" +
-        "La exploración interactiva de este dique " +
-        "se incorporará en la próxima etapa.";
+    contenedor.innerHTML =
+        "";
 
 
-    panel.style.display =
-        "block";
+    // Crear hotspots del dique
+
+    Object.entries(
+        dique.componentes
+    ).forEach(
+        function([numero, dato]) {
+
+
+            const boton =
+                document.createElement(
+                    "button"
+                );
+
+
+            boton.className =
+                "hotspot";
+
+
+            boton.textContent =
+                numero;
+
+
+            boton.dataset.numero =
+                numero;
+
+
+            boton.style.left =
+                dato.x + "%";
+
+
+            boton.style.top =
+                dato.y + "%";
+
+
+            boton.addEventListener(
+                "click",
+                function() {
+
+                    seleccionarComponente(
+                        numero
+                    );
+
+                }
+            );
+
+
+            contenedor.appendChild(
+                boton
+            );
+
+        }
+    );
 
 }
 
 
 // ==========================================================
-// HOTSPOTS
+// SELECCIONAR COMPONENTE
 // ==========================================================
 
 function seleccionarComponente(
@@ -3392,8 +3346,19 @@ function seleccionarComponente(
 ) {
 
 
+    if (!diqueActual) {
+        return;
+    }
+
+
+    const dique =
+        diquesInteractivos[
+            diqueActual
+        ];
+
+
     const dato =
-        componentesPuntaNegra[
+        dique.componentes[
             numero
         ];
 
@@ -3402,6 +3367,8 @@ function seleccionarComponente(
         return;
     }
 
+
+    // Quitar selección anterior
 
     document.querySelectorAll(
         ".hotspot"
@@ -3416,7 +3383,9 @@ function seleccionarComponente(
     );
 
 
-    const hotspotActivo =
+    // Activar seleccionado
+
+    const activo =
         document.querySelector(
             '.hotspot[data-numero="' +
             numero +
@@ -3424,9 +3393,9 @@ function seleccionarComponente(
         );
 
 
-    if (hotspotActivo) {
+    if (activo) {
 
-        hotspotActivo.classList.add(
+        activo.classList.add(
             "activo"
         );
 
@@ -3439,15 +3408,15 @@ function seleccionarComponente(
         "none";
 
 
-    const panelActivo =
-        document.getElementById(
-            "panel-activo"
-        );
-
-
-    panelActivo.style.display =
+    document.getElementById(
+        "panel-activo"
+    ).style.display =
         "block";
 
+
+    // ======================================================
+    // IMAGEN
+    // ======================================================
 
     const imagen =
         document.getElementById(
@@ -3455,9 +3424,7 @@ function seleccionarComponente(
         );
 
 
-    if (
-        dato.imagen
-    ) {
+    if (dato.imagen) {
 
         imagen.src =
             dato.imagen;
@@ -3469,11 +3436,22 @@ function seleccionarComponente(
 
     else {
 
+        // Si no existe imagen,
+        // directamente no mostramos
+        // una caja vacía.
+
+        imagen.src =
+            "";
+
         imagen.style.display =
             "none";
 
     }
 
+
+    // ======================================================
+    // NÚMERO
+    // ======================================================
 
     document.getElementById(
         "numero-componente"
@@ -3482,11 +3460,23 @@ function seleccionarComponente(
         " · COMPONENTE";
 
 
+    // ======================================================
+    // TÍTULO
+    // ======================================================
+
     document.getElementById(
         "titulo-componente"
     ).textContent =
         dato.nombre;
 
+
+    // ======================================================
+    // TEXTO
+    // ======================================================
+    //
+    // Por ahora queda vacío.
+    // Lo completaremos después.
+    //
 
     document.getElementById(
         "texto-componente"
@@ -3531,7 +3521,7 @@ function continuarSimulacion() {
 
 
     # ========================================================
-    # REEMPLAZOS
+    # REEMPLAZOS HTML
     # ========================================================
 
     html = html_template
@@ -3586,14 +3576,8 @@ function continuarSimulacion() {
 
 
     html = html.replace(
-        "__PUNTA_NEGRA_DETALLE__",
-        punta_negra_detalle_data or ""
-    )
-
-
-    html = html.replace(
-        "__COMPONENTES_PUNTA_NEGRA__",
-        componentes_punta_negra_json
+        "__DIQUES_INTERACTIVOS__",
+        diques_interactivos_json
     )
 
 
