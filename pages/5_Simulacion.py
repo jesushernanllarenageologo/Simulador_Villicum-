@@ -2,6 +2,7 @@ import streamlit as st
 from pathlib import Path
 import base64
 import mimetypes
+import json
 
 from core.state_manager import init_session_state
 
@@ -22,11 +23,10 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 
 
 # ============================================================
-# FUNCIONES
+# FUNCIONES AUXILIARES
 # ============================================================
 
 def file_to_data_uri(file_path: Path):
-
     if file_path is None or not file_path.exists():
         return None
 
@@ -43,29 +43,48 @@ def file_to_data_uri(file_path: Path):
 
 
 def buscar_archivo(carpeta: Path, extensiones):
-
     """
     Busca recursivamente el primer archivo
-    que tenga alguna de las extensiones indicadas.
+    con una de las extensiones indicadas.
     """
 
     if not carpeta.exists():
         return None
 
-    archivos = []
+    encontrados = []
 
     for archivo in carpeta.rglob("*"):
-
         if (
             archivo.is_file()
             and archivo.suffix.lower() in extensiones
         ):
-            archivos.append(archivo)
+            encontrados.append(archivo)
 
-    if not archivos:
+    if not encontrados:
         return None
 
-    return sorted(archivos)[0]
+    return sorted(encontrados)[0]
+
+
+def buscar_por_prefijo(carpeta: Path, prefijo: str):
+    """
+    Busca un archivo cuyo nombre empiece
+    por un determinado prefijo.
+    """
+
+    if not carpeta.exists():
+        return None
+
+    for archivo in sorted(carpeta.rglob("*")):
+        if (
+            archivo.is_file()
+            and archivo.stem.lower().startswith(
+                prefijo.lower()
+            )
+        ):
+            return archivo
+
+    return None
 
 
 def crear_tarjeta_proceso(
@@ -76,16 +95,13 @@ def crear_tarjeta_proceso(
 ):
 
     if imagen:
-
         bloque_imagen = f"""
         <img
             src="{imagen}"
             class="foto-proceso"
         >
         """
-
     else:
-
         bloque_imagen = """
         <div class="placeholder-foto">
             Imagen no disponible
@@ -118,26 +134,44 @@ def crear_tarjeta_proceso(
 
 
 def crear_tarjeta_dique(
-    titulo,
-    texto,
-    imagen
+    identificador,
+    nombre,
+    subtitulo,
+    imagen,
+    activo=True
 ):
 
     if imagen:
-
         bloque_imagen = f"""
         <img
             src="{imagen}"
-            class="foto-dique"
+            class="foto-card-dique"
         >
         """
-
     else:
-
         bloque_imagen = """
-        <div class="placeholder-dique">
+        <div class="placeholder-card-dique">
             Imagen no disponible
         </div>
+        """
+
+    if activo:
+        boton = f"""
+        <button
+            class="btn-explorar"
+            onclick="explorarDique('{identificador}')"
+        >
+            Explorar dique →
+        </button>
+        """
+    else:
+        boton = f"""
+        <button
+            class="btn-explorar deshabilitado"
+            onclick="mostrarProximamente('{nombre}')"
+        >
+            Explorar dique
+        </button>
         """
 
     return f"""
@@ -145,15 +179,21 @@ def crear_tarjeta_dique(
 
         {bloque_imagen}
 
-        <div class="dique-contenido">
+        <div class="card-dique-body">
 
-            <div class="dique-titulo">
-                {titulo}
+            <div class="card-dique-kicker">
+                APROVECHAMIENTO HIDROELÉCTRICO
             </div>
 
-            <div class="dique-texto">
-                {texto}
+            <div class="card-dique-title">
+                {nombre}
             </div>
+
+            <div class="card-dique-text">
+                {subtitulo}
+            </div>
+
+            {boton}
 
         </div>
 
@@ -162,13 +202,12 @@ def crear_tarjeta_dique(
 
 
 # ============================================================
-# ESCENARIO
+# ESCENARIO SELECCIONADO
 # ============================================================
 
 escenario = st.session_state.get(
     "escenario_seleccionado"
 )
-
 
 if not escenario:
 
@@ -177,7 +216,6 @@ if not escenario:
     )
 
     if st.button("← Volver al simulador"):
-
         st.switch_page(
             "pages/1_Simulador.py"
         )
@@ -203,7 +241,6 @@ if escenario != "Superavitario":
     )
 
     if st.button("← Volver"):
-
         st.switch_page(
             "pages/1_Simulador.py"
         )
@@ -223,7 +260,6 @@ video_1_path = (
     / "Superavitario.mp4"
 )
 
-
 if not video_1_path.exists():
 
     st.error(
@@ -231,7 +267,6 @@ if not video_1_path.exists():
     )
 
     st.code(str(video_1_path))
-
     st.stop()
 
 
@@ -246,16 +281,11 @@ carpeta_video_2 = (
     / "02_Mina_Diques"
 )
 
-
-# Primero intenta encontrar Mina_Diques.mp4
 video_2_path = (
     carpeta_video_2
     / "Mina_Diques.mp4"
 )
 
-
-# Si no existe con ese nombre,
-# busca automáticamente el primer video.
 if not video_2_path.exists():
 
     video_2_path = buscar_archivo(
@@ -268,12 +298,11 @@ if not video_2_path.exists():
         }
     )
 
-
 if video_2_path is None:
 
     st.error(
-        "No se encontró ningún video "
-        "dentro de assets/videos/02_Mina_Diques/"
+        "No se encontró ningún video dentro de "
+        "assets/videos/02_Mina_Diques/"
     )
 
     st.stop()
@@ -291,7 +320,6 @@ img_moderno_path = (
     / "metodo_moderno_recirculacion.jpg"
 )
 
-
 img_tradicional_path = (
     BASE_DIR
     / "assets"
@@ -299,7 +327,6 @@ img_tradicional_path = (
     / "mina"
     / "metodo_tradicional_abierto.jpg"
 )
-
 
 fondo_mina_path = (
     BASE_DIR
@@ -311,52 +338,112 @@ fondo_mina_path = (
 
 
 # ============================================================
-# IMÁGENES DIQUES
+# CARPETAS DIQUES
 # ============================================================
 
-carpeta_diques = (
+DIQUES_DIR = (
     BASE_DIR
     / "assets"
     / "images"
     / "Diques"
 )
 
-
-img_caracoles_path = buscar_archivo(
-    carpeta_diques / "Caracoles",
-    {
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp"
-    }
+CARACOLES_DIR = (
+    DIQUES_DIR
+    / "Caracoles"
 )
 
-
-img_punta_negra_path = buscar_archivo(
-    carpeta_diques / "Punta_Negra",
-    {
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp"
-    }
+PUNTA_NEGRA_DIR = (
+    DIQUES_DIR
+    / "Punta_Negra"
 )
 
-
-img_ullum_path = buscar_archivo(
-    carpeta_diques / "Ullum",
-    {
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp"
-    }
+ULLUM_DIR = (
+    DIQUES_DIR
+    / "Ullum"
 )
 
 
 # ============================================================
-# CONVERTIR ARCHIVOS
+# IMÁGENES MENÚ
+# ============================================================
+
+caracoles_menu_path = (
+    CARACOLES_DIR
+    / "caracoles_menu.jpg"
+)
+
+punta_negra_menu_path = (
+    PUNTA_NEGRA_DIR
+    / "punta_negra_menu.jpg"
+)
+
+ullum_menu_path = (
+    ULLUM_DIR
+    / "ullum_menu.jpg"
+)
+
+
+# ============================================================
+# IMAGEN DETALLE PUNTA NEGRA
+# ============================================================
+
+punta_negra_detalle_path = (
+    PUNTA_NEGRA_DIR
+    / "punta_negra_detalle.jpg"
+)
+
+if not punta_negra_detalle_path.exists():
+
+    punta_negra_detalle_path = buscar_por_prefijo(
+        PUNTA_NEGRA_DIR,
+        "punta_negra_detalle"
+    )
+
+
+# ============================================================
+# COMPONENTES PUNTA NEGRA
+# ============================================================
+
+COMPONENTES_DIR = (
+    PUNTA_NEGRA_DIR
+    / "Componentes"
+)
+
+componentes_paths = {
+    "01": buscar_por_prefijo(
+        COMPONENTES_DIR,
+        "01_"
+    ),
+    "02": buscar_por_prefijo(
+        COMPONENTES_DIR,
+        "02_"
+    ),
+    "03": buscar_por_prefijo(
+        COMPONENTES_DIR,
+        "03_"
+    ),
+    "04": buscar_por_prefijo(
+        COMPONENTES_DIR,
+        "04_"
+    ),
+    "05": buscar_por_prefijo(
+        COMPONENTES_DIR,
+        "05_"
+    ),
+    "06": buscar_por_prefijo(
+        COMPONENTES_DIR,
+        "06_"
+    ),
+    "07": buscar_por_prefijo(
+        COMPONENTES_DIR,
+        "07_"
+    ),
+}
+
+
+# ============================================================
+# CONVERTIR A DATA URI
 # ============================================================
 
 video_1_data = file_to_data_uri(
@@ -379,16 +466,156 @@ fondo_mina_data = file_to_data_uri(
     fondo_mina_path
 )
 
-img_caracoles_data = file_to_data_uri(
-    img_caracoles_path
+caracoles_menu_data = file_to_data_uri(
+    caracoles_menu_path
 )
 
-img_punta_negra_data = file_to_data_uri(
-    img_punta_negra_path
+punta_negra_menu_data = file_to_data_uri(
+    punta_negra_menu_path
 )
 
-img_ullum_data = file_to_data_uri(
-    img_ullum_path
+ullum_menu_data = file_to_data_uri(
+    ullum_menu_path
+)
+
+punta_negra_detalle_data = file_to_data_uri(
+    punta_negra_detalle_path
+)
+
+
+# ============================================================
+# DATOS COMPONENTES PUNTA NEGRA
+# ============================================================
+
+componentes_punta_negra = {
+
+    "01": {
+        "nombre": "Obra de toma",
+        "imagen": file_to_data_uri(
+            componentes_paths["01"]
+        ) or "",
+        "texto": ""
+    },
+
+    "02": {
+        "nombre": "Aliviadero",
+        "imagen": file_to_data_uri(
+            componentes_paths["02"]
+        ) or "",
+        "texto": ""
+    },
+
+    "03": {
+        "nombre": "Casa de máquinas",
+        "imagen": file_to_data_uri(
+            componentes_paths["03"]
+        ) or "",
+        "texto": ""
+    },
+
+    "04": {
+        "nombre": "Subestación",
+        "imagen": file_to_data_uri(
+            componentes_paths["04"]
+        ) or "",
+        "texto": ""
+    },
+
+    "05": {
+        "nombre": "Descargador de fondo",
+        "imagen": file_to_data_uri(
+            componentes_paths["05"]
+        ) or "",
+        "texto": ""
+    },
+
+    "06": {
+        "nombre": "Presa",
+        "imagen": file_to_data_uri(
+            componentes_paths["06"]
+        ) or "",
+        "texto": ""
+    },
+
+    "07": {
+        "nombre": "Embalse",
+        "imagen": file_to_data_uri(
+            componentes_paths["07"]
+        ) or "",
+        "texto": ""
+    }
+
+}
+
+
+# ============================================================
+# POSICIÓN DE HOTSPOTS PUNTA NEGRA
+# ============================================================
+#
+# Coordenadas iniciales en porcentaje.
+# Si después vemos que alguno está desplazado,
+# solamente modificamos x / y.
+#
+# x = posición horizontal
+# y = posición vertical
+#
+# ============================================================
+
+HOTSPOTS_PUNTA_NEGRA = {
+
+    "01": {
+        "x": 86,
+        "y": 37
+    },
+
+    "02": {
+        "x": 88,
+        "y": 53
+    },
+
+    "03": {
+        "x": 80,
+        "y": 63
+    },
+
+    "04": {
+        "x": 88,
+        "y": 74
+    },
+
+    "05": {
+        "x": 48,
+        "y": 82
+    },
+
+    "06": {
+        "x": 50,
+        "y": 56
+    },
+
+    "07": {
+        "x": 57,
+        "y": 23
+    }
+
+}
+
+
+# Añadimos las coordenadas a los datos
+for numero, posicion in HOTSPOTS_PUNTA_NEGRA.items():
+
+    componentes_punta_negra[
+        numero
+    ]["x"] = posicion["x"]
+
+    componentes_punta_negra[
+        numero
+    ]["y"] = posicion["y"]
+
+
+componentes_punta_negra_json = json.dumps(
+    componentes_punta_negra,
+    ensure_ascii=False
 )
 
 
@@ -445,19 +672,18 @@ if not st.session_state.experiencia_iniciada:
         ):
 
             st.session_state.experiencia_iniciada = True
-
             st.rerun()
 
 
 # ============================================================
-# EXPERIENCIA
+# EXPERIENCIA PRINCIPAL
 # ============================================================
 
 else:
 
-    # --------------------------------------------------------
+    # ========================================================
     # TARJETAS MINA
-    # --------------------------------------------------------
+    # ========================================================
 
     tradicional_html = crear_tarjeta_proceso(
 
@@ -497,48 +723,60 @@ else:
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # TARJETAS DIQUES
-    # --------------------------------------------------------
+    # ========================================================
 
     caracoles_html = crear_tarjeta_dique(
 
-        titulo="Dique Caracoles",
+        identificador="caracoles",
 
-        texto="""
-        Forma parte del sistema de regulación del Río San Juan
-        y permite almacenar agua proveniente de la cuenca alta.
+        nombre="Los Caracoles",
+
+        subtitulo="""
+        Primer gran aprovechamiento del sistema
+        en el recorrido aguas abajo.
         """,
 
-        imagen=img_caracoles_data
+        imagen=caracoles_menu_data,
+
+        activo=False
 
     )
 
 
     punta_negra_html = crear_tarjeta_dique(
 
-        titulo="Dique Punta Negra",
+        identificador="punta_negra",
 
-        texto="""
-        Integra el sistema de embalses y participa en la
-        regulación del agua que continúa hacia el valle.
+        nombre="Punta Negra",
+
+        subtitulo="""
+        Explorá sus principales componentes
+        y cómo se integran dentro del aprovechamiento.
         """,
 
-        imagen=img_punta_negra_data
+        imagen=punta_negra_menu_data,
+
+        activo=True
 
     )
 
 
     ullum_html = crear_tarjeta_dique(
 
-        titulo="Dique de Ullum",
+        identificador="ullum",
 
-        texto="""
-        Es una etapa clave antes de la distribución del agua
-        hacia los distintos usos de la cuenca baja.
+        nombre="Quebrada de Ullum",
+
+        subtitulo="""
+        Último gran aprovechamiento antes
+        del ingreso hacia la cuenca baja.
         """,
 
-        imagen=img_ullum_data
+        imagen=ullum_menu_data,
+
+        activo=False
 
     )
 
@@ -578,26 +816,38 @@ else:
 
 <style>
 
+
+/* =========================================================
+   GENERAL
+========================================================= */
+
 body {
     margin: 0;
-    background: #101820;
-    font-family: Arial, Helvetica, sans-serif;
+    background: #0d1820;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 }
+
 
 .experiencia {
     width: 100%;
     height: 900px;
     position: relative;
-    border-radius: 18px;
     overflow: hidden;
-    background: #101820;
-    box-shadow: 0 18px 45px rgba(0,0,0,0.20);
+    border-radius: 18px;
+    background: #0d1820;
+    box-shadow:
+        0 18px 45px
+        rgba(0,0,0,0.22);
 }
 
 
-/* =======================================================
+
+/* =========================================================
    VIDEOS
-======================================================= */
+========================================================= */
 
 .pantalla-video {
     width: 100%;
@@ -606,6 +856,7 @@ body {
     overflow: hidden;
     background: black;
 }
+
 
 .video-recorrido {
     position: absolute;
@@ -616,24 +867,30 @@ body {
     object-position: center;
 }
 
+
 .etiqueta-video {
     position: absolute;
     top: 30px;
     left: 35px;
     padding: 12px 20px;
     color: white;
-    background: rgba(0,0,0,0.48);
-    border: 1px solid rgba(255,255,255,0.18);
+    background:
+        rgba(0,0,0,0.48);
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
     border-radius: 12px;
-    backdrop-filter: blur(7px);
+    backdrop-filter:
+        blur(7px);
     font-size: 18px;
     font-weight: 700;
 }
 
 
-/* =======================================================
-   PANTALLAS GENERALES
-======================================================= */
+
+/* =========================================================
+   PANTALLAS
+========================================================= */
 
 .pantalla-contenido {
     display: none;
@@ -643,8 +900,10 @@ body {
     padding: 35px 38px;
     color: white;
     overflow-y: auto;
-    animation: aparecer 0.55s ease;
+    animation:
+        aparecer 0.50s ease;
 }
+
 
 .pantalla-mina {
     background:
@@ -653,15 +912,22 @@ body {
     background-position: center;
 }
 
+
 @keyframes aparecer {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 
-/* =======================================================
+
+/* =========================================================
    TÍTULOS
-======================================================= */
+========================================================= */
 
 .titulo-etapa {
     font-size: 14px;
@@ -669,16 +935,22 @@ body {
     color: #69d6dd;
     font-weight: 700;
     margin-bottom: 10px;
-    text-shadow: 0 2px 7px rgba(0,0,0,0.60);
+    text-shadow:
+        0 2px 7px
+        rgba(0,0,0,0.60);
 }
+
 
 .titulo-principal {
     font-size: 42px;
     font-weight: 800;
     margin-bottom: 12px;
     color: white;
-    text-shadow: 0 3px 10px rgba(0,0,0,0.70);
+    text-shadow:
+        0 3px 10px
+        rgba(0,0,0,0.70);
 }
+
 
 .descripcion {
     font-size: 17px;
@@ -686,30 +958,39 @@ body {
     max-width: 1050px;
     margin-bottom: 24px;
     color: white;
-    text-shadow: 0 2px 7px rgba(0,0,0,0.80);
+    text-shadow:
+        0 2px 7px
+        rgba(0,0,0,0.80);
 }
 
 
-/* =======================================================
+
+/* =========================================================
    TARJETAS MINA
-======================================================= */
+========================================================= */
 
 .grid-procesos {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+        repeat(2,1fr);
     gap: 18px;
     margin-top: 18px;
     margin-bottom: 20px;
 }
 
+
 .card-proceso {
-    background: rgba(12,22,27,0.52);
-    border: 1px solid rgba(255,255,255,0.24);
+    background:
+        rgba(12,22,27,0.52);
+    border:
+        1px solid
+        rgba(255,255,255,0.24);
     border-radius: 17px;
     overflow: hidden;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.22);
+    backdrop-filter:
+        blur(8px);
 }
+
 
 .foto-proceso {
     width: 100%;
@@ -717,17 +998,20 @@ body {
     object-fit: cover;
 }
 
+
 .placeholder-foto {
     height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.10);
 }
 
+
 .card-proceso-body {
-    padding: 17px 20px 19px;
+    padding:
+        17px 20px 19px;
 }
+
 
 .card-subtitle {
     font-size: 12px;
@@ -737,11 +1021,13 @@ body {
     margin-bottom: 7px;
 }
 
+
 .card-title {
     font-size: 23px;
     font-weight: 750;
     margin-bottom: 10px;
 }
+
 
 .card-text {
     font-size: 15px;
@@ -750,24 +1036,24 @@ body {
 }
 
 
-/* =======================================================
-   CONCEPTO CLAVE
-======================================================= */
-
 .info-clave {
     margin-top: 10px;
-    padding: 16px 20px;
+    padding:
+        16px 20px;
     border-radius: 15px;
-    background: rgba(10,20,25,0.52);
-    border: 1px solid rgba(112,214,222,0.42);
+    background:
+        rgba(10,20,25,0.52);
+    border:
+        1px solid
+        rgba(112,214,222,0.42);
     line-height: 1.55;
-    backdrop-filter: blur(8px);
 }
 
 
-/* =======================================================
-   BOTONES
-======================================================= */
+
+/* =========================================================
+   BOTONES GENERALES
+========================================================= */
 
 .botones-navegacion {
     display: flex;
@@ -777,11 +1063,15 @@ body {
     flex-wrap: wrap;
 }
 
+
 .btn-principal,
 .btn-secundario {
-    border: 1px solid rgba(255,255,255,0.28);
+    border:
+        1px solid
+        rgba(255,255,255,0.28);
     border-radius: 13px;
-    padding: 15px 25px;
+    padding:
+        15px 25px;
     color: white;
     font-size: 16px;
     font-weight: 700;
@@ -789,28 +1079,37 @@ body {
     transition: 0.25s;
 }
 
+
 .btn-principal {
-    background: rgba(22,156,171,0.95);
+    background:
+        rgba(22,156,171,0.95);
 }
+
 
 .btn-principal:hover {
-    transform: translateY(-3px);
-    background: rgba(42,187,199,1);
+    transform:
+        translateY(-3px);
+    background:
+        rgba(42,187,199,1);
 }
+
 
 .btn-secundario {
-    background: rgba(10,20,25,0.62);
+    background:
+        rgba(10,20,25,0.62);
 }
+
 
 .btn-secundario:hover {
-    transform: translateY(-3px);
-    background: rgba(255,255,255,0.16);
+    background:
+        rgba(255,255,255,0.16);
 }
 
 
-/* =======================================================
+
+/* =========================================================
    DECISIÓN MINA
-======================================================= */
+========================================================= */
 
 .pregunta {
     font-size: 25px;
@@ -819,38 +1118,48 @@ body {
     margin-bottom: 20px;
 }
 
+
 .opciones {
     display: grid;
-    grid-template-columns: repeat(3,1fr);
+    grid-template-columns:
+        repeat(3,1fr);
     gap: 17px;
 }
+
 
 .opcion {
     width: 100%;
     box-sizing: border-box;
     text-align: left;
     color: white;
-    background: rgba(10,20,25,0.58);
-    border: 1px solid rgba(255,255,255,0.24);
+    background:
+        rgba(10,20,25,0.58);
+    border:
+        1px solid
+        rgba(255,255,255,0.24);
     border-radius: 17px;
     padding: 23px;
-    backdrop-filter: blur(8px);
     cursor: pointer;
     transition: 0.25s;
-    font-family: Arial, Helvetica, sans-serif;
 }
 
+
 .opcion:hover {
-    transform: translateY(-5px);
-    background: rgba(32,150,161,0.36);
-    border-color: #71d9df;
+    transform:
+        translateY(-5px);
+    background:
+        rgba(32,150,161,0.36);
+    border-color:
+        #71d9df;
 }
+
 
 .opcion strong {
     display: block;
     font-size: 20px;
     margin-bottom: 9px;
 }
+
 
 .opcion span {
     display: block;
@@ -859,22 +1168,26 @@ body {
 }
 
 
-/* =======================================================
+
+/* =========================================================
    RESULTADO MINA
-======================================================= */
+========================================================= */
 
 .resultado-grid {
     display: grid;
-    grid-template-columns: 0.85fr 1.15fr;
+    grid-template-columns:
+        0.85fr 1.15fr;
     gap: 38px;
     align-items: center;
     margin-top: 25px;
 }
 
+
 .donut-wrapper {
     display: flex;
     justify-content: center;
 }
+
 
 .donut {
     width: 315px;
@@ -882,24 +1195,31 @@ body {
     border-radius: 50%;
     background:
         conic-gradient(
-            #e9a23b 0% calc(var(--consumo) * 1%),
-            #4dc1d1 calc(var(--consumo) * 1%) 100%
+            #e9a23b
+            0%
+            calc(var(--consumo) * 1%),
+
+            #4dc1d1
+            calc(var(--consumo) * 1%)
+            100%
         );
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    box-shadow: 0 18px 45px rgba(0,0,0,0.30);
 }
+
 
 .donut::before {
     content: "";
     width: 205px;
     height: 205px;
-    background: rgba(7,19,26,0.94);
+    background:
+        rgba(7,19,26,0.94);
     border-radius: 50%;
     position: absolute;
 }
+
 
 .donut-centro {
     position: relative;
@@ -907,10 +1227,12 @@ body {
     text-align: center;
 }
 
+
 .donut-numero {
     font-size: 54px;
     font-weight: 800;
 }
+
 
 .donut-texto {
     margin-top: 8px;
@@ -919,24 +1241,32 @@ body {
     max-width: 140px;
 }
 
+
 .metricas {
     display: grid;
-    grid-template-columns: repeat(3,1fr);
+    grid-template-columns:
+        repeat(3,1fr);
     gap: 12px;
     margin-bottom: 18px;
 }
 
+
 .metrica {
-    background: rgba(9,22,29,0.60);
-    border: 1px solid rgba(255,255,255,0.18);
+    background:
+        rgba(9,22,29,0.60);
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
     padding: 18px;
     border-radius: 14px;
 }
+
 
 .metrica-numero {
     font-size: 31px;
     font-weight: 800;
 }
+
 
 .metrica-label {
     font-size: 13px;
@@ -944,13 +1274,18 @@ body {
     margin-top: 4px;
 }
 
+
 .resultado-explicacion {
-    background: rgba(9,22,29,0.59);
-    border: 1px solid rgba(255,255,255,0.19);
+    background:
+        rgba(9,22,29,0.59);
+    border:
+        1px solid
+        rgba(255,255,255,0.19);
     border-radius: 16px;
     padding: 21px;
     line-height: 1.6;
 }
+
 
 .modelo-educativo {
     margin-top: 18px;
@@ -958,117 +1293,549 @@ body {
     border-radius: 12px;
     font-size: 13px;
     line-height: 1.5;
-    background: rgba(0,0,0,0.40);
-    border: 1px solid rgba(255,255,255,0.16);
+    background:
+        rgba(0,0,0,0.40);
+    border:
+        1px solid
+        rgba(255,255,255,0.16);
 }
 
 
-/* =======================================================
-   DIQUES
-======================================================= */
 
-#info-diques {
+/* =========================================================
+   MENÚ DIQUES
+========================================================= */
+
+#menu-diques {
     background:
         linear-gradient(
             135deg,
-            #102533 0%,
-            #17394a 50%,
-            #1e5367 100%
+            #071925 0%,
+            #0d3041 48%,
+            #12516a 100%
         );
 }
 
-.grid-diques {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 18px;
-    margin-top: 28px;
-}
 
-.card-dique {
-    background: rgba(5,18,27,0.62);
-    border: 1px solid rgba(255,255,255,0.20);
-    border-radius: 18px;
-    overflow: hidden;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.25);
-    transition: 0.25s;
-}
-
-.card-dique:hover {
-    transform: translateY(-5px);
-    border-color: #6bd5df;
-}
-
-.foto-dique,
-.placeholder-dique {
-    width: 100%;
-    height: 230px;
-    object-fit: cover;
-}
-
-.placeholder-dique {
+.recorrido-diques {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.08);
-}
+    gap: 10px;
+    flex-wrap: wrap;
 
-.dique-contenido {
-    padding: 20px;
-}
+    margin:
+        8px 0 28px;
 
-.dique-titulo {
-    font-size: 23px;
-    font-weight: 800;
-    margin-bottom: 10px;
-}
+    padding:
+        12px 15px;
 
-.dique-texto {
-    font-size: 15px;
-    line-height: 1.5;
-    color: #e8f2f5;
-}
-
-.estado-caudal {
-    margin-top: 25px;
-    padding: 18px 22px;
-    border-radius: 15px;
-    background: rgba(5,18,27,0.58);
-    border: 1px solid rgba(107,213,223,0.35);
-    font-size: 16px;
-    line-height: 1.55;
-}
-
-.aviso-proxima-decision {
-    display: none;
-    margin-top: 18px;
-    padding: 17px;
     border-radius: 14px;
-    text-align: center;
-    background: rgba(107,213,223,0.14);
-    border: 1px solid rgba(107,213,223,0.38);
+
+    background:
+        rgba(255,255,255,0.06);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.12);
 }
 
 
-/* =======================================================
+.nodo-recorrido {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+.flecha-recorrido {
+    color: #63d2df;
+}
+
+
+.grid-diques {
+    display: grid;
+    grid-template-columns:
+        repeat(3,1fr);
+    gap: 18px;
+}
+
+
+.card-dique {
+    overflow: hidden;
+
+    background:
+        rgba(4,18,27,0.65);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 14px 32px
+        rgba(0,0,0,0.25);
+
+    transition: 0.25s;
+}
+
+
+.card-dique:hover {
+    transform:
+        translateY(-5px);
+
+    border-color:
+        rgba(99,210,223,0.65);
+}
+
+
+.foto-card-dique,
+.placeholder-card-dique {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+}
+
+
+.placeholder-card-dique {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.card-dique-body {
+    padding: 18px 18px 20px;
+}
+
+
+.card-dique-kicker {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: #69d6dd;
+    margin-bottom: 6px;
+}
+
+
+.card-dique-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+
+.card-dique-text {
+    min-height: 45px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #dce8ec;
+}
+
+
+.btn-explorar {
+    margin-top: 15px;
+    width: 100%;
+
+    padding: 12px;
+
+    border: none;
+    border-radius: 11px;
+
+    background:
+        rgba(25,166,183,0.88);
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.btn-explorar:hover {
+    background:
+        rgba(48,194,208,1);
+}
+
+
+.btn-explorar.deshabilitado {
+    background:
+        rgba(255,255,255,0.10);
+
+    color:
+        rgba(255,255,255,0.70);
+}
+
+
+.mensaje-proximamente {
+    display: none;
+
+    margin-top: 20px;
+
+    padding: 14px 18px;
+
+    border-radius: 13px;
+
+    text-align: center;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.15);
+}
+
+
+
+/* =========================================================
+   EXPLORADOR PUNTA NEGRA
+========================================================= */
+
+#explorador-punta-negra {
+    background:
+        linear-gradient(
+            135deg,
+            #071720,
+            #0c2c3a
+        );
+}
+
+
+.explorador-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+
+.btn-volver {
+    border:
+        1px solid
+        rgba(255,255,255,0.20);
+
+    background:
+        rgba(255,255,255,0.07);
+
+    color: white;
+
+    border-radius: 11px;
+
+    padding:
+        11px 16px;
+
+    cursor: pointer;
+
+    font-weight: 700;
+}
+
+
+.indicadores-dique {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    margin:
+        12px 0 20px;
+}
+
+
+.indicador {
+    padding:
+        10px 14px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.13);
+}
+
+
+.indicador strong {
+    display: block;
+    font-size: 18px;
+}
+
+
+.indicador span {
+    font-size: 11px;
+    color: #cbdde3;
+}
+
+
+.explorador-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(0,1.55fr)
+        minmax(280px,0.65fr);
+
+    gap: 18px;
+}
+
+
+.mapa-hotspots {
+    position: relative;
+
+    width: 100%;
+
+    border-radius: 17px;
+
+    overflow: hidden;
+
+    background: black;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.14);
+}
+
+
+.img-detalle {
+    width: 100%;
+    height: 570px;
+    object-fit: cover;
+    display: block;
+}
+
+
+.hotspot {
+    position: absolute;
+
+    transform:
+        translate(-50%,-50%);
+
+    width: 46px;
+    height: 46px;
+
+    border-radius: 50%;
+
+    border:
+        2px solid white;
+
+    background:
+        rgba(6,25,34,0.76);
+
+    color: white;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 18px
+        rgba(0,0,0,0.38);
+
+    transition:
+        0.22s;
+
+    z-index: 5;
+}
+
+
+.hotspot:hover {
+    transform:
+        translate(-50%,-50%)
+        scale(1.12);
+
+    background:
+        #2bb9c8;
+}
+
+
+.hotspot.activo {
+    background:
+        #37c6d5;
+
+    border-color:
+        #baf9ff;
+
+    transform:
+        translate(-50%,-50%)
+        scale(1.15);
+
+    box-shadow:
+        0 0 0 7px
+        rgba(55,198,213,0.18);
+}
+
+
+
+/* =========================================================
+   PANEL COMPONENTE
+========================================================= */
+
+.panel-componente {
+    min-height: 570px;
+
+    box-sizing: border-box;
+
+    border-radius: 17px;
+
+    overflow: hidden;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.13);
+
+    backdrop-filter:
+        blur(10px);
+}
+
+
+.panel-inicial {
+    min-height: 570px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 30px;
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+    color: #d8e7eb;
+}
+
+
+.icono-explorar {
+    font-size: 50px;
+    margin-bottom: 14px;
+}
+
+
+.panel-activo {
+    display: none;
+}
+
+
+.imagen-componente {
+    width: 100%;
+    height: 245px;
+    object-fit: cover;
+    display: block;
+}
+
+
+.numero-componente {
+    margin:
+        20px 22px 4px;
+
+    color: #64d3df;
+
+    font-size: 12px;
+
+    letter-spacing: 1.8px;
+
+    font-weight: 800;
+}
+
+
+.titulo-componente {
+    margin:
+        0 22px;
+
+    font-size: 25px;
+
+    font-weight: 800;
+}
+
+
+.texto-componente {
+    margin:
+        18px 22px 25px;
+
+    min-height: 110px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,0.10);
+
+    padding-top: 16px;
+
+    font-size: 15px;
+
+    line-height: 1.55;
+
+    color: #dce8ec;
+}
+
+
+
+/* =========================================================
+   CONTINUAR SIMULACIÓN
+========================================================= */
+
+.panel-continuar {
+    display: none;
+
+    margin-top: 20px;
+
+    padding:
+        18px;
+
+    text-align: center;
+
+    border-radius: 14px;
+
+    background:
+        rgba(99,210,223,0.12);
+
+    border:
+        1px solid
+        rgba(99,210,223,0.35);
+}
+
+
+
+/* =========================================================
    RESPONSIVE
-======================================================= */
+========================================================= */
 
 @media (max-width: 900px) {
 
     .grid-procesos,
     .opciones,
     .resultado-grid,
-    .grid-diques {
-        grid-template-columns: 1fr;
+    .grid-diques,
+    .explorador-grid {
+        grid-template-columns:
+            1fr;
     }
+
 
     .metricas {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            1fr;
     }
 
+
     .titulo-principal {
-        font-size: 33px;
+        font-size: 32px;
+    }
+
+
+    .img-detalle {
+        height: 430px;
+    }
+
+
+    .panel-componente,
+    .panel-inicial {
+        min-height: auto;
     }
 
 }
@@ -1081,7 +1848,7 @@ body {
 
 
 <!-- =====================================================
-     VIDEO 1 · CORDILLERA → MINA
+     VIDEO 1
 ===================================================== -->
 
 <div
@@ -1107,12 +1874,15 @@ body {
 
 
 <!-- =====================================================
-     INFORMACIÓN MINA
+     INFO MINA
 ===================================================== -->
 
 <div
     id="info-mina"
-    class="pantalla-contenido pantalla-mina"
+    class="
+        pantalla-contenido
+        pantalla-mina
+    "
 >
 
     <div class="titulo-etapa">
@@ -1125,13 +1895,10 @@ body {
 
     <div class="descripcion">
 
-        Antes de tomar una decisión, observá cómo
-        diferentes formas de gestión pueden modificar
-        el consumo neto de agua de una operación minera.
-
-        La recuperación y recirculación permiten reutilizar
-        parte del agua utilizada y reducir la necesidad
-        de incorporar nuevos aportes.
+        Antes de tomar una decisión,
+        observá cómo distintas formas
+        de gestión modifican el consumo
+        neto de agua.
 
     </div>
 
@@ -1147,23 +1914,24 @@ body {
 
         <strong>💡 Concepto clave:</strong>
 
-        una mayor eficiencia en recuperación y recirculación
-        disminuye la necesidad de incorporar agua fresca.
+        una mayor recuperación y
+        recirculación reduce la necesidad
+        de incorporar agua fresca.
 
     </div>
 
     <div class="botones-navegacion">
 
         <button
-            id="btn-repetir-1-info"
             class="btn-secundario"
+            onclick="reproducirVideo1()"
         >
             ↻ Reproducir recorrido
         </button>
 
         <button
-            id="btn-ir-decision"
             class="btn-principal"
+            onclick="mostrarDecisionMina()"
         >
             Continuar a la decisión →
         </button>
@@ -1180,7 +1948,10 @@ body {
 
 <div
     id="decision-mina"
-    class="pantalla-contenido pantalla-mina"
+    class="
+        pantalla-contenido
+        pantalla-mina
+    "
 >
 
     <div class="titulo-etapa">
@@ -1193,11 +1964,9 @@ body {
 
     <div class="descripcion">
 
-        Para este modelo educativo se considera
-        una demanda equivalente al 25 % del caudal inicial.
-
-        La cantidad realmente consumida dependerá
-        de cuánto pueda recuperarse y recircularse.
+        Para este modelo educativo,
+        el proceso requiere un volumen
+        equivalente al 25 % del caudal inicial.
 
     </div>
 
@@ -1211,16 +1980,13 @@ body {
             class="opcion"
             onclick="seleccionarDecision('alta')"
         >
-
             <strong>
                 ♻️ Alta recirculación · 80 %
             </strong>
 
             <span>
-                Consumo neto equivalente:
-                aproximadamente 5 %.
+                Consumo neto aproximado: 5 %.
             </span>
-
         </button>
 
 
@@ -1228,16 +1994,13 @@ body {
             class="opcion"
             onclick="seleccionarDecision('media')"
         >
-
             <strong>
                 ⚖️ Recirculación intermedia · 60 %
             </strong>
 
             <span>
-                Consumo neto equivalente:
-                aproximadamente 10 %.
+                Consumo neto aproximado: 10 %.
             </span>
-
         </button>
 
 
@@ -1245,16 +2008,13 @@ body {
             class="opcion"
             onclick="seleccionarDecision('nula')"
         >
-
             <strong>
                 💧 Sin recirculación · 0 %
             </strong>
 
             <span>
-                Consumo neto equivalente:
-                25 %.
+                Consumo neto aproximado: 25 %.
             </span>
-
         </button>
 
     </div>
@@ -1262,17 +2022,10 @@ body {
     <div class="botones-navegacion">
 
         <button
-            id="btn-volver-info"
             class="btn-secundario"
+            onclick="mostrarInfoMina()"
         >
             ← Volver a la información
-        </button>
-
-        <button
-            id="btn-repetir-1-decision"
-            class="btn-secundario"
-        >
-            ↻ Reproducir recorrido
         </button>
 
     </div>
@@ -1287,7 +2040,10 @@ body {
 
 <div
     id="resultado-mina"
-    class="pantalla-contenido pantalla-mina"
+    class="
+        pantalla-contenido
+        pantalla-mina
+    "
 >
 
     <div class="titulo-etapa">
@@ -1319,7 +2075,7 @@ body {
                 <div
                     id="donut"
                     class="donut"
-                    style="--consumo: 5;"
+                    style="--consumo:5;"
                 >
 
                     <div class="donut-centro">
@@ -1400,52 +2156,37 @@ body {
 
             <div class="resultado-explicacion">
 
-                El proceso utiliza agua,
-                pero parte de ella puede recuperarse
-                y volver al circuito.
-
-                <br><br>
-
-                Con la estrategia seleccionada,
-                el consumo neto representa
+                El consumo neto de esta etapa
+                representa aproximadamente
 
                 <strong id="texto-consumo">
                     5 %
-                </strong>
-
-                del caudal inicial normalizado.
+                </strong>.
 
                 <br><br>
 
-                Por lo tanto,
+                Continúa disponible aproximadamente
 
                 <strong id="texto-restante">
                     95 %
                 </strong>
 
-                continúa disponible para seguir
-                hacia el sistema de embalses.
+                para seguir hacia el sistema
+                de embalses.
 
             </div>
 
 
             <div class="modelo-educativo">
 
-                <strong>
-                    ℹ️ Modelo educativo simplificado:
-                </strong>
-
-                los porcentajes se utilizan para visualizar
-                la relación entre demanda, recuperación
-                y consumo neto.
-
-                No representan directamente el porcentaje real
-                del Río San Juan utilizado por una mina específica.
+                ℹ️ Modelo educativo simplificado.
+                Los porcentajes son normalizados
+                para representar la relación entre
+                consumo y recuperación.
 
             </div>
 
         </div>
-
 
     </div>
 
@@ -1453,22 +2194,15 @@ body {
     <div class="botones-navegacion">
 
         <button
-            id="btn-cambiar-decision"
             class="btn-secundario"
+            onclick="mostrarDecisionMina()"
         >
             ← Cambiar decisión
         </button>
 
         <button
-            id="btn-repetir-1-resultado"
-            class="btn-secundario"
-        >
-            ↻ Reproducir recorrido
-        </button>
-
-        <button
-            id="btn-continuar-diques"
             class="btn-principal"
+            onclick="reproducirVideo2()"
         >
             Continuar hacia los diques →
         </button>
@@ -1506,11 +2240,11 @@ body {
 
 
 <!-- =====================================================
-     INFORMACIÓN DIQUES
+     MENÚ DIQUES
 ===================================================== -->
 
 <div
-    id="info-diques"
+    id="menu-diques"
     class="pantalla-contenido"
 >
 
@@ -1519,16 +2253,57 @@ body {
     </div>
 
     <div class="titulo-principal">
-        🏞️ Regulación y almacenamiento del agua
+        🏞️ Sistema de regulación del Río San Juan
     </div>
 
     <div class="descripcion">
 
-        El agua continúa su recorrido hacia el sistema
-        de embalses del Río San Juan.
+        Los principales aprovechamientos
+        funcionan de manera encadenada.
 
-        Los diques permiten almacenar y regular el recurso
-        antes de su posterior distribución hacia la cuenca baja.
+        El agua liberada en uno continúa
+        su recorrido hacia el siguiente.
+
+    </div>
+
+
+    <div class="recorrido-diques">
+
+        <span class="nodo-recorrido">
+            🏔 Cordillera
+        </span>
+
+        <span class="flecha-recorrido">
+            →
+        </span>
+
+        <span class="nodo-recorrido">
+            Los Caracoles
+        </span>
+
+        <span class="flecha-recorrido">
+            →
+        </span>
+
+        <span class="nodo-recorrido">
+            Punta Negra
+        </span>
+
+        <span class="flecha-recorrido">
+            →
+        </span>
+
+        <span class="nodo-recorrido">
+            Ullum
+        </span>
+
+        <span class="flecha-recorrido">
+            →
+        </span>
+
+        <span class="nodo-recorrido">
+            🌾 Valle de Tulum
+        </span>
 
     </div>
 
@@ -1544,66 +2319,251 @@ body {
     </div>
 
 
-    <div class="estado-caudal">
-
-        🌊 <strong>Estado actual del recorrido:</strong>
-
-        luego de la decisión tomada en la mina,
-        permanece disponible aproximadamente
-
-        <strong id="caudal-llegada-diques">
-            95 %
-        </strong>
-
-        del caudal inicial normalizado.
-
-    </div>
+    <div
+        id="mensaje-proximamente"
+        class="mensaje-proximamente"
+    ></div>
 
 
     <div class="botones-navegacion">
 
         <button
-            id="btn-volver-resultado-mina"
             class="btn-secundario"
+            onclick="reproducirVideo2()"
         >
-            ← Volver al resultado de la mina
+            ↻ Reproducir Mina → Embalses
         </button>
 
         <button
-            id="btn-repetir-2"
-            class="btn-secundario"
-        >
-            ↻ Reproducir Mina → Diques
-        </button>
-
-        <button
-            id="btn-proxima-decision"
             class="btn-principal"
+            onclick="continuarSimulacion()"
         >
-            Continuar →
+            Continuar con la simulación →
         </button>
 
     </div>
 
 
     <div
-        id="aviso-proxima-decision"
-        class="aviso-proxima-decision"
+        id="panel-continuar"
+        class="panel-continuar"
     >
 
-        ✅ Llegaste a la <strong>Parada 2</strong>.
+        ✅ Centro interactivo completado.
 
         <br><br>
 
-        El próximo paso será definir
-        la decisión de operación de los embalses
-        y cómo esa decisión modificará
-        el agua disponible aguas abajo.
+        El próximo paso será incorporar
+        la información sobre gestión de los
+        embalses y la decisión de operación.
 
     </div>
 
 </div>
 
+
+
+<!-- =====================================================
+     EXPLORADOR PUNTA NEGRA
+===================================================== -->
+
+<div
+    id="explorador-punta-negra"
+    class="pantalla-contenido"
+>
+
+    <div class="explorador-top">
+
+        <div>
+
+            <div class="titulo-etapa">
+                EXPLORADOR · PUNTA NEGRA
+            </div>
+
+            <div class="titulo-principal">
+                Complejo Hidroeléctrico Punta Negra
+            </div>
+
+        </div>
+
+
+        <button
+            class="btn-volver"
+            onclick="mostrarMenuDiques()"
+        >
+            ← Volver a los diques
+        </button>
+
+    </div>
+
+
+    <div class="indicadores-dique">
+
+        <div class="indicador">
+            <strong>118,4 m</strong>
+            <span>Altura aproximada de presa</span>
+        </div>
+
+        <div class="indicador">
+            <strong>500 hm³</strong>
+            <span>Capacidad aproximada</span>
+        </div>
+
+        <div class="indicador">
+            <strong>300 GWh/año</strong>
+            <span>Generación aproximada</span>
+        </div>
+
+    </div>
+
+
+    <div class="explorador-grid">
+
+
+        <!-- FOTO + HOTSPOTS -->
+
+        <div class="mapa-hotspots">
+
+            <img
+                src="__PUNTA_NEGRA_DETALLE__"
+                class="img-detalle"
+            >
+
+
+            <button
+                class="hotspot"
+                data-numero="01"
+                onclick="seleccionarComponente('01')"
+            >
+                01
+            </button>
+
+
+            <button
+                class="hotspot"
+                data-numero="02"
+                onclick="seleccionarComponente('02')"
+            >
+                02
+            </button>
+
+
+            <button
+                class="hotspot"
+                data-numero="03"
+                onclick="seleccionarComponente('03')"
+            >
+                03
+            </button>
+
+
+            <button
+                class="hotspot"
+                data-numero="04"
+                onclick="seleccionarComponente('04')"
+            >
+                04
+            </button>
+
+
+            <button
+                class="hotspot"
+                data-numero="05"
+                onclick="seleccionarComponente('05')"
+            >
+                05
+            </button>
+
+
+            <button
+                class="hotspot"
+                data-numero="06"
+                onclick="seleccionarComponente('06')"
+            >
+                06
+            </button>
+
+
+            <button
+                class="hotspot"
+                data-numero="07"
+                onclick="seleccionarComponente('07')"
+            >
+                07
+            </button>
+
+        </div>
+
+
+
+        <!-- PANEL COMPONENTE -->
+
+        <div class="panel-componente">
+
+
+            <div
+                id="panel-inicial"
+                class="panel-inicial"
+            >
+
+                <div class="icono-explorar">
+                    ◎
+                </div>
+
+                <strong>
+                    Explorá el aprovechamiento
+                </strong>
+
+                <br>
+
+                Seleccioná uno de los puntos
+                numerados sobre la fotografía.
+
+            </div>
+
+
+
+            <div
+                id="panel-activo"
+                class="panel-activo"
+            >
+
+                <img
+                    id="imagen-componente"
+                    class="imagen-componente"
+                    src=""
+                >
+
+
+                <div
+                    id="numero-componente"
+                    class="numero-componente"
+                >
+                </div>
+
+
+                <div
+                    id="titulo-componente"
+                    class="titulo-componente"
+                >
+                </div>
+
+
+                <div
+                    id="texto-componente"
+                    class="texto-componente"
+                >
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</div>
 
 
 </div>
@@ -1614,7 +2574,44 @@ body {
 
 
 // ==========================================================
-// VARIABLES DEL ESTADO
+// DATOS PUNTA NEGRA
+// ==========================================================
+
+const componentesPuntaNegra =
+    __COMPONENTES_PUNTA_NEGRA__;
+
+
+//
+// Aplicamos posición de cada hotspot.
+//
+Object.entries(
+    componentesPuntaNegra
+).forEach(
+    function([numero, dato]) {
+
+        const hotspot =
+            document.querySelector(
+                '.hotspot[data-numero="' +
+                numero +
+                '"]'
+            );
+
+        if (hotspot) {
+
+            hotspot.style.left =
+                dato.x + "%";
+
+            hotspot.style.top =
+                dato.y + "%";
+
+        }
+
+    }
+);
+
+
+// ==========================================================
+// ESTADO DE LA SIMULACIÓN
 // ==========================================================
 
 let decisionActual = null;
@@ -1630,111 +2627,74 @@ let restanteActual = 100;
 // PANTALLAS
 // ==========================================================
 
-const video1Screen =
-    document.getElementById("video-1-screen");
+const pantallas = [
 
-const infoMina =
-    document.getElementById("info-mina");
+    "video-1-screen",
 
-const decisionMina =
-    document.getElementById("decision-mina");
+    "info-mina",
 
-const resultadoMina =
-    document.getElementById("resultado-mina");
+    "decision-mina",
 
-const video2Screen =
-    document.getElementById("video-2-screen");
+    "resultado-mina",
 
-const infoDiques =
-    document.getElementById("info-diques");
+    "video-2-screen",
 
+    "menu-diques",
 
-// ==========================================================
-// VIDEOS
-// ==========================================================
+    "explorador-punta-negra"
 
-const video1 =
-    document.getElementById("video-1");
+];
 
-const video2 =
-    document.getElementById("video-2");
-
-
-// ==========================================================
-// OCULTAR TODO
-// ==========================================================
 
 function ocultarTodo() {
 
-    video1Screen.style.display = "none";
+    pantallas.forEach(
+        function(id) {
 
-    infoMina.style.display = "none";
+            const elemento =
+                document.getElementById(id);
 
-    decisionMina.style.display = "none";
+            if (elemento) {
 
-    resultadoMina.style.display = "none";
+                elemento.style.display =
+                    "none";
 
-    video2Screen.style.display = "none";
+            }
 
-    infoDiques.style.display = "none";
+        }
+    );
 
 }
 
 
 // ==========================================================
-// MOSTRAR PANTALLAS
+// REFERENCIAS VIDEOS
 // ==========================================================
 
-function mostrarInfoMina() {
-
-    ocultarTodo();
-
-    infoMina.style.display = "block";
-
-}
-
-
-function mostrarDecisionMina() {
-
-    ocultarTodo();
-
-    decisionMina.style.display = "block";
-
-}
-
-
-function mostrarResultadoMina() {
-
-    ocultarTodo();
-
-    resultadoMina.style.display = "block";
-
-}
-
-
-function mostrarInfoDiques() {
-
-    ocultarTodo();
-
-    infoDiques.style.display = "block";
-
+const video1 =
     document.getElementById(
-        "caudal-llegada-diques"
-    ).textContent =
-        restanteActual + " %";
+        "video-1"
+    );
 
-}
+
+const video2 =
+    document.getElementById(
+        "video-2"
+    );
 
 
 // ==========================================================
-// REPRODUCIR VIDEO 1
+// VIDEO 1
 // ==========================================================
 
 function reproducirVideo1() {
 
     ocultarTodo();
 
-    video1Screen.style.display = "block";
+    document.getElementById(
+        "video-1-screen"
+    ).style.display =
+        "block";
 
     video1.currentTime = 0;
 
@@ -1742,27 +2702,6 @@ function reproducirVideo1() {
 
 }
 
-
-// ==========================================================
-// REPRODUCIR VIDEO 2
-// ==========================================================
-
-function reproducirVideo2() {
-
-    ocultarTodo();
-
-    video2Screen.style.display = "block";
-
-    video2.currentTime = 0;
-
-    video2.play();
-
-}
-
-
-// ==========================================================
-// FIN VIDEO 1
-// ==========================================================
 
 video1.addEventListener(
     "ended",
@@ -1775,22 +2714,36 @@ video1.addEventListener(
 
 
 // ==========================================================
-// FIN VIDEO 2
+// INFO MINA
 // ==========================================================
 
-video2.addEventListener(
-    "ended",
-    function() {
+function mostrarInfoMina() {
 
-        mostrarInfoDiques();
+    ocultarTodo();
 
-    }
-);
+    document.getElementById(
+        "info-mina"
+    ).style.display =
+        "block";
+
+}
 
 
 // ==========================================================
 // DECISIÓN MINA
 // ==========================================================
+
+function mostrarDecisionMina() {
+
+    ocultarTodo();
+
+    document.getElementById(
+        "decision-mina"
+    ).style.display =
+        "block";
+
+}
+
 
 function seleccionarDecision(tipo) {
 
@@ -1846,7 +2799,7 @@ function seleccionarDecision(tipo) {
     }
 
 
-    actualizarResultado();
+    actualizarResultadoMina();
 
     mostrarResultadoMina();
 
@@ -1854,10 +2807,10 @@ function seleccionarDecision(tipo) {
 
 
 // ==========================================================
-// ACTUALIZAR RESULTADO
+// RESULTADO MINA
 // ==========================================================
 
-function actualizarResultado() {
+function actualizarResultadoMina() {
 
 
     document.getElementById(
@@ -1912,119 +2865,267 @@ function actualizarResultado() {
 }
 
 
+function mostrarResultadoMina() {
+
+    ocultarTodo();
+
+    document.getElementById(
+        "resultado-mina"
+    ).style.display =
+        "block";
+
+}
+
+
 // ==========================================================
-// BOTONES MINA
+// VIDEO 2 · MINA → DIQUES
 // ==========================================================
 
-document.getElementById(
-    "btn-ir-decision"
-).addEventListener(
-    "click",
+function reproducirVideo2() {
+
+    ocultarTodo();
+
+    document.getElementById(
+        "video-2-screen"
+    ).style.display =
+        "block";
+
+    video2.currentTime = 0;
+
+    video2.play();
+
+}
+
+
+video2.addEventListener(
+    "ended",
     function() {
 
-        mostrarDecisionMina();
-
-    }
-);
-
-
-document.getElementById(
-    "btn-repetir-1-info"
-).addEventListener(
-    "click",
-    reproducirVideo1
-);
-
-
-document.getElementById(
-    "btn-volver-info"
-).addEventListener(
-    "click",
-    mostrarInfoMina
-);
-
-
-document.getElementById(
-    "btn-repetir-1-decision"
-).addEventListener(
-    "click",
-    reproducirVideo1
-);
-
-
-document.getElementById(
-    "btn-cambiar-decision"
-).addEventListener(
-    "click",
-    mostrarDecisionMina
-);
-
-
-document.getElementById(
-    "btn-repetir-1-resultado"
-).addEventListener(
-    "click",
-    reproducirVideo1
-);
-
-
-// ==========================================================
-// RESULTADO → VIDEO 2
-// ==========================================================
-
-document.getElementById(
-    "btn-continuar-diques"
-).addEventListener(
-    "click",
-    function() {
-
-        reproducirVideo2();
+        mostrarMenuDiques();
 
     }
 );
 
 
 // ==========================================================
-// BOTONES DIQUES
+// MENÚ DIQUES
 // ==========================================================
 
-document.getElementById(
-    "btn-volver-resultado-mina"
-).addEventListener(
-    "click",
-    mostrarResultadoMina
-);
+function mostrarMenuDiques() {
+
+    ocultarTodo();
+
+    document.getElementById(
+        "menu-diques"
+    ).style.display =
+        "block";
+
+}
 
 
-document.getElementById(
-    "btn-repetir-2"
-).addEventListener(
-    "click",
-    reproducirVideo2
-);
+function explorarDique(dique) {
 
+    if (
+        dique ===
+        "punta_negra"
+    ) {
 
-document.getElementById(
-    "btn-proxima-decision"
-).addEventListener(
-    "click",
-    function() {
+        ocultarTodo();
 
         document.getElementById(
-            "aviso-proxima-decision"
+            "explorador-punta-negra"
         ).style.display =
             "block";
 
     }
-);
+
+}
+
+
+function mostrarProximamente(nombre) {
+
+    const panel =
+        document.getElementById(
+            "mensaje-proximamente"
+        );
+
+
+    panel.innerHTML =
+        "<strong>" +
+        nombre +
+        "</strong>" +
+        "<br>" +
+        "La exploración interactiva de este dique " +
+        "se incorporará en la próxima etapa.";
+
+
+    panel.style.display =
+        "block";
+
+}
+
+
+// ==========================================================
+// HOTSPOTS PUNTA NEGRA
+// ==========================================================
+
+function seleccionarComponente(numero) {
+
+
+    const dato =
+        componentesPuntaNegra[
+            numero
+        ];
+
+
+    if (!dato) {
+        return;
+    }
+
+
+    // Quitar hotspot activo anterior
+
+    document.querySelectorAll(
+        ".hotspot"
+    ).forEach(
+        function(elemento) {
+
+            elemento.classList.remove(
+                "activo"
+            );
+
+        }
+    );
+
+
+    // Activar hotspot seleccionado
+
+    const hotspotActivo =
+        document.querySelector(
+            '.hotspot[data-numero="' +
+            numero +
+            '"]'
+        );
+
+
+    if (hotspotActivo) {
+
+        hotspotActivo.classList.add(
+            "activo"
+        );
+
+    }
+
+
+    // Ocultar panel inicial
+
+    document.getElementById(
+        "panel-inicial"
+    ).style.display =
+        "none";
+
+
+    // Mostrar panel activo
+
+    const panelActivo =
+        document.getElementById(
+            "panel-activo"
+        );
+
+
+    panelActivo.style.display =
+        "block";
+
+
+    // Foto componente
+
+    const imagen =
+        document.getElementById(
+            "imagen-componente"
+        );
+
+
+    if (dato.imagen) {
+
+        imagen.src =
+            dato.imagen;
+
+        imagen.style.display =
+            "block";
+
+    }
+
+    else {
+
+        imagen.style.display =
+            "none";
+
+    }
+
+
+    // Número
+
+    document.getElementById(
+        "numero-componente"
+    ).textContent =
+        numero + " · COMPONENTE";
+
+
+    // Nombre
+
+    document.getElementById(
+        "titulo-componente"
+    ).textContent =
+        dato.nombre;
+
+
+    // Texto
+    // Por ahora queda vacío tal como acordamos.
+
+    document.getElementById(
+        "texto-componente"
+    ).textContent =
+        dato.texto || "";
+
+}
+
+
+// ==========================================================
+// CONTINUAR SIMULACIÓN
+// ==========================================================
+
+function continuarSimulacion() {
+
+    const panel =
+        document.getElementById(
+            "panel-continuar"
+        );
+
+
+    panel.style.display =
+        "block";
+
+
+    panel.scrollIntoView({
+
+        behavior:
+            "smooth",
+
+        block:
+            "nearest"
+
+    });
+
+}
 
 
 </script>
+
 """
 
 
     # ========================================================
-    # REEMPLAZOS
+    # REEMPLAZAR VARIABLES
     # ========================================================
 
     html = html_template
@@ -2075,6 +3176,18 @@ document.getElementById(
     html = html.replace(
         "__ULLUM__",
         ullum_html
+    )
+
+
+    html = html.replace(
+        "__PUNTA_NEGRA_DETALLE__",
+        punta_negra_detalle_data or ""
+    )
+
+
+    html = html.replace(
+        "__COMPONENTES_PUNTA_NEGRA__",
+        componentes_punta_negra_json
     )
 
 
