@@ -212,7 +212,6 @@ def construir_componentes(
                 else ""
             ),
 
-            # Por ahora lo dejamos vacío.
             "texto": "",
 
             "x": coordenadas[numero]["x"],
@@ -464,6 +463,7 @@ PUNTA_NEGRA_COMPONENTES = {
 }
 
 
+# Punta Negra ya quedó calibrado.
 HOTSPOTS_PUNTA_NEGRA = {
 
     "01": {
@@ -517,7 +517,7 @@ CARACOLES_COMPONENTES = {
 
     "04": "Aliviadero",
 
-    "05": "Casa de máquinas",
+    "05": "Casa de máquinas y túneles",
 
     "06": "Camino de acceso",
 
@@ -525,40 +525,51 @@ CARACOLES_COMPONENTES = {
 }
 
 
+# ============================================================
+# HOTSPOTS CARACOLES · CORREGIDOS
+# ============================================================
+#
+# Calculados usando el ancho COMPLETO
+# de caracoles_hotspots_ref.jpg.
+#
+# Antes estaban todos demasiado a la derecha.
+#
+# ============================================================
+
 HOTSPOTS_CARACOLES = {
 
     "01": {
-        "x": 77.8,
-        "y": 85.4
+        "x": 56.4,
+        "y": 84.9
     },
 
     "02": {
-        "x": 70.1,
-        "y": 64.3
+        "x": 50.7,
+        "y": 64.2
     },
 
     "03": {
-        "x": 69.8,
-        "y": 49.4
+        "x": 50.7,
+        "y": 49.2
     },
 
     "04": {
-        "x": 25.3,
-        "y": 57.6
+        "x": 18.2,
+        "y": 57.4
     },
 
     "05": {
-        "x": 29.6,
-        "y": 76.8
+        "x": 21.3,
+        "y": 76.1
     },
 
     "06": {
-        "x": 11.7,
-        "y": 31.4
+        "x": 8.3,
+        "y": 31.1
     },
 
     "07": {
-        "x": 57.4,
+        "x": 41.3,
         "y": 9.8
     }
 }
@@ -566,11 +577,6 @@ HOTSPOTS_CARACOLES = {
 
 # ============================================================
 # COMPONENTES · ULLUM
-# ============================================================
-#
-# El hotspot 08 (Quebrada de Ullum)
-# NO se incluye.
-#
 # ============================================================
 
 ULLUM_COMPONENTES = {
@@ -591,41 +597,52 @@ ULLUM_COMPONENTES = {
 }
 
 
+# ============================================================
+# HOTSPOTS ULLUM · CORREGIDOS
+# ============================================================
+#
+# El hotspot 08 se elimina.
+#
+# Las Y estaban prácticamente bien.
+# El error principal estaba en las X.
+#
+# ============================================================
+
 HOTSPOTS_ULLUM = {
 
     "01": {
-        "x": 22.5,
-        "y": 12.5
+        "x": 16.8,
+        "y": 12.2
     },
 
     "02": {
-        "x": 38.5,
-        "y": 27.8
+        "x": 28.8,
+        "y": 28.0
     },
 
     "03": {
-        "x": 52.6,
-        "y": 13.8
+        "x": 39.1,
+        "y": 13.7
     },
 
     "04": {
-        "x": 73.4,
-        "y": 20.0
+        "x": 54.8,
+        "y": 19.7
     },
 
     "05": {
-        "x": 84.2,
-        "y": 32.8
+        "x": 63.1,
+        "y": 32.4
     },
 
     "06": {
-        "x": 70.8,
-        "y": 50.0
+        "x": 53.3,
+        "y": 50.7
     },
 
     "07": {
-        "x": 55.0,
-        "y": 75.9
+        "x": 41.4,
+        "y": 76.7
     }
 }
 
@@ -724,44 +741,56 @@ ullum_detalle_data = file_to_data_uri(
 
 
 # ============================================================
-# BASE DE DATOS DE LOS 3 DIQUES
+# BASE DE DATOS DE LOS DIQUES
 # ============================================================
 
 DIQUES_INTERACTIVOS = {
 
     "caracoles": {
 
-        "nombre": "Complejo Hidroeléctrico Los Caracoles",
+        "nombre":
+            "Complejo Hidroeléctrico Los Caracoles",
 
-        "etiqueta": "LOS CARACOLES",
+        "etiqueta":
+            "LOS CARACOLES",
 
-        "detalle": caracoles_detalle_data,
+        "detalle":
+            caracoles_detalle_data,
 
-        "componentes": caracoles_componentes
+        "componentes":
+            caracoles_componentes
     },
 
 
     "punta_negra": {
 
-        "nombre": "Complejo Hidroeléctrico Punta Negra",
+        "nombre":
+            "Complejo Hidroeléctrico Punta Negra",
 
-        "etiqueta": "PUNTA NEGRA",
+        "etiqueta":
+            "PUNTA NEGRA",
 
-        "detalle": punta_negra_detalle_data,
+        "detalle":
+            punta_negra_detalle_data,
 
-        "componentes": punta_negra_componentes
+        "componentes":
+            punta_negra_componentes
     },
 
 
     "ullum": {
 
-        "nombre": "Complejo Hidroeléctrico Dique de Ullum",
+        "nombre":
+            "Complejo Hidroeléctrico Dique de Ullum",
 
-        "etiqueta": "ULLUM",
+        "etiqueta":
+            "ULLUM",
 
-        "detalle": ullum_detalle_data,
+        "detalle":
+            ullum_detalle_data,
 
-        "componentes": ullum_componentes
+        "componentes":
+            ullum_componentes
     }
 
 }
@@ -968,10 +997,6 @@ else:
 <style>
 
 
-/* =========================================================
-   GENERAL
-========================================================= */
-
 body {
 
     margin: 0;
@@ -1007,9 +1032,8 @@ body {
 }
 
 
-
 /* =========================================================
-   VIDEO
+   VIDEOS
 ========================================================= */
 
 .pantalla-video {
@@ -1075,7 +1099,6 @@ body {
 }
 
 
-
 /* =========================================================
    PANTALLAS
 ========================================================= */
@@ -1128,7 +1151,6 @@ body {
 }
 
 
-
 /* =========================================================
    TÍTULOS
 ========================================================= */
@@ -1172,7 +1194,6 @@ body {
     margin-bottom: 24px;
 
 }
-
 
 
 /* =========================================================
@@ -1301,7 +1322,6 @@ body {
 }
 
 
-
 /* =========================================================
    BOTONES
 ========================================================= */
@@ -1358,7 +1378,6 @@ body {
         rgba(10,20,25,0.62);
 
 }
-
 
 
 /* =========================================================
@@ -1436,7 +1455,6 @@ body {
     line-height: 1.5;
 
 }
-
 
 
 /* =========================================================
@@ -1639,7 +1657,6 @@ body {
 }
 
 
-
 /* =========================================================
    MENÚ DIQUES
 ========================================================= */
@@ -1814,7 +1831,6 @@ body {
 }
 
 
-
 /* =========================================================
    EXPLORADOR GENÉRICO
 ========================================================= */
@@ -1886,8 +1902,7 @@ body {
         1px solid
         rgba(255,255,255,0.11);
 
-    color:
-        #d5e7ec;
+    color: #d5e7ec;
 
     font-size: 14px;
 
@@ -1907,7 +1922,6 @@ body {
     align-items: start;
 
 }
-
 
 
 /* =========================================================
@@ -1973,8 +1987,7 @@ body {
         0 4px 18px
         rgba(0,0,0,0.38);
 
-    transition:
-        0.22s;
+    transition: 0.22s;
 
     z-index: 5;
 
@@ -2010,7 +2023,6 @@ body {
         rgba(55,198,213,0.18);
 
 }
-
 
 
 /* =========================================================
@@ -2139,7 +2151,6 @@ body {
 }
 
 
-
 /* =========================================================
    CONTINUAR
 ========================================================= */
@@ -2164,7 +2175,6 @@ body {
         rgba(99,210,223,0.35);
 
 }
-
 
 
 /* =========================================================
@@ -2622,7 +2632,7 @@ body {
 
 
 <!-- =====================================================
-     MENÚ DE DIQUES
+     MENÚ DIQUES
 ===================================================== -->
 
 <div
@@ -2739,7 +2749,7 @@ body {
 
 
 <!-- =====================================================
-     EXPLORADOR GENÉRICO DE DIQUES
+     EXPLORADOR GENÉRICO
 ===================================================== -->
 
 <div
@@ -2789,8 +2799,6 @@ body {
     <div class="explorador-grid">
 
 
-        <!-- FOTO GRANDE -->
-
         <div
             id="mapa-hotspots"
             class="mapa-hotspots"
@@ -2811,8 +2819,6 @@ body {
         </div>
 
 
-
-        <!-- PANEL LATERAL -->
 
         <div class="panel-componente">
 
@@ -2892,7 +2898,7 @@ body {
 
 
 // ==========================================================
-// BASE DE DATOS DIQUES
+// BASE DE DATOS
 // ==========================================================
 
 const diquesInteractivos =
@@ -3005,7 +3011,7 @@ video1.addEventListener(
 
 
 // ==========================================================
-// INFORMACIÓN MINA
+// INFO MINA
 // ==========================================================
 
 function mostrarInfoMina() {
@@ -3206,7 +3212,7 @@ function mostrarMenuDiques() {
 
 
 // ==========================================================
-// EXPLORAR DIQUE
+// EXPLORADOR
 // ==========================================================
 
 function explorarDique(clave) {
@@ -3255,8 +3261,6 @@ function explorarDique(clave) {
         dique.detalle;
 
 
-    // Reset panel lateral
-
     document.getElementById(
         "panel-inicial"
     ).style.display =
@@ -3269,8 +3273,6 @@ function explorarDique(clave) {
         "none";
 
 
-    // Limpiar hotspots previos
-
     const contenedor =
         document.getElementById(
             "contenedor-hotspots"
@@ -3280,8 +3282,6 @@ function explorarDique(clave) {
     contenedor.innerHTML =
         "";
 
-
-    // Crear hotspots del dique
 
     Object.entries(
         dique.componentes
@@ -3338,7 +3338,7 @@ function explorarDique(clave) {
 
 
 // ==========================================================
-// SELECCIONAR COMPONENTE
+// COMPONENTES
 // ==========================================================
 
 function seleccionarComponente(
@@ -3368,8 +3368,6 @@ function seleccionarComponente(
     }
 
 
-    // Quitar selección anterior
-
     document.querySelectorAll(
         ".hotspot"
     ).forEach(
@@ -3382,8 +3380,6 @@ function seleccionarComponente(
         }
     );
 
-
-    // Activar seleccionado
 
     const activo =
         document.querySelector(
@@ -3414,10 +3410,6 @@ function seleccionarComponente(
         "block";
 
 
-    // ======================================================
-    // IMAGEN
-    // ======================================================
-
     const imagen =
         document.getElementById(
             "imagen-componente"
@@ -3436,10 +3428,6 @@ function seleccionarComponente(
 
     else {
 
-        // Si no existe imagen,
-        // directamente no mostramos
-        // una caja vacía.
-
         imagen.src =
             "";
 
@@ -3449,10 +3437,6 @@ function seleccionarComponente(
     }
 
 
-    // ======================================================
-    // NÚMERO
-    // ======================================================
-
     document.getElementById(
         "numero-componente"
     ).textContent =
@@ -3460,23 +3444,11 @@ function seleccionarComponente(
         " · COMPONENTE";
 
 
-    // ======================================================
-    // TÍTULO
-    // ======================================================
-
     document.getElementById(
         "titulo-componente"
     ).textContent =
         dato.nombre;
 
-
-    // ======================================================
-    // TEXTO
-    // ======================================================
-    //
-    // Por ahora queda vacío.
-    // Lo completaremos después.
-    //
 
     document.getElementById(
         "texto-componente"
@@ -3521,7 +3493,7 @@ function continuarSimulacion() {
 
 
     # ========================================================
-    # REEMPLAZOS HTML
+    # REEMPLAZOS
     # ========================================================
 
     html = html_template
@@ -3582,7 +3554,7 @@ function continuarSimulacion() {
 
 
     # ========================================================
-    # MOSTRAR COMPONENTE
+    # MOSTRAR
     # ========================================================
 
     st.components.v1.html(
