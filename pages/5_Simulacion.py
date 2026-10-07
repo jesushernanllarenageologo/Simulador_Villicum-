@@ -8,7 +8,7 @@ from core.state_manager import init_session_state
 
 
 # ============================================================
-# CONFIGURACIÓN
+# CONFIGURACIÓN GENERAL
 # ============================================================
 
 st.set_page_config(
@@ -212,7 +212,6 @@ def construir_componentes(
                 else ""
             ),
 
-            # Por ahora dejamos los textos vacíos.
             "texto": "",
 
             "x": coordenadas[numero]["x"],
@@ -331,15 +330,38 @@ if not video_2_path.exists():
 if video_2_path is None:
 
     st.error(
-        "No se encontró ningún video dentro de "
-        "assets/videos/02_Mina_Diques/"
+        "No se encontró el video Mina → Diques."
     )
 
     st.stop()
 
 
 # ============================================================
-# MINA
+# VIDEO 3 · CARACOLES → ULLUM
+# ============================================================
+
+video_3_path = (
+    BASE_DIR
+    / "assets"
+    / "videos"
+    / "03_Caracoles_Ullum"
+    / "Caracoles_Ullum.mp4"
+)
+
+
+if not video_3_path.exists():
+
+    st.error(
+        "No se encontró el video Caracoles → Ullum."
+    )
+
+    st.code(str(video_3_path))
+
+    st.stop()
+
+
+# ============================================================
+# IMÁGENES MINA
 # ============================================================
 
 MINA_DIR = (
@@ -369,7 +391,7 @@ fondo_mina_path = (
 
 
 # ============================================================
-# CARPETAS DIQUES
+# DIQUES
 # ============================================================
 
 DIQUES_DIR = (
@@ -421,7 +443,7 @@ ullum_menu_path = (
 
 
 # ============================================================
-# IMÁGENES LIMPIAS PARA HOTSPOTS
+# IMÁGENES DETALLE
 # ============================================================
 
 caracoles_detalle_path = (
@@ -449,58 +471,24 @@ ullum_detalle_path = (
 PUNTA_NEGRA_COMPONENTES = {
 
     "01": "Obra de toma",
-
     "02": "Aliviadero",
-
     "03": "Casa de máquinas",
-
     "04": "Subestación",
-
     "05": "Descargador de fondo",
-
     "06": "Presa",
-
     "07": "Embalse"
 }
 
 
-# Ya calibrado previamente.
 HOTSPOTS_PUNTA_NEGRA = {
 
-    "01": {
-        "x": 60.2,
-        "y": 58.1
-    },
-
-    "02": {
-        "x": 55.6,
-        "y": 67.1
-    },
-
-    "03": {
-        "x": 61.4,
-        "y": 86.2
-    },
-
-    "04": {
-        "x": 63.6,
-        "y": 94.0
-    },
-
-    "05": {
-        "x": 31.5,
-        "y": 83.0
-    },
-
-    "06": {
-        "x": 33.8,
-        "y": 65.2
-    },
-
-    "07": {
-        "x": 38.4,
-        "y": 45.1
-    }
+    "01": {"x": 60.2, "y": 58.1},
+    "02": {"x": 55.6, "y": 67.1},
+    "03": {"x": 61.4, "y": 86.2},
+    "04": {"x": 63.6, "y": 94.0},
+    "05": {"x": 31.5, "y": 83.0},
+    "06": {"x": 33.8, "y": 65.2},
+    "07": {"x": 38.4, "y": 45.1}
 }
 
 
@@ -511,69 +499,24 @@ HOTSPOTS_PUNTA_NEGRA = {
 CARACOLES_COMPONENTES = {
 
     "01": "Embalse",
-
     "02": "Pantalla de hormigón",
-
     "03": "Coronamiento",
-
     "04": "Aliviadero",
-
     "05": "Casa de máquinas y túneles",
-
     "06": "Camino de acceso",
-
     "07": "Río San Juan"
 }
 
 
-# ============================================================
-# HOTSPOTS CARACOLES
-# ============================================================
-#
-# IMPORTANTE:
-#
-# Estas coordenadas corresponden a la NUEVA
-# caracoles_detalle.jpg que coincide exactamente
-# con caracoles_hotspots_ref.jpg.
-#
-# ============================================================
-
 HOTSPOTS_CARACOLES = {
 
-    "01": {
-        "x": 56.5,
-        "y": 85.0
-    },
-
-    "02": {
-        "x": 50.6,
-        "y": 64.2
-    },
-
-    "03": {
-        "x": 50.6,
-        "y": 49.2
-    },
-
-    "04": {
-        "x": 18.2,
-        "y": 57.4
-    },
-
-    "05": {
-        "x": 21.2,
-        "y": 76.1
-    },
-
-    "06": {
-        "x": 8.2,
-        "y": 31.1
-    },
-
-    "07": {
-        "x": 41.3,
-        "y": 9.8
-    }
+    "01": {"x": 56.5, "y": 85.0},
+    "02": {"x": 50.6, "y": 64.2},
+    "03": {"x": 50.6, "y": 49.2},
+    "04": {"x": 18.2, "y": 57.4},
+    "05": {"x": 21.2, "y": 76.1},
+    "06": {"x": 8.2,  "y": 31.1},
+    "07": {"x": 41.3, "y": 9.8}
 }
 
 
@@ -584,68 +527,24 @@ HOTSPOTS_CARACOLES = {
 ULLUM_COMPONENTES = {
 
     "01": "Embalse (Lago de Ullum)",
-
     "02": "Presa de materiales sueltos",
-
     "03": "Coronamiento",
-
     "04": "Vertedero / Aliviadero",
-
     "05": "Central hidroeléctrica",
-
     "06": "Descargador de fondo",
-
     "07": "Río San Juan"
 }
 
 
-# ============================================================
-# HOTSPOTS ULLUM
-# ============================================================
-#
-# Se mantienen los valores que ya quedaron
-# aproximadamente 8/10.
-#
-# 08 Quebrada de Ullum está eliminado.
-#
-# ============================================================
-
 HOTSPOTS_ULLUM = {
 
-    "01": {
-        "x": 16.8,
-        "y": 12.2
-    },
-
-    "02": {
-        "x": 28.8,
-        "y": 28.0
-    },
-
-    "03": {
-        "x": 39.1,
-        "y": 13.7
-    },
-
-    "04": {
-        "x": 54.8,
-        "y": 19.7
-    },
-
-    "05": {
-        "x": 63.1,
-        "y": 32.4
-    },
-
-    "06": {
-        "x": 53.3,
-        "y": 50.7
-    },
-
-    "07": {
-        "x": 41.4,
-        "y": 76.7
-    }
+    "01": {"x": 16.8, "y": 12.2},
+    "02": {"x": 28.8, "y": 28.0},
+    "03": {"x": 39.1, "y": 13.7},
+    "04": {"x": 54.8, "y": 19.7},
+    "05": {"x": 63.1, "y": 32.4},
+    "06": {"x": 53.3, "y": 50.7},
+    "07": {"x": 41.4, "y": 76.7}
 }
 
 
@@ -654,46 +553,40 @@ HOTSPOTS_ULLUM = {
 # ============================================================
 
 punta_negra_componentes = construir_componentes(
-
     PUNTA_NEGRA_DIR / "Componentes",
-
     PUNTA_NEGRA_COMPONENTES,
-
     HOTSPOTS_PUNTA_NEGRA
 )
 
 
 caracoles_componentes = construir_componentes(
-
     CARACOLES_DIR / "Componentes",
-
     CARACOLES_COMPONENTES,
-
     HOTSPOTS_CARACOLES
 )
 
 
 ullum_componentes = construir_componentes(
-
     ULLUM_DIR / "Componentes",
-
     ULLUM_COMPONENTES,
-
     HOTSPOTS_ULLUM
 )
 
 
 # ============================================================
-# CONVERTIR ARCHIVOS A DATA URI
+# CONVERTIR ARCHIVOS
 # ============================================================
 
 video_1_data = file_to_data_uri(
     video_1_path
 )
 
-
 video_2_data = file_to_data_uri(
     video_2_path
+)
+
+video_3_data = file_to_data_uri(
+    video_3_path
 )
 
 
@@ -701,11 +594,9 @@ img_moderno_data = file_to_data_uri(
     img_moderno_path
 )
 
-
 img_tradicional_data = file_to_data_uri(
     img_tradicional_path
 )
-
 
 fondo_mina_data = file_to_data_uri(
     fondo_mina_path
@@ -716,34 +607,38 @@ caracoles_menu_data = file_to_data_uri(
     caracoles_menu_path
 )
 
-
 punta_negra_menu_data = file_to_data_uri(
     punta_negra_menu_path
 )
-
 
 ullum_menu_data = file_to_data_uri(
     ullum_menu_path
 )
 
 
-caracoles_detalle_data = file_to_data_uri(
-    caracoles_detalle_path
-) or ""
+caracoles_detalle_data = (
+    file_to_data_uri(
+        caracoles_detalle_path
+    ) or ""
+)
 
 
-punta_negra_detalle_data = file_to_data_uri(
-    punta_negra_detalle_path
-) or ""
+punta_negra_detalle_data = (
+    file_to_data_uri(
+        punta_negra_detalle_path
+    ) or ""
+)
 
 
-ullum_detalle_data = file_to_data_uri(
-    ullum_detalle_path
-) or ""
+ullum_detalle_data = (
+    file_to_data_uri(
+        ullum_detalle_path
+    ) or ""
+)
 
 
 # ============================================================
-# BASE DE DATOS DE LOS DIQUES
+# BASE DE DATOS DIQUES
 # ============================================================
 
 DIQUES_INTERACTIVOS = {
@@ -848,7 +743,6 @@ if not st.session_state.experiencia_iniciada:
     col1, col2, col3 = st.columns(
         [1, 2, 1]
     )
-
 
     with col2:
 
@@ -986,13 +880,17 @@ else:
 
 
     # ========================================================
-    # HTML + CSS + JAVASCRIPT
+    # HTML
     # ========================================================
 
     html_template = """
 
 <style>
 
+
+/* =========================================================
+   GENERAL
+========================================================= */
 
 body {
 
@@ -1022,9 +920,41 @@ body {
 
     background: #0d1820;
 
-    box-shadow:
-        0 18px 45px
-        rgba(0,0,0,0.22);
+}
+
+
+/* =========================================================
+   PANTALLAS
+========================================================= */
+
+.pantalla-contenido {
+
+    display: none;
+
+    width: 100%;
+
+    height: 900px;
+
+    box-sizing: border-box;
+
+    padding:
+        35px 38px;
+
+    color: white;
+
+    overflow-y: auto;
+
+}
+
+
+.pantalla-mina {
+
+    background:
+        __FONDO_MINA__;
+
+    background-size: cover;
+
+    background-position: center;
 
 }
 
@@ -1069,12 +999,14 @@ body {
 
     position: absolute;
 
-    top: 30px;
+    top: 28px;
 
-    left: 35px;
+    left: 30px;
 
     padding:
-        12px 20px;
+        12px 18px;
+
+    border-radius: 12px;
 
     color: white;
 
@@ -1083,67 +1015,14 @@ body {
 
     border:
         1px solid
-        rgba(255,255,255,0.18);
+        rgba(255,255,255,0.20);
 
-    border-radius: 12px;
+    backdrop-filter:
+        blur(8px);
 
-    backdrop-filter: blur(7px);
-
-    font-size: 18px;
+    font-size: 17px;
 
     font-weight: 700;
-
-}
-
-
-/* =========================================================
-   PANTALLAS
-========================================================= */
-
-.pantalla-contenido {
-
-    display: none;
-
-    width: 100%;
-
-    height: 900px;
-
-    box-sizing: border-box;
-
-    padding:
-        35px 38px;
-
-    color: white;
-
-    overflow-y: auto;
-
-    animation:
-        aparecer 0.5s ease;
-
-}
-
-
-.pantalla-mina {
-
-    background:
-        __FONDO_MINA__;
-
-    background-size: cover;
-
-    background-position: center;
-
-}
-
-
-@keyframes aparecer {
-
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
 
 }
 
@@ -1154,167 +1033,41 @@ body {
 
 .titulo-etapa {
 
-    font-size: 14px;
+    font-size: 13px;
 
-    letter-spacing: 2.4px;
+    letter-spacing: 2.2px;
 
-    color: #69d6dd;
+    color: #64d6df;
 
-    font-weight: 700;
+    font-weight: 800;
 
-    margin-bottom: 10px;
+    margin-bottom: 9px;
 
 }
 
 
 .titulo-principal {
 
-    font-size: 42px;
+    font-size: 40px;
+
+    line-height: 1.1;
 
     font-weight: 800;
 
-    margin-bottom: 12px;
-
-    color: white;
+    margin-bottom: 14px;
 
 }
 
 
 .descripcion {
 
-    font-size: 17px;
-
-    line-height: 1.6;
-
     max-width: 1050px;
 
-    margin-bottom: 24px;
-
-}
-
-
-/* =========================================================
-   TARJETAS MINA
-========================================================= */
-
-.grid-procesos {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap: 18px;
-
-    margin-top: 18px;
-
-    margin-bottom: 20px;
-
-}
-
-
-.card-proceso {
-
-    background:
-        rgba(12,22,27,0.52);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.24);
-
-    border-radius: 17px;
-
-    overflow: hidden;
-
-}
-
-
-.foto-proceso {
-
-    width: 100%;
-
-    height: 200px;
-
-    object-fit: cover;
-
-}
-
-
-.placeholder-foto {
-
-    height: 200px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-}
-
-
-.card-proceso-body {
-
-    padding:
-        17px 20px 19px;
-
-}
-
-
-.card-subtitle {
-
-    font-size: 12px;
-
-    letter-spacing: 1.5px;
-
-    color: #75dce2;
-
-    font-weight: 700;
-
-    margin-bottom: 7px;
-
-}
-
-
-.card-title {
-
-    font-size: 23px;
-
-    font-weight: 750;
-
-    margin-bottom: 10px;
-
-}
-
-
-.card-text {
-
-    font-size: 15px;
-
-    line-height: 1.5;
-
-    color: #f3f3f3;
-
-}
-
-
-.info-clave {
-
-    margin-top: 10px;
-
-    padding:
-        16px 20px;
-
-    border-radius: 15px;
-
-    background:
-        rgba(10,20,25,0.52);
-
-    border:
-        1px solid
-        rgba(112,214,222,0.42);
+    font-size: 16px;
 
     line-height: 1.55;
+
+    margin-bottom: 20px;
 
 }
 
@@ -1329,11 +1082,11 @@ body {
 
     justify-content: center;
 
-    gap: 14px;
-
-    margin-top: 22px;
+    gap: 13px;
 
     flex-wrap: wrap;
+
+    margin-top: 22px;
 
 }
 
@@ -1343,20 +1096,22 @@ body {
 
     border:
         1px solid
-        rgba(255,255,255,0.28);
+        rgba(255,255,255,0.25);
 
-    border-radius: 13px;
+    border-radius: 12px;
 
     padding:
-        15px 25px;
+        14px 22px;
 
     color: white;
 
-    font-size: 16px;
+    font-size: 15px;
 
     font-weight: 700;
 
     cursor: pointer;
+
+    transition: 0.2s;
 
 }
 
@@ -1364,7 +1119,18 @@ body {
 .btn-principal {
 
     background:
-        rgba(22,156,171,0.95);
+        #169cad;
+
+}
+
+
+.btn-principal:hover {
+
+    background:
+        #22b6c8;
+
+    transform:
+        translateY(-2px);
 
 }
 
@@ -1372,7 +1138,110 @@ body {
 .btn-secundario {
 
     background:
-        rgba(10,20,25,0.62);
+        rgba(7,20,28,0.62);
+
+}
+
+
+/* =========================================================
+   TARJETAS MINA
+========================================================= */
+
+.grid-procesos {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 18px;
+
+}
+
+
+.card-proceso {
+
+    overflow: hidden;
+
+    border-radius: 17px;
+
+    background:
+        rgba(10,22,28,0.60);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+}
+
+
+.foto-proceso {
+
+    width: 100%;
+
+    height: 195px;
+
+    object-fit: cover;
+
+}
+
+
+.card-proceso-body {
+
+    padding: 17px 19px;
+
+}
+
+
+.card-subtitle {
+
+    color: #66d6df;
+
+    font-size: 11px;
+
+    letter-spacing: 1.5px;
+
+    font-weight: 800;
+
+}
+
+
+.card-title {
+
+    font-size: 22px;
+
+    font-weight: 800;
+
+    margin:
+        5px 0 9px;
+
+}
+
+
+.card-text {
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+}
+
+
+.info-clave {
+
+    margin-top: 17px;
+
+    padding:
+        15px 18px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(5,20,27,0.55);
+
+    border:
+        1px solid
+        rgba(99,211,222,0.36);
 
 }
 
@@ -1383,13 +1252,12 @@ body {
 
 .pregunta {
 
-    font-size: 25px;
+    font-size: 24px;
 
-    font-weight: 700;
+    font-weight: 800;
 
-    margin-top: 32px;
-
-    margin-bottom: 20px;
+    margin:
+        27px 0 18px;
 
 }
 
@@ -1401,33 +1269,29 @@ body {
     grid-template-columns:
         repeat(3,1fr);
 
-    gap: 17px;
+    gap: 15px;
 
 }
 
 
 .opcion {
 
-    width: 100%;
-
-    box-sizing: border-box;
-
-    text-align: left;
+    padding: 22px;
 
     color: white;
 
+    text-align: left;
+
+    cursor: pointer;
+
+    border-radius: 16px;
+
     background:
-        rgba(10,20,25,0.58);
+        rgba(7,20,28,0.62);
 
     border:
         1px solid
-        rgba(255,255,255,0.24);
-
-    border-radius: 17px;
-
-    padding: 23px;
-
-    cursor: pointer;
+        rgba(255,255,255,0.22);
 
 }
 
@@ -1436,20 +1300,18 @@ body {
 
     display: block;
 
-    font-size: 20px;
+    margin-bottom: 8px;
 
-    margin-bottom: 9px;
+    font-size: 18px;
 
 }
 
 
 .opcion span {
 
-    display: block;
+    font-size: 14px;
 
-    font-size: 15px;
-
-    line-height: 1.5;
+    line-height: 1.45;
 
 }
 
@@ -1465,11 +1327,9 @@ body {
     grid-template-columns:
         0.85fr 1.15fr;
 
-    gap: 38px;
+    gap: 35px;
 
     align-items: center;
-
-    margin-top: 25px;
 
 }
 
@@ -1485,33 +1345,30 @@ body {
 
 .donut {
 
-    width: 315px;
+    width: 300px;
 
-    height: 315px;
+    height: 300px;
 
     border-radius: 50%;
 
-    background:
-
-        conic-gradient(
-
-            #e9a23b
-            0%
-            calc(var(--consumo) * 1%),
-
-            #4dc1d1
-            calc(var(--consumo) * 1%)
-            100%
-
-        );
+    position: relative;
 
     display: flex;
 
-    align-items: center;
-
     justify-content: center;
 
-    position: relative;
+    align-items: center;
+
+    background:
+        conic-gradient(
+            #e5a13a
+            0%
+            calc(var(--consumo) * 1%),
+
+            #42bfd0
+            calc(var(--consumo) * 1%)
+            100%
+        );
 
 }
 
@@ -1520,16 +1377,16 @@ body {
 
     content: "";
 
-    width: 205px;
+    width: 195px;
 
-    height: 205px;
+    height: 195px;
 
-    background:
-        rgba(7,19,26,0.94);
+    position: absolute;
 
     border-radius: 50%;
 
-    position: absolute;
+    background:
+        #071921;
 
 }
 
@@ -1538,7 +1395,7 @@ body {
 
     position: relative;
 
-    z-index: 3;
+    z-index: 2;
 
     text-align: center;
 
@@ -1547,7 +1404,7 @@ body {
 
 .donut-numero {
 
-    font-size: 54px;
+    font-size: 50px;
 
     font-weight: 800;
 
@@ -1556,13 +1413,11 @@ body {
 
 .donut-texto {
 
-    margin-top: 8px;
-
-    font-size: 15px;
-
-    color: #cdebf0;
-
     max-width: 140px;
+
+    font-size: 14px;
+
+    color: #cce8ed;
 
 }
 
@@ -1574,32 +1429,32 @@ body {
     grid-template-columns:
         repeat(3,1fr);
 
-    gap: 12px;
+    gap: 11px;
 
-    margin-bottom: 18px;
+    margin-bottom: 15px;
 
 }
 
 
 .metrica {
 
+    padding: 17px;
+
+    border-radius: 13px;
+
     background:
-        rgba(9,22,29,0.60);
+        rgba(7,20,28,0.60);
 
     border:
         1px solid
-        rgba(255,255,255,0.18);
-
-    padding: 18px;
-
-    border-radius: 14px;
+        rgba(255,255,255,0.15);
 
 }
 
 
 .metrica-numero {
 
-    font-size: 31px;
+    font-size: 28px;
 
     font-weight: 800;
 
@@ -1608,48 +1463,39 @@ body {
 
 .metrica-label {
 
-    font-size: 13px;
-
-    color: #cde0e5;
-
     margin-top: 4px;
+
+    font-size: 12px;
+
+    color: #c8dce1;
 
 }
 
 
-.resultado-explicacion {
+.resultado-explicacion,
+.modelo-educativo {
+
+    padding: 18px;
+
+    border-radius: 14px;
 
     background:
-        rgba(9,22,29,0.59);
+        rgba(7,20,28,0.58);
 
     border:
         1px solid
-        rgba(255,255,255,0.19);
+        rgba(255,255,255,0.16);
 
-    border-radius: 16px;
-
-    padding: 21px;
-
-    line-height: 1.6;
+    line-height: 1.55;
 
 }
 
 
 .modelo-educativo {
 
-    margin-top: 18px;
+    margin-top: 14px;
 
-    padding:
-        14px 17px;
-
-    border-radius: 12px;
-
-    font-size: 13px;
-
-    line-height: 1.5;
-
-    background:
-        rgba(0,0,0,0.40);
+    font-size: 12px;
 
 }
 
@@ -1663,9 +1509,9 @@ body {
     background:
         linear-gradient(
             135deg,
-            #071925 0%,
-            #0d3041 48%,
-            #12516a 100%
+            #071925,
+            #0c3547,
+            #10556b
         );
 
 }
@@ -1675,44 +1521,39 @@ body {
 
     display: flex;
 
-    align-items: center;
-
     justify-content: center;
+
+    align-items: center;
 
     gap: 10px;
 
     flex-wrap: wrap;
 
+    padding: 12px;
+
     margin:
-        8px 0 28px;
+        7px 0 24px;
 
-    padding:
-        12px 15px;
-
-    border-radius: 14px;
+    border-radius: 13px;
 
     background:
         rgba(255,255,255,0.06);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.12);
-
-}
-
-
-.flecha-recorrido {
-
-    color: #63d2df;
 
 }
 
 
 .nodo-recorrido {
 
-    font-size: 14px;
+    font-size: 13px;
 
     font-weight: 700;
+
+}
+
+
+.flecha-recorrido {
+
+    color: #64d6df;
 
 }
 
@@ -1724,7 +1565,7 @@ body {
     grid-template-columns:
         repeat(3,1fr);
 
-    gap: 18px;
+    gap: 16px;
 
 }
 
@@ -1733,24 +1574,23 @@ body {
 
     overflow: hidden;
 
+    border-radius: 17px;
+
     background:
-        rgba(4,18,27,0.65);
+        rgba(4,18,27,0.67);
 
     border:
         1px solid
-        rgba(255,255,255,0.18);
-
-    border-radius: 18px;
+        rgba(255,255,255,0.16);
 
 }
 
 
-.foto-card-dique,
-.placeholder-card-dique {
+.foto-card-dique {
 
     width: 100%;
 
-    height: 210px;
+    height: 205px;
 
     object-fit: cover;
 
@@ -1759,8 +1599,7 @@ body {
 
 .card-dique-body {
 
-    padding:
-        18px 18px 20px;
+    padding: 17px;
 
 }
 
@@ -1769,57 +1608,55 @@ body {
 
     font-size: 10px;
 
-    letter-spacing: 1.5px;
+    color: #65d7df;
 
-    color: #69d6dd;
+    letter-spacing: 1.4px;
 
-    margin-bottom: 6px;
+    font-weight: 800;
 
 }
 
 
 .card-dique-title {
 
-    font-size: 24px;
+    margin:
+        5px 0 7px;
+
+    font-size: 22px;
 
     font-weight: 800;
-
-    margin-bottom: 8px;
 
 }
 
 
 .card-dique-text {
 
-    min-height: 45px;
+    min-height: 43px;
 
-    font-size: 14px;
+    color: #dbe8eb;
+
+    font-size: 13px;
 
     line-height: 1.45;
-
-    color: #dce8ec;
 
 }
 
 
 .btn-explorar {
 
-    margin-top: 15px;
-
     width: 100%;
+
+    margin-top: 14px;
 
     padding: 12px;
 
-    border: none;
+    border: 0;
 
-    border-radius: 11px;
-
-    background:
-        rgba(25,166,183,0.88);
+    border-radius: 10px;
 
     color: white;
 
-    font-size: 14px;
+    background: #169cad;
 
     font-weight: 700;
 
@@ -1838,7 +1675,7 @@ body {
         linear-gradient(
             135deg,
             #071720,
-            #0c2c3a
+            #0b303f
         );
 
 }
@@ -1848,60 +1685,26 @@ body {
 
     display: flex;
 
-    justify-content:
-        space-between;
+    justify-content: space-between;
 
-    align-items:
-        flex-start;
+    align-items: flex-start;
 
-    gap: 20px;
-
-}
-
-
-.btn-volver {
-
-    border:
-        1px solid
-        rgba(255,255,255,0.20);
-
-    background:
-        rgba(255,255,255,0.07);
-
-    color: white;
-
-    border-radius: 11px;
-
-    padding:
-        11px 16px;
-
-    cursor: pointer;
-
-    font-weight: 700;
+    gap: 15px;
 
 }
 
 
 .guia-explorador {
 
-    margin:
-        5px 0 18px;
-
     padding:
-        11px 15px;
+        10px 14px;
 
-    border-radius: 12px;
+    margin-bottom: 16px;
+
+    border-radius: 11px;
 
     background:
         rgba(255,255,255,0.06);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.11);
-
-    color: #d5e7ec;
-
-    font-size: 14px;
 
 }
 
@@ -1912,45 +1715,37 @@ body {
 
     grid-template-columns:
         minmax(0,1.55fr)
-        minmax(280px,0.65fr);
+        minmax(275px,0.65fr);
 
-    gap: 18px;
+    gap: 17px;
 
     align-items: start;
 
 }
 
 
-/* =========================================================
-   FOTO + HOTSPOTS
-========================================================= */
-
 .mapa-hotspots {
 
     position: relative;
 
-    width: 100%;
-
-    border-radius: 17px;
-
     overflow: hidden;
 
-    background: black;
+    width: 100%;
 
-    border:
-        1px solid
-        rgba(255,255,255,0.14);
+    border-radius: 16px;
+
+    background: black;
 
 }
 
 
 .img-detalle {
 
+    display: block;
+
     width: 100%;
 
     height: auto;
-
-    display: block;
 
 }
 
@@ -1959,47 +1754,28 @@ body {
 
     position: absolute;
 
+    width: 44px;
+
+    height: 44px;
+
     transform:
         translate(-50%,-50%);
-
-    width: 46px;
-
-    height: 46px;
 
     border-radius: 50%;
 
     border:
         2px solid white;
 
-    background:
-        rgba(6,25,34,0.76);
-
     color: white;
+
+    background:
+        rgba(3,20,28,0.78);
 
     font-weight: 800;
 
     cursor: pointer;
 
-    box-shadow:
-        0 4px 18px
-        rgba(0,0,0,0.38);
-
-    transition:
-        0.22s;
-
     z-index: 5;
-
-}
-
-
-.hotspot:hover {
-
-    transform:
-        translate(-50%,-50%)
-        scale(1.12);
-
-    background:
-        #2bb9c8;
 
 }
 
@@ -2007,74 +1783,50 @@ body {
 .hotspot.activo {
 
     background:
-        #37c6d5;
-
-    border-color:
-        #baf9ff;
-
-    transform:
-        translate(-50%,-50%)
-        scale(1.15);
+        #2cc2d1;
 
     box-shadow:
-        0 0 0 7px
-        rgba(55,198,213,0.18);
+        0 0 0 6px
+        rgba(44,194,209,0.19);
 
 }
 
 
-/* =========================================================
-   PANEL DEL COMPONENTE
-========================================================= */
-
 .panel-componente {
 
-    min-height: 520px;
-
-    box-sizing: border-box;
-
-    border-radius: 17px;
+    min-height: 515px;
 
     overflow: hidden;
+
+    border-radius: 16px;
 
     background:
         rgba(255,255,255,0.07);
 
     border:
         1px solid
-        rgba(255,255,255,0.13);
+        rgba(255,255,255,0.14);
 
 }
 
 
 .panel-inicial {
 
-    min-height: 520px;
+    min-height: 515px;
+
+    box-sizing: border-box;
+
+    padding: 30px;
 
     display: flex;
-
-    flex-direction: column;
 
     justify-content: center;
 
     align-items: center;
 
-    padding: 30px;
-
-    box-sizing: border-box;
+    flex-direction: column;
 
     text-align: center;
-
-    color: #d8e7eb;
-
-}
-
-
-.icono-explorar {
-
-    font-size: 48px;
-
-    margin-bottom: 14px;
 
 }
 
@@ -2094,23 +1846,21 @@ body {
 
     object-fit: cover;
 
-    display: block;
-
 }
 
 
 .numero-componente {
 
     margin:
-        20px 22px 4px;
+        19px 20px 4px;
 
-    color: #64d3df;
+    color: #64d6df;
 
-    font-size: 12px;
-
-    letter-spacing: 1.8px;
+    font-size: 11px;
 
     font-weight: 800;
+
+    letter-spacing: 1.5px;
 
 }
 
@@ -2118,9 +1868,9 @@ body {
 .titulo-componente {
 
     margin:
-        0 22px;
+        0 20px;
 
-    font-size: 25px;
+    font-size: 23px;
 
     font-weight: 800;
 
@@ -2130,47 +1880,635 @@ body {
 .texto-componente {
 
     margin:
-        18px 22px 25px;
+        15px 20px;
 
-    min-height: 110px;
+    padding-top: 15px;
+
+    min-height: 90px;
 
     border-top:
         1px solid
         rgba(255,255,255,0.10);
 
-    padding-top: 16px;
+}
 
-    font-size: 15px;
 
-    line-height: 1.55;
+/* =========================================================
+   ULLUM · PANTALLA INFORMATIVA
+========================================================= */
 
-    color: #dce8ec;
+#info-ullum {
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            #17465a 0%,
+            #0b2735 48%,
+            #061720 100%
+        );
+
+}
+
+
+.rueda-wrapper {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1.15fr;
+
+    gap: 35px;
+
+    align-items: center;
+
+    margin-top: 25px;
+
+}
+
+
+.rueda {
+
+    position: relative;
+
+    width: 470px;
+
+    height: 470px;
+
+    max-width: 100%;
+
+    margin: auto;
+
+}
+
+
+.rueda-centro {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    width: 155px;
+
+    height: 155px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+    box-sizing: border-box;
+
+    padding: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #168fa2,
+            #1eb6c8
+        );
+
+    border:
+        5px solid
+        rgba(255,255,255,0.18);
+
+    box-shadow:
+        0 0 0 12px
+        rgba(35,193,207,0.08);
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+}
+
+
+.rueda-btn {
+
+    position: absolute;
+
+    width: 150px;
+
+    min-height: 82px;
+
+    padding: 13px;
+
+    border-radius: 15px;
+
+    color: white;
+
+    background:
+        rgba(5,22,30,0.82);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.20);
+
+    cursor: pointer;
+
+    font-weight: 700;
+
+    transition: 0.2s;
+
+}
+
+
+.rueda-btn:hover,
+.rueda-btn.activo {
+
+    background:
+        #168fa2;
+
+    transform:
+        scale(1.04);
+
+}
+
+
+.rueda-top {
+
+    top: 0;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+}
+
+
+.rueda-bottom {
+
+    bottom: 0;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+}
+
+
+.rueda-left {
+
+    left: 0;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+}
+
+
+.rueda-right {
+
+    right: 0;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+}
+
+
+.panel-info-ullum {
+
+    min-height: 360px;
+
+    box-sizing: border-box;
+
+    padding: 30px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.15);
+
+}
+
+
+.info-icono {
+
+    font-size: 45px;
+
+}
+
+
+.info-titulo {
+
+    margin:
+        10px 0;
+
+    font-size: 29px;
+
+    font-weight: 800;
+
+}
+
+
+.info-texto {
+
+    color: #d7e7ea;
+
+    font-size: 16px;
+
+    line-height: 1.6;
 
 }
 
 
 /* =========================================================
-   CONTINUAR
+   DECISIÓN ULLUM
 ========================================================= */
 
-.panel-continuar {
+#decision-ullum {
 
-    display: none;
+    background:
+        linear-gradient(
+            135deg,
+            #08202b,
+            #0e3e50
+        );
 
-    margin-top: 20px;
+}
 
-    padding: 18px;
+
+.opciones-ullum {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 17px;
+
+    margin-top: 28px;
+
+}
+
+
+.opcion-ullum {
+
+    min-height: 230px;
+
+    padding: 24px;
+
+    box-sizing: border-box;
+
+    text-align: left;
+
+    border-radius: 18px;
+
+    color: white;
+
+    background:
+        rgba(5,20,28,0.68);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.opcion-ullum:hover {
+
+    transform:
+        translateY(-5px);
+
+    border-color:
+        #55d1dd;
+
+}
+
+
+.opcion-icono {
+
+    font-size: 34px;
+
+}
+
+
+.opcion-titulo {
+
+    margin:
+        11px 0 8px;
+
+    font-size: 21px;
+
+    font-weight: 800;
+
+}
+
+
+.opcion-desc {
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    color: #d7e5e9;
+
+}
+
+
+.opcion-dato {
+
+    margin-top: 18px;
+
+    padding-top: 13px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,0.12);
+
+    color: #65d6df;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   RESULTADO ULLUM
+========================================================= */
+
+#resultado-ullum {
+
+    background:
+        linear-gradient(
+            135deg,
+            #061923,
+            #0b3546
+        );
+
+}
+
+
+.resultado-ullum-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        0.85fr 1.15fr;
+
+    gap: 40px;
+
+    align-items: center;
+
+    margin-top: 30px;
+
+}
+
+
+.donut-ullum {
+
+    width: 315px;
+
+    height: 315px;
+
+    margin: auto;
+
+    position: relative;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        conic-gradient(
+            #33bccb
+            0%
+            calc(var(--reserva) * 1%),
+
+            #e5a13a
+            calc(var(--reserva) * 1%)
+            100%
+        );
+
+}
+
+
+.donut-ullum::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 205px;
+
+    height: 205px;
+
+    border-radius: 50%;
+
+    background:
+        #071b24;
+
+}
+
+
+.donut-ullum-centro {
+
+    position: relative;
+
+    z-index: 2;
 
     text-align: center;
+
+}
+
+
+.reserva-numero {
+
+    font-size: 51px;
+
+    font-weight: 800;
+
+}
+
+
+.reserva-label {
+
+    width: 135px;
+
+    font-size: 14px;
+
+    color: #cbe6ea;
+
+}
+
+
+.leyenda-donut {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 18px;
+
+    margin-top: 17px;
+
+    font-size: 13px;
+
+}
+
+
+.punto-reserva,
+.punto-liberado {
+
+    display: inline-block;
+
+    width: 10px;
+
+    height: 10px;
+
+    margin-right: 5px;
+
+    border-radius: 50%;
+
+}
+
+
+.punto-reserva {
+
+    background:
+        #33bccb;
+
+}
+
+
+.punto-liberado {
+
+    background:
+        #e5a13a;
+
+}
+
+
+.metricas-ullum {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 12px;
+
+}
+
+
+.metrica-ullum {
+
+    padding: 19px;
 
     border-radius: 14px;
 
     background:
-        rgba(99,210,223,0.12);
+        rgba(5,20,28,0.65);
 
     border:
         1px solid
-        rgba(99,210,223,0.35);
+        rgba(255,255,255,0.15);
+
+}
+
+
+.metrica-ullum-numero {
+
+    font-size: 27px;
+
+    font-weight: 800;
+
+}
+
+
+.metrica-ullum-label {
+
+    margin-top: 4px;
+
+    font-size: 12px;
+
+    color: #c8dce1;
+
+}
+
+
+.resultado-ullum-texto {
+
+    margin-top: 15px;
+
+    padding: 18px;
+
+    border-radius: 14px;
+
+    line-height: 1.55;
+
+    background:
+        rgba(5,20,28,0.62);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.15);
+
+}
+
+
+.aviso-modelo {
+
+    margin-top: 13px;
+
+    font-size: 12px;
+
+    color: #c6dadd;
+
+}
+
+
+/* =========================================================
+   SIGUIENTE ETAPA
+========================================================= */
+
+#aviso-distribuidor {
+
+    display: none;
+
+    margin-top: 16px;
+
+    padding: 16px;
+
+    border-radius: 13px;
+
+    text-align: center;
+
+    background:
+        rgba(70,201,213,0.12);
+
+    border:
+        1px solid
+        rgba(70,201,213,0.35);
 
 }
 
@@ -2185,31 +2523,28 @@ body {
     .opciones,
     .resultado-grid,
     .grid-diques,
-    .explorador-grid {
+    .explorador-grid,
+    .rueda-wrapper,
+    .opciones-ullum,
+    .resultado-ullum-grid {
 
         grid-template-columns: 1fr;
 
     }
 
 
-    .metricas {
+    .metricas,
+    .metricas-ullum {
 
         grid-template-columns: 1fr;
 
     }
 
 
-    .titulo-principal {
+    .rueda {
 
-        font-size: 32px;
-
-    }
-
-
-    .panel-componente,
-    .panel-inicial {
-
-        min-height: auto;
+        transform:
+            scale(0.85);
 
     }
 
@@ -2249,15 +2584,12 @@ body {
 
 
 <!-- =====================================================
-     INFORMACIÓN MINA
+     INFO MINA
 ===================================================== -->
 
 <div
     id="info-mina"
-    class="
-        pantalla-contenido
-        pantalla-mina
-    "
+    class="pantalla-contenido pantalla-mina"
 >
 
     <div class="titulo-etapa">
@@ -2276,7 +2608,6 @@ body {
 
     </div>
 
-
     <div class="grid-procesos">
 
         __TRADICIONAL__
@@ -2284,7 +2615,6 @@ body {
         __MODERNO__
 
     </div>
-
 
     <div class="info-clave">
 
@@ -2294,7 +2624,6 @@ body {
         reduce la necesidad de incorporar agua fresca.
 
     </div>
-
 
     <div class="botones-navegacion">
 
@@ -2324,10 +2653,7 @@ body {
 
 <div
     id="decision-mina"
-    class="
-        pantalla-contenido
-        pantalla-mina
-    "
+    class="pantalla-contenido pantalla-mina"
 >
 
     <div class="titulo-etapa">
@@ -2346,17 +2672,15 @@ body {
 
     </div>
 
-
     <div class="pregunta">
         Seleccioná una estrategia
     </div>
-
 
     <div class="opciones">
 
         <button
             class="opcion"
-            onclick="seleccionarDecision('alta')"
+            onclick="seleccionarDecisionMina('alta')"
         >
 
             <strong>
@@ -2372,7 +2696,7 @@ body {
 
         <button
             class="opcion"
-            onclick="seleccionarDecision('media')"
+            onclick="seleccionarDecisionMina('media')"
         >
 
             <strong>
@@ -2388,7 +2712,7 @@ body {
 
         <button
             class="opcion"
-            onclick="seleccionarDecision('nula')"
+            onclick="seleccionarDecisionMina('nula')"
         >
 
             <strong>
@@ -2403,18 +2727,6 @@ body {
 
     </div>
 
-
-    <div class="botones-navegacion">
-
-        <button
-            class="btn-secundario"
-            onclick="mostrarInfoMina()"
-        >
-            ← Volver a la información
-        </button>
-
-    </div>
-
 </div>
 
 
@@ -2425,10 +2737,7 @@ body {
 
 <div
     id="resultado-mina"
-    class="
-        pantalla-contenido
-        pantalla-mina
-    "
+    class="pantalla-contenido pantalla-mina"
 >
 
     <div class="titulo-etapa">
@@ -2451,7 +2760,6 @@ body {
 
 
     <div class="resultado-grid">
-
 
         <div>
 
@@ -2487,9 +2795,7 @@ body {
 
         <div>
 
-
             <div class="metricas">
-
 
                 <div class="metrica">
 
@@ -2538,7 +2844,6 @@ body {
 
                 </div>
 
-
             </div>
 
 
@@ -2559,8 +2864,7 @@ body {
                     95 %
                 </strong>
 
-                para seguir hacia el sistema
-                de embalses.
+                para seguir hacia el sistema de embalses.
 
             </div>
 
@@ -2569,14 +2873,9 @@ body {
 
                 ℹ️ Modelo educativo simplificado.
 
-                Los porcentajes son normalizados
-                para representar la relación entre
-                consumo y recuperación.
-
             </div>
 
         </div>
-
 
     </div>
 
@@ -2604,7 +2903,7 @@ body {
 
 
 <!-- =====================================================
-     VIDEO 2 · MINA → EMBALSES
+     VIDEO 2
 ===================================================== -->
 
 <div
@@ -2622,7 +2921,7 @@ body {
     ></video>
 
     <div class="etiqueta-video">
-        🌊 Mina → Sistema de embalses
+        🌊 Mina → Los Caracoles
     </div>
 
 </div>
@@ -2639,20 +2938,18 @@ body {
 >
 
     <div class="titulo-etapa">
-        PARADA 2 · SISTEMA DE EMBALSES
+        SISTEMA DE EMBALSES
     </div>
 
     <div class="titulo-principal">
-        🏞️ Sistema de regulación del Río San Juan
+        🏞️ Regulación del Río San Juan
     </div>
 
     <div class="descripcion">
 
-        Los principales aprovechamientos
-        funcionan de manera encadenada.
-
-        Podés explorar cada dique antes
-        de continuar con la simulación.
+        Antes de continuar, podés explorar
+        los tres principales aprovechamientos
+        del sistema.
 
     </div>
 
@@ -2663,36 +2960,28 @@ body {
             🏔 Cordillera
         </span>
 
-        <span class="flecha-recorrido">
-            →
-        </span>
+        <span class="flecha-recorrido">→</span>
 
         <span class="nodo-recorrido">
             Los Caracoles
         </span>
 
-        <span class="flecha-recorrido">
-            →
-        </span>
+        <span class="flecha-recorrido">→</span>
 
         <span class="nodo-recorrido">
             Punta Negra
         </span>
 
-        <span class="flecha-recorrido">
-            →
-        </span>
+        <span class="flecha-recorrido">→</span>
 
         <span class="nodo-recorrido">
             Ullum
         </span>
 
-        <span class="flecha-recorrido">
-            →
-        </span>
+        <span class="flecha-recorrido">→</span>
 
         <span class="nodo-recorrido">
-            🌾 Valle de Tulum
+            🌾 Cuenca baja
         </span>
 
     </div>
@@ -2715,30 +3004,15 @@ body {
             class="btn-secundario"
             onclick="reproducirVideo2()"
         >
-            ↻ Reproducir Mina → Embalses
+            ↻ Reproducir recorrido
         </button>
 
         <button
             class="btn-principal"
-            onclick="continuarSimulacion()"
+            onclick="reproducirVideo3()"
         >
-            Continuar con la simulación →
+            Continuar hacia Ullum →
         </button>
-
-    </div>
-
-
-    <div
-        id="panel-continuar"
-        class="panel-continuar"
-    >
-
-        ✅ Exploración de los embalses disponible.
-
-        <br><br>
-
-        El próximo paso será incorporar
-        la decisión de gestión de los embalses.
 
     </div>
 
@@ -2747,7 +3021,7 @@ body {
 
 
 <!-- =====================================================
-     EXPLORADOR GENÉRICO
+     EXPLORADOR DIQUES
 ===================================================== -->
 
 <div
@@ -2770,14 +3044,12 @@ body {
                 id="explorador-titulo"
                 class="titulo-principal"
             >
-                Complejo Hidroeléctrico
             </div>
 
         </div>
 
-
         <button
-            class="btn-volver"
+            class="btn-secundario"
             onclick="mostrarMenuDiques()"
         >
             ← Volver a los diques
@@ -2789,18 +3061,14 @@ body {
     <div class="guia-explorador">
 
         Seleccioná uno de los puntos numerados
-        para conocer cada componente del aprovechamiento.
+        para conocer cada componente.
 
     </div>
 
 
     <div class="explorador-grid">
 
-
-        <div
-            id="mapa-hotspots"
-            class="mapa-hotspots"
-        >
+        <div class="mapa-hotspots">
 
             <img
                 id="imagen-detalle-dique"
@@ -2808,14 +3076,10 @@ body {
                 src=""
             >
 
-
-            <div
-                id="contenedor-hotspots"
-            >
+            <div id="contenedor-hotspots">
             </div>
 
         </div>
-
 
 
         <div class="panel-componente">
@@ -2826,7 +3090,7 @@ body {
                 class="panel-inicial"
             >
 
-                <div class="icono-explorar">
+                <div style="font-size:48px;">
                     ◎
                 </div>
 
@@ -2834,13 +3098,11 @@ body {
                     Explorá el aprovechamiento
                 </strong>
 
-                <br><br>
+                <br>
 
-                Tocá uno de los círculos
-                numerados sobre la fotografía.
+                Tocá uno de los círculos numerados.
 
             </div>
-
 
 
             <div
@@ -2848,13 +3110,11 @@ body {
                 class="panel-activo"
             >
 
-
                 <img
                     id="imagen-componente"
                     class="imagen-componente"
                     src=""
                 >
-
 
                 <div
                     id="numero-componente"
@@ -2862,13 +3122,11 @@ body {
                 >
                 </div>
 
-
                 <div
                     id="titulo-componente"
                     class="titulo-componente"
                 >
                 </div>
-
 
                 <div
                     id="texto-componente"
@@ -2876,12 +3134,523 @@ body {
                 >
                 </div>
 
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     VIDEO 3 · CARACOLES → ULLUM
+===================================================== -->
+
+<div
+    id="video-3-screen"
+    class="pantalla-video"
+    style="display:none;"
+>
+
+    <video
+        id="video-3"
+        class="video-recorrido"
+        muted
+        playsinline
+        src="__VIDEO_3__"
+    ></video>
+
+    <div class="etiqueta-video">
+        🌊 Los Caracoles → Ullum
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     PARADA ULLUM · RUEDA INFORMATIVA
+===================================================== -->
+
+<div
+    id="info-ullum"
+    class="pantalla-contenido"
+>
+
+    <div class="titulo-etapa">
+        PARADA 2 · DIQUE DE ULLUM
+    </div>
+
+    <div class="titulo-principal">
+        💧 Gestión del último embalse
+    </div>
+
+    <div class="descripcion">
+
+        Ullum representa el último gran punto
+        de regulación antes de que el Río San Juan
+        continúe hacia la cuenca baja.
+
+        Explorá los factores que intervienen
+        antes de tomar una decisión.
+
+    </div>
+
+
+    <div class="rueda-wrapper">
+
+
+        <div class="rueda">
+
+
+            <button
+                class="rueda-btn rueda-top"
+                data-info="reserva"
+                onclick="mostrarInfoUllum('reserva')"
+            >
+                💧 Reserva
+                <br>
+                del embalse
+            </button>
+
+
+            <button
+                class="rueda-btn rueda-left"
+                data-info="energia"
+                onclick="mostrarInfoUllum('energia')"
+            >
+                ⚡ Generación
+                <br>
+                hidroeléctrica
+            </button>
+
+
+            <div class="rueda-centro">
+
+                DIQUE
+                <br>
+                DE ULLUM
+
+            </div>
+
+
+            <button
+                class="rueda-btn rueda-right"
+                data-info="caudal"
+                onclick="mostrarInfoUllum('caudal')"
+            >
+                🌊 Caudal
+                <br>
+                aguas abajo
+            </button>
+
+
+            <button
+                class="rueda-btn rueda-bottom"
+                data-info="demanda"
+                onclick="mostrarInfoUllum('demanda')"
+            >
+                🌾 Demanda
+                <br>
+                cuenca baja
+            </button>
+
+
+        </div>
+
+
+        <div class="panel-info-ullum">
+
+            <div
+                id="info-ullum-icono"
+                class="info-icono"
+            >
+                ◎
+            </div>
+
+            <div
+                id="info-ullum-titulo"
+                class="info-titulo"
+            >
+                ¿Qué debemos considerar?
+            </div>
+
+            <div
+                id="info-ullum-texto"
+                class="info-texto"
+            >
+
+                Seleccioná uno de los cuatro factores
+                para conocer cómo interviene
+                en la operación del embalse.
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="botones-navegacion">
+
+        <button
+            class="btn-secundario"
+            onclick="reproducirVideo3()"
+        >
+            ↻ Reproducir Caracoles → Ullum
+        </button>
+
+        <button
+            class="btn-principal"
+            onclick="mostrarDecisionUllum()"
+        >
+            Tomar decisión →
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     DECISIÓN ULLUM
+===================================================== -->
+
+<div
+    id="decision-ullum"
+    class="pantalla-contenido"
+>
+
+    <div class="titulo-etapa">
+        PARADA 2 · DECISIÓN
+    </div>
+
+    <div class="titulo-principal">
+        🏞️ ¿Cómo administrarías la liberación?
+    </div>
+
+    <div class="descripcion">
+
+        La liberación modifica la reserva disponible,
+        el caudal que continúa hacia la cuenca baja
+        y la generación hidroeléctrica.
+
+    </div>
+
+
+    <div class="opciones-ullum">
+
+
+        <button
+            class="opcion-ullum"
+            onclick="seleccionarDecisionUllum('reserva')"
+        >
+
+            <div class="opcion-icono">
+                💧
+            </div>
+
+            <div class="opcion-titulo">
+                Conservar reservas
+            </div>
+
+            <div class="opcion-desc">
+
+                Reducir la liberación para conservar
+                una mayor proporción del agua almacenada.
+
+            </div>
+
+            <div class="opcion-dato">
+                Liberación relativa: 24
+            </div>
+
+        </button>
+
+
+
+        <button
+            class="opcion-ullum"
+            onclick="seleccionarDecisionUllum('equilibrada')"
+        >
+
+            <div class="opcion-icono">
+                ⚖️
+            </div>
+
+            <div class="opcion-titulo">
+                Gestión equilibrada
+            </div>
+
+            <div class="opcion-desc">
+
+                Mantener un equilibrio entre reserva,
+                generación y entrega hacia aguas abajo.
+
+            </div>
+
+            <div class="opcion-dato">
+                Liberación relativa: 30
+            </div>
+
+        </button>
+
+
+
+        <button
+            class="opcion-ullum"
+            onclick="seleccionarDecisionUllum('liberacion')"
+        >
+
+            <div class="opcion-icono">
+                ⚡
+            </div>
+
+            <div class="opcion-titulo">
+                Mayor liberación
+            </div>
+
+            <div class="opcion-desc">
+
+                Aumentar temporalmente el agua
+                entregada hacia la cuenca baja.
+
+            </div>
+
+            <div class="opcion-dato">
+                Liberación relativa: 36
+            </div>
+
+        </button>
+
+
+    </div>
+
+
+    <div class="botones-navegacion">
+
+        <button
+            class="btn-secundario"
+            onclick="mostrarInfoUllumPantalla()"
+        >
+            ← Volver a la información
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     RESULTADO ULLUM
+===================================================== -->
+
+<div
+    id="resultado-ullum"
+    class="pantalla-contenido"
+>
+
+    <div class="titulo-etapa">
+        RESULTADO · PARADA 2
+    </div>
+
+    <div class="titulo-principal">
+        📊 Gestión del embalse
+    </div>
+
+    <div class="descripcion">
+
+        Estrategia seleccionada:
+
+        <strong id="estrategia-ullum">
+            -
+        </strong>
+
+    </div>
+
+
+    <div class="resultado-ullum-grid">
+
+
+        <div>
+
+
+            <div
+                id="donut-ullum"
+                class="donut-ullum"
+                style="--reserva:70;"
+            >
+
+                <div class="donut-ullum-centro">
+
+                    <div
+                        id="reserva-numero"
+                        class="reserva-numero"
+                    >
+                        70%
+                    </div>
+
+                    <div class="reserva-label">
+                        reserva relativa
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="leyenda-donut">
+
+                <span>
+                    <span class="punto-reserva"></span>
+                    Reserva
+                </span>
+
+                <span>
+                    <span class="punto-liberado"></span>
+                    Liberación
+                </span>
 
             </div>
 
 
         </div>
 
+
+
+        <div>
+
+
+            <div class="metricas-ullum">
+
+
+                <div class="metrica-ullum">
+
+                    <div
+                        id="caudal-ullum"
+                        class="metrica-ullum-numero"
+                    >
+                        30
+                    </div>
+
+                    <div class="metrica-ullum-label">
+                        Liberación relativa
+                    </div>
+
+                </div>
+
+
+                <div class="metrica-ullum">
+
+                    <div
+                        id="energia-ullum"
+                        class="metrica-ullum-numero"
+                    >
+                        Media
+                    </div>
+
+                    <div class="metrica-ullum-label">
+                        Generación
+                    </div>
+
+                </div>
+
+
+                <div class="metrica-ullum">
+
+                    <div
+                        id="estado-reserva-ullum"
+                        class="metrica-ullum-numero"
+                    >
+                        Estable
+                    </div>
+
+                    <div class="metrica-ullum-label">
+                        Reserva
+                    </div>
+
+                </div>
+
+
+                <div class="metrica-ullum">
+
+                    <div
+                        class="metrica-ullum-numero"
+                    >
+                        Cuenca baja
+                    </div>
+
+                    <div class="metrica-ullum-label">
+                        Próximo destino
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <div
+                id="resultado-ullum-texto"
+                class="resultado-ullum-texto"
+            >
+            </div>
+
+
+            <div class="aviso-modelo">
+
+                ℹ️ Los valores 24, 30 y 36 forman parte
+                de un modelo educativo normalizado
+                para visualizar diferentes estrategias
+                de regulación. No representan una operación
+                real específica del Dique de Ullum.
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <div class="botones-navegacion">
+
+        <button
+            class="btn-secundario"
+            onclick="mostrarDecisionUllum()"
+        >
+            ← Cambiar decisión
+        </button>
+
+        <button
+            class="btn-principal"
+            onclick="continuarDistribuidor()"
+        >
+            Continuar hacia el distribuidor →
+        </button>
+
+    </div>
+
+
+    <div
+        id="aviso-distribuidor"
+    >
+
+        ✅ Decisión guardada dentro de esta simulación.
+
+        <br><br>
+
+        El próximo paso será conectar esta elección
+        con el video correspondiente:
+
+        <strong id="video-siguiente">
+        </strong>
 
     </div>
 
@@ -2896,7 +3665,7 @@ body {
 
 
 // ==========================================================
-// BASE DE DATOS
+// DATOS DIQUES
 // ==========================================================
 
 const diquesInteractivos =
@@ -2904,18 +3673,20 @@ const diquesInteractivos =
 
 
 // ==========================================================
-// ESTADO
+// ESTADO GENERAL
 // ==========================================================
 
-let decisionActual = null;
+let diqueActual = null;
+
+let decisionMina = null;
+
+let decisionUllum = null;
 
 let recirculacionActual = 0;
 
 let consumoActual = 0;
 
 let restanteActual = 100;
-
-let diqueActual = null;
 
 
 // ==========================================================
@@ -2936,7 +3707,15 @@ const pantallas = [
 
     "menu-diques",
 
-    "explorador-dique"
+    "explorador-dique",
+
+    "video-3-screen",
+
+    "info-ullum",
+
+    "decision-ullum",
+
+    "resultado-ullum"
 
 ];
 
@@ -2967,15 +3746,13 @@ function ocultarTodo() {
 // ==========================================================
 
 const video1 =
-    document.getElementById(
-        "video-1"
-    );
-
+    document.getElementById("video-1");
 
 const video2 =
-    document.getElementById(
-        "video-2"
-    );
+    document.getElementById("video-2");
+
+const video3 =
+    document.getElementById("video-3");
 
 
 // ==========================================================
@@ -3000,16 +3777,12 @@ function reproducirVideo1() {
 
 video1.addEventListener(
     "ended",
-    function() {
-
-        mostrarInfoMina();
-
-    }
+    mostrarInfoMina
 );
 
 
 // ==========================================================
-// INFORMACIÓN MINA
+// INFO MINA
 // ==========================================================
 
 function mostrarInfoMina() {
@@ -3040,12 +3813,12 @@ function mostrarDecisionMina() {
 }
 
 
-function seleccionarDecision(tipo) {
+function seleccionarDecisionMina(tipo) {
 
 
     if (tipo === "alta") {
 
-        decisionActual =
+        decisionMina =
             "Alta recirculación";
 
         recirculacionActual = 80;
@@ -3059,7 +3832,7 @@ function seleccionarDecision(tipo) {
 
     else if (tipo === "media") {
 
-        decisionActual =
+        decisionMina =
             "Recirculación intermedia";
 
         recirculacionActual = 60;
@@ -3071,9 +3844,9 @@ function seleccionarDecision(tipo) {
     }
 
 
-    else if (tipo === "nula") {
+    else {
 
-        decisionActual =
+        decisionMina =
             "Sin recirculación";
 
         recirculacionActual = 0;
@@ -3085,24 +3858,10 @@ function seleccionarDecision(tipo) {
     }
 
 
-    actualizarResultadoMina();
-
-    mostrarResultadoMina();
-
-}
-
-
-// ==========================================================
-// RESULTADO MINA
-// ==========================================================
-
-function actualizarResultadoMina() {
-
-
     document.getElementById(
         "resultado-titulo"
     ).textContent =
-        decisionActual;
+        decisionMina;
 
 
     document.getElementById(
@@ -3148,10 +3907,6 @@ function actualizarResultadoMina() {
     ).textContent =
         restanteActual + " %";
 
-}
-
-
-function mostrarResultadoMina() {
 
     ocultarTodo();
 
@@ -3185,11 +3940,7 @@ function reproducirVideo2() {
 
 video2.addEventListener(
     "ended",
-    function() {
-
-        mostrarMenuDiques();
-
-    }
+    mostrarMenuDiques
 );
 
 
@@ -3210,16 +3961,14 @@ function mostrarMenuDiques() {
 
 
 // ==========================================================
-// EXPLORADOR DE DIQUES
+// EXPLORADOR
 // ==========================================================
 
 function explorarDique(clave) {
 
 
     const dique =
-        diquesInteractivos[
-            clave
-        ];
+        diquesInteractivos[clave];
 
 
     if (!dique) {
@@ -3227,8 +3976,7 @@ function explorarDique(clave) {
     }
 
 
-    diqueActual =
-        clave;
+    diqueActual = clave;
 
 
     ocultarTodo();
@@ -3259,8 +4007,6 @@ function explorarDique(clave) {
         dique.detalle;
 
 
-    // Reset del panel derecho
-
     document.getElementById(
         "panel-inicial"
     ).style.display =
@@ -3273,19 +4019,14 @@ function explorarDique(clave) {
         "none";
 
 
-    // Limpiar hotspots anteriores
-
     const contenedor =
         document.getElementById(
             "contenedor-hotspots"
         );
 
 
-    contenedor.innerHTML =
-        "";
+    contenedor.innerHTML = "";
 
-
-    // Crear hotspots
 
     Object.entries(
         dique.componentes
@@ -3319,16 +4060,14 @@ function explorarDique(clave) {
                 dato.y + "%";
 
 
-            boton.addEventListener(
-                "click",
+            boton.onclick =
                 function() {
 
                     seleccionarComponente(
                         numero
                     );
 
-                }
-            );
+                };
 
 
             contenedor.appendChild(
@@ -3342,37 +4081,19 @@ function explorarDique(clave) {
 
 
 // ==========================================================
-// COMPONENTES
+// COMPONENTE DEL DIQUE
 // ==========================================================
 
-function seleccionarComponente(
-    numero
-) {
-
-
-    if (!diqueActual) {
-        return;
-    }
-
-
-    const dique =
-        diquesInteractivos[
-            diqueActual
-        ];
+function seleccionarComponente(numero) {
 
 
     const dato =
-        dique.componentes[
+        diquesInteractivos[
+            diqueActual
+        ].componentes[
             numero
         ];
 
-
-    if (!dato) {
-        return;
-    }
-
-
-    // Quitar hotspot activo anterior
 
     document.querySelectorAll(
         ".hotspot"
@@ -3386,8 +4107,6 @@ function seleccionarComponente(
         }
     );
 
-
-    // Activar actual
 
     const activo =
         document.querySelector(
@@ -3405,8 +4124,6 @@ function seleccionarComponente(
 
     }
 
-
-    // Cambiar panel lateral
 
     document.getElementById(
         "panel-inicial"
@@ -3426,7 +4143,6 @@ function seleccionarComponente(
         );
 
 
-    // Si tiene imagen:
     if (dato.imagen) {
 
         imagen.src =
@@ -3437,11 +4153,7 @@ function seleccionarComponente(
 
     }
 
-    // Si NO tiene imagen:
     else {
-
-        imagen.src =
-            "";
 
         imagen.style.display =
             "none";
@@ -3462,8 +4174,6 @@ function seleccionarComponente(
         dato.nombre;
 
 
-    // Todavía dejamos el texto vacío.
-
     document.getElementById(
         "texto-componente"
     ).textContent =
@@ -3473,36 +4183,398 @@ function seleccionarComponente(
 
 
 // ==========================================================
-// CONTINUAR SIMULACIÓN
+// VIDEO 3 · CARACOLES → ULLUM
 // ==========================================================
 
-function continuarSimulacion() {
+function reproducirVideo3() {
 
-    const panel =
-        document.getElementById(
-            "panel-continuar"
+    ocultarTodo();
+
+    document.getElementById(
+        "video-3-screen"
+    ).style.display =
+        "block";
+
+    video3.currentTime = 0;
+
+    video3.play();
+
+}
+
+
+video3.addEventListener(
+    "ended",
+    mostrarInfoUllumPantalla
+);
+
+
+// ==========================================================
+// INFO ULLUM
+// ==========================================================
+
+function mostrarInfoUllumPantalla() {
+
+    ocultarTodo();
+
+    document.getElementById(
+        "info-ullum"
+    ).style.display =
+        "block";
+
+}
+
+
+// ==========================================================
+// RUEDA ULLUM
+// ==========================================================
+
+const infoUllum = {
+
+
+    reserva: {
+
+        icono: "💧",
+
+        titulo:
+            "Reserva del embalse",
+
+        texto:
+            "El embalse permite almacenar agua y regular su liberación en el tiempo. Mantener una mayor reserva puede aumentar la capacidad del sistema para responder a períodos posteriores de menor disponibilidad."
+
+    },
+
+
+    energia: {
+
+        icono: "⚡",
+
+        titulo:
+            "Generación hidroeléctrica",
+
+        texto:
+            "Parte del agua liberada puede atravesar el sistema hidroeléctrico antes de continuar aguas abajo. Una mayor liberación permite una mayor generación relativa, pero también reduce más rápidamente el volumen almacenado."
+
+    },
+
+
+    caudal: {
+
+        icono: "🌊",
+
+        titulo:
+            "Caudal aguas abajo",
+
+        texto:
+            "La cantidad de agua liberada desde Ullum condiciona la disponibilidad inmediata que continúa hacia la cuenca baja del Río San Juan."
+
+    },
+
+
+    demanda: {
+
+        icono: "🌾",
+
+        titulo:
+            "Demanda de la cuenca baja",
+
+        texto:
+            "Aguas abajo, el recurso deberá abastecer distintos usos. En las siguientes etapas del simulador se incorporarán la agricultura, la ciudad, la industria y el abastecimiento de agua potable."
+
+    }
+
+};
+
+
+function mostrarInfoUllum(clave) {
+
+
+    const dato =
+        infoUllum[clave];
+
+
+    document.querySelectorAll(
+        ".rueda-btn"
+    ).forEach(
+        function(elemento) {
+
+            elemento.classList.remove(
+                "activo"
+            );
+
+        }
+    );
+
+
+    const botonActivo =
+        document.querySelector(
+            '.rueda-btn[data-info="' +
+            clave +
+            '"]'
         );
 
 
-    panel.style.display =
+    if (botonActivo) {
+
+        botonActivo.classList.add(
+            "activo"
+        );
+
+    }
+
+
+    document.getElementById(
+        "info-ullum-icono"
+    ).textContent =
+        dato.icono;
+
+
+    document.getElementById(
+        "info-ullum-titulo"
+    ).textContent =
+        dato.titulo;
+
+
+    document.getElementById(
+        "info-ullum-texto"
+    ).textContent =
+        dato.texto;
+
+}
+
+
+// ==========================================================
+// DECISIÓN ULLUM
+// ==========================================================
+
+function mostrarDecisionUllum() {
+
+    ocultarTodo();
+
+    document.getElementById(
+        "decision-ullum"
+    ).style.display =
         "block";
 
+}
 
-    panel.scrollIntoView({
 
-        behavior:
-            "smooth",
+// ==========================================================
+// RESULTADO ULLUM
+// ==========================================================
 
-        block:
-            "nearest"
+function seleccionarDecisionUllum(tipo) {
 
-    });
+
+    let estrategia;
+
+    let liberacion;
+
+    let reserva;
+
+    let energia;
+
+    let estadoReserva;
+
+    let texto;
+
+    let videoSiguiente;
+
+
+    if (tipo === "reserva") {
+
+
+        estrategia =
+            "Conservar reservas";
+
+        liberacion =
+            24;
+
+        reserva =
+            76;
+
+        energia =
+            "Baja";
+
+        estadoReserva =
+            "Alta";
+
+        videoSiguiente =
+            "Caudal_bajo";
+
+        texto =
+            "La estrategia conserva una mayor proporción del agua almacenada. La disponibilidad inmediata aguas abajo es menor, pero el sistema mantiene una reserva relativa más alta.";
+
+
+    }
+
+
+    else if (
+        tipo === "equilibrada"
+    ) {
+
+
+        estrategia =
+            "Gestión equilibrada";
+
+        liberacion =
+            30;
+
+        reserva =
+            70;
+
+        energia =
+            "Media";
+
+        estadoReserva =
+            "Estable";
+
+        videoSiguiente =
+            "Caudal_medio";
+
+        texto =
+            "La estrategia busca un equilibrio entre almacenamiento, generación hidroeléctrica y disponibilidad de agua para la cuenca baja.";
+
+
+    }
+
+
+    else {
+
+
+        estrategia =
+            "Mayor liberación";
+
+        liberacion =
+            36;
+
+        reserva =
+            64;
+
+        energia =
+            "Alta";
+
+        estadoReserva =
+            "Disminuye";
+
+        videoSiguiente =
+            "Caudal_alto";
+
+        texto =
+            "La liberación aumenta la disponibilidad inmediata aguas abajo y la generación relativa, pero reduce en mayor medida la reserva del embalse.";
+
+
+    }
+
+
+    decisionUllum = {
+
+        estrategia:
+            estrategia,
+
+        liberacion:
+            liberacion,
+
+        reserva:
+            reserva,
+
+        energia:
+            energia,
+
+        estadoReserva:
+            estadoReserva,
+
+        videoSiguiente:
+            videoSiguiente
+
+    };
+
+
+    document.getElementById(
+        "estrategia-ullum"
+    ).textContent =
+        estrategia;
+
+
+    document.getElementById(
+        "donut-ullum"
+    ).style.setProperty(
+        "--reserva",
+        reserva
+    );
+
+
+    document.getElementById(
+        "reserva-numero"
+    ).textContent =
+        reserva + "%";
+
+
+    document.getElementById(
+        "caudal-ullum"
+    ).textContent =
+        liberacion;
+
+
+    document.getElementById(
+        "energia-ullum"
+    ).textContent =
+        energia;
+
+
+    document.getElementById(
+        "estado-reserva-ullum"
+    ).textContent =
+        estadoReserva;
+
+
+    document.getElementById(
+        "resultado-ullum-texto"
+    ).textContent =
+        texto;
+
+
+    ocultarTodo();
+
+
+    document.getElementById(
+        "resultado-ullum"
+    ).style.display =
+        "block";
+
+}
+
+
+// ==========================================================
+// CONTINUAR DISTRIBUIDOR
+// ==========================================================
+
+function continuarDistribuidor() {
+
+
+    if (!decisionUllum) {
+        return;
+    }
+
+
+    const aviso =
+        document.getElementById(
+            "aviso-distribuidor"
+        );
+
+
+    document.getElementById(
+        "video-siguiente"
+    ).textContent =
+        decisionUllum.videoSiguiente;
+
+
+    aviso.style.display =
+        "block";
 
 }
 
 
 </script>
-
 """
 
 
@@ -3528,6 +4600,12 @@ function continuarSimulacion() {
     html = html.replace(
         "__VIDEO_2__",
         video_2_data or ""
+    )
+
+
+    html = html.replace(
+        "__VIDEO_3__",
+        video_3_data or ""
     )
 
 
