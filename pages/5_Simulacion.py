@@ -4621,7 +4621,7 @@ function continuarDistribuidor() {
     # )
 
 
-    # ========================================================
+# ========================================================
     # MOSTRAR MAPA INTERACTIVO Y COMPONENTES
     # ========================================================
     
@@ -4636,7 +4636,15 @@ function continuarDistribuidor() {
     st.markdown("### Mapa Interactivo 3D")
     
     # 2. Incrusta el mapa 3D interactivo exportado desde QGIS
-    # Streamlit sirve automáticamente el contenido de la carpeta 'static' en '/app/static/'
-    url_mapa_3d = "/app/static/visor_3d/index.html"
     
-    components.iframe(url_mapa_3d, height=700, scrolling=False)
+    # Definimos la ruta usando Pathlib para evitar errores entre Windows/Linux
+    ruta_visor = BASE_DIR / "static" / "visor_3d" / "index.html"
+    
+    if ruta_visor.exists():
+        # Leemos el archivo y lo incrustamos directamente
+        with open(ruta_visor, 'r', encoding='utf-8') as f:
+            html_visor = f.read()
+            
+        components.html(html_visor, height=700, scrolling=False)
+    else:
+        st.error(f"No se encontró el visor 3D en la ruta: {ruta_visor}")
