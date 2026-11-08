@@ -4635,16 +4635,8 @@ function continuarDistribuidor() {
     st.markdown("---")
     st.markdown("### Mapa Interactivo 3D")
     
-    # 2. Incrusta el mapa 3D interactivo exportado desde QGIS
+    # 2. Incrusta el mapa 3D interactivo exportado desde QGIS usando GitHub Pages
+    # URL pública generada por tu propio repositorio
+    url_mapa_3d = "https://jesushernanllarenageologo.github.io/Simulador_Villicum-/static/visor_3d/index.html"
     
-    # Definimos la ruta usando Pathlib para evitar errores entre Windows/Linux
-    ruta_visor = BASE_DIR / "static" / "visor_3d" / "index.html"
-    
-    if ruta_visor.exists():
-        # Leemos el archivo y lo incrustamos directamente
-        with open(ruta_visor, 'r', encoding='utf-8') as f:
-            html_visor = f.read()
-            
-        components.html(html_visor, height=700, scrolling=False)
-    else:
-        st.error(f"No se encontró el visor 3D en la ruta: {ruta_visor}")
+    components.iframe(url_mapa_3d, height=700, scrolling=False)
