@@ -3,6 +3,7 @@ from pathlib import Path
 import base64
 import mimetypes
 import json
+import streamlit.components.v1 as components # Importación necesaria para el iframe
 
 from core.state_manager import init_session_state
 
@@ -640,63 +641,38 @@ ullum_detalle_data = (
 # ============================================================
 # BASE DE DATOS DIQUES
 # ============================================================
-
-DIQUES_INTERACTIVOS = {
-
-    "caracoles": {
-
-        "nombre":
-            "Complejo Hidroeléctrico Los Caracoles",
-
-        "etiqueta":
-            "LOS CARACOLES",
-
-        "detalle":
-            caracoles_detalle_data,
-
-        "componentes":
-            caracoles_componentes
-    },
-
-
-    "punta_negra": {
-
-        "nombre":
-            "Complejo Hidroeléctrico Punta Negra",
-
-        "etiqueta":
-            "PUNTA NEGRA",
-
-        "detalle":
-            punta_negra_detalle_data,
-
-        "componentes":
-            punta_negra_componentes
-    },
-
-
-    "ullum": {
-
-        "nombre":
-            "Complejo Hidroeléctrico Dique de Ullum",
-
-        "etiqueta":
-            "ULLUM",
-
-        "detalle":
-            ullum_detalle_data,
-
-        "componentes":
-            ullum_componentes
-    }
-
-}
-
-
-diques_interactivos_json = json.dumps(
-    DIQUES_INTERACTIVOS,
-    ensure_ascii=False
-)
+#
+# Toda esta sección se comenta porque la interactividad
+# de los marcadores ya fue programada directamente en el mapa 3D de QGIS.
+#
+# DIQUES_INTERACTIVOS = {
+#
+#     "caracoles": {
+#         "nombre": "Complejo Hidroeléctrico Los Caracoles",
+#         "etiqueta": "LOS CARACOLES",
+#         "detalle": caracoles_detalle_data,
+#         "componentes": caracoles_componentes
+#     },
+#
+#     "punta_negra": {
+#         "nombre": "Complejo Hidroeléctrico Punta Negra",
+#         "etiqueta": "PUNTA NEGRA",
+#         "detalle": punta_negra_detalle_data,
+#         "componentes": punta_negra_componentes
+#     },
+#
+#     "ullum": {
+#         "nombre": "Complejo Hidroeléctrico Dique de Ullum",
+#         "etiqueta": "ULLUM",
+#         "detalle": ullum_detalle_data,
+#         "componentes": ullum_componentes
+#     }
+# }
+#
+# diques_interactivos_json = json.dumps(
+#     DIQUES_INTERACTIVOS,
+#     ensure_ascii=False
+# )
 
 
 # ============================================================
@@ -3665,11 +3641,11 @@ body {
 
 
 // ==========================================================
-// DATOS DIQUES
+// DATOS DIQUES (Comentado porque usamos el visor 3D)
 // ==========================================================
-
-const diquesInteractivos =
-    __DIQUES_INTERACTIVOS__;
+//
+// const diquesInteractivos =
+//     __DIQUES_INTERACTIVOS__;
 
 
 // ==========================================================
@@ -3967,115 +3943,115 @@ function mostrarMenuDiques() {
 function explorarDique(clave) {
 
 
-    const dique =
-        diquesInteractivos[clave];
+    // const dique =
+    //     diquesInteractivos[clave];
 
 
-    if (!dique) {
-        return;
-    }
+    // if (!dique) {
+    //     return;
+    // }
 
 
-    diqueActual = clave;
+    // diqueActual = clave;
 
 
-    ocultarTodo();
+    // ocultarTodo();
 
 
-    document.getElementById(
-        "explorador-dique"
-    ).style.display =
-        "block";
+    // document.getElementById(
+    //     "explorador-dique"
+    // ).style.display =
+    //     "block";
 
 
-    document.getElementById(
-        "explorador-etiqueta"
-    ).textContent =
-        "EXPLORADOR · " +
-        dique.etiqueta;
+    // document.getElementById(
+    //     "explorador-etiqueta"
+    // ).textContent =
+    //     "EXPLORADOR · " +
+    //     dique.etiqueta;
 
 
-    document.getElementById(
-        "explorador-titulo"
-    ).textContent =
-        dique.nombre;
+    // document.getElementById(
+    //     "explorador-titulo"
+    // ).textContent =
+    //     dique.nombre;
 
 
-    document.getElementById(
-        "imagen-detalle-dique"
-    ).src =
-        dique.detalle;
+    // document.getElementById(
+    //     "imagen-detalle-dique"
+    // ).src =
+    //     dique.detalle;
 
 
-    document.getElementById(
-        "panel-inicial"
-    ).style.display =
-        "flex";
+    // document.getElementById(
+    //     "panel-inicial"
+    // ).style.display =
+    //     "flex";
 
 
-    document.getElementById(
-        "panel-activo"
-    ).style.display =
-        "none";
+    // document.getElementById(
+    //     "panel-activo"
+    // ).style.display =
+    //     "none";
 
 
-    const contenedor =
-        document.getElementById(
-            "contenedor-hotspots"
-        );
+    // const contenedor =
+    //     document.getElementById(
+    //         "contenedor-hotspots"
+    //     );
 
 
-    contenedor.innerHTML = "";
+    // contenedor.innerHTML = "";
 
 
-    Object.entries(
-        dique.componentes
-    ).forEach(
-        function([numero, dato]) {
+    // Object.entries(
+    //     dique.componentes
+    // ).forEach(
+    //     function([numero, dato]) {
 
 
-            const boton =
-                document.createElement(
-                    "button"
-                );
+    //         const boton =
+    //             document.createElement(
+    //                 "button"
+    //             );
 
 
-            boton.className =
-                "hotspot";
+    //         boton.className =
+    //             "hotspot";
 
 
-            boton.textContent =
-                numero;
+    //         boton.textContent =
+    //             numero;
 
 
-            boton.dataset.numero =
-                numero;
+    //         boton.dataset.numero =
+    //             numero;
 
 
-            boton.style.left =
-                dato.x + "%";
+    //         boton.style.left =
+    //             dato.x + "%";
 
 
-            boton.style.top =
-                dato.y + "%";
+    //         boton.style.top =
+    //             dato.y + "%";
 
 
-            boton.onclick =
-                function() {
+    //         boton.onclick =
+    //             function() {
 
-                    seleccionarComponente(
-                        numero
-                    );
+    //                 seleccionarComponente(
+    //                     numero
+    //                 );
 
-                };
+    //             };
 
 
-            contenedor.appendChild(
-                boton
-            );
+    //         contenedor.appendChild(
+    //             boton
+    //         );
 
-        }
-    );
+    //     }
+    // );
 
 }
 
@@ -4087,97 +4063,97 @@ function explorarDique(clave) {
 function seleccionarComponente(numero) {
 
 
-    const dato =
-        diquesInteractivos[
-            diqueActual
-        ].componentes[
-            numero
-        ];
+    // const dato =
+    //     diquesInteractivos[
+    //         diqueActual
+    //     ].componentes[
+    //         numero
+    //     ];
 
 
-    document.querySelectorAll(
-        ".hotspot"
-    ).forEach(
-        function(elemento) {
+    // document.querySelectorAll(
+    //     ".hotspot"
+    // ).forEach(
+    //     function(elemento) {
 
-            elemento.classList.remove(
-                "activo"
-            );
+    //         elemento.classList.remove(
+    //             "activo"
+    //         );
 
-        }
-    );
-
-
-    const activo =
-        document.querySelector(
-            '.hotspot[data-numero="' +
-            numero +
-            '"]'
-        );
+    //     }
+    // );
 
 
-    if (activo) {
-
-        activo.classList.add(
-            "activo"
-        );
-
-    }
-
-
-    document.getElementById(
-        "panel-inicial"
-    ).style.display =
-        "none";
+    // const activo =
+    //     document.querySelector(
+    //         '.hotspot[data-numero="' +
+    //         numero +
+    //         '"]'
+    //     );
 
 
-    document.getElementById(
-        "panel-activo"
-    ).style.display =
-        "block";
+    // if (activo) {
+
+    //     activo.classList.add(
+    //         "activo"
+    //     );
+
+    // }
 
 
-    const imagen =
-        document.getElementById(
-            "imagen-componente"
-        );
+    // document.getElementById(
+    //     "panel-inicial"
+    // ).style.display =
+    //     "none";
 
 
-    if (dato.imagen) {
-
-        imagen.src =
-            dato.imagen;
-
-        imagen.style.display =
-            "block";
-
-    }
-
-    else {
-
-        imagen.style.display =
-            "none";
-
-    }
+    // document.getElementById(
+    //     "panel-activo"
+    // ).style.display =
+    //     "block";
 
 
-    document.getElementById(
-        "numero-componente"
-    ).textContent =
-        numero +
-        " · COMPONENTE";
+    // const imagen =
+    //     document.getElementById(
+    //         "imagen-componente"
+    //     );
 
 
-    document.getElementById(
-        "titulo-componente"
-    ).textContent =
-        dato.nombre;
+    // if (dato.imagen) {
+
+    //     imagen.src =
+    //         dato.imagen;
+
+    //     imagen.style.display =
+    //         "block";
+
+    // }
+
+    // else {
+
+    //     imagen.style.display =
+    //         "none";
+
+    // }
 
 
-    document.getElementById(
-        "texto-componente"
-    ).textContent =
-        dato.texto || "";
+    // document.getElementById(
+    //     "numero-componente"
+    // ).textContent =
+    //     numero +
+    //     " · COMPONENTE";
+
+
+    // document.getElementById(
+    //     "titulo-componente"
+    // ).textContent =
+    //     dato.nombre;
+
+
+    // document.getElementById(
+    //     "texto-componente"
+    // ).textContent =
+    //     dato.texto || "";
 
 }
 
@@ -4638,19 +4614,29 @@ function continuarDistribuidor() {
         ullum_html
     )
 
-
-    html = html.replace(
-        "__DIQUES_INTERACTIVOS__",
-        diques_interactivos_json
-    )
+    # Se omite el reemplazo de los diques interactivos, ya que se usan directamente en QGIS
+    # html = html.replace(
+    #     "__DIQUES_INTERACTIVOS__",
+    #     diques_interactivos_json
+    # )
 
 
     # ========================================================
-    # MOSTRAR
+    # MOSTRAR MAPA INTERACTIVO Y COMPONENTES
     # ========================================================
-
+    
+    # 1. Renderiza el HTML de la experiencia (videos, tarjetas, etc.)
     st.components.v1.html(
         html,
         height=920,
         scrolling=False
     )
+    
+    st.markdown("---")
+    st.markdown("### Mapa Interactivo 3D")
+    
+    # 2. Incrusta el mapa 3D interactivo exportado desde QGIS
+    # Streamlit sirve automáticamente el contenido de la carpeta 'static' en '/app/static/'
+    url_mapa_3d = "/app/static/visor_3d/index.html"
+    
+    components.iframe(url_mapa_3d, height=700, scrolling=False)
