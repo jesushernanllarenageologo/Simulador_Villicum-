@@ -4622,21 +4622,20 @@ function continuarDistribuidor() {
 
 
 # ========================================================
-    # MOSTRAR MAPA INTERACTIVO Y COMPONENTES
-    # ========================================================
-    
-    # 1. Renderiza el HTML de la experiencia (videos, tarjetas, etc.)
-    st.components.v1.html(
-        html,
-        height=920,
-        scrolling=False
-    )
-    
-    st.markdown("---")
-    st.markdown("### Mapa Interactivo 3D")
-    
-    # 2. Incrusta el mapa 3D interactivo exportado desde QGIS usando GitHub Pages
-    # URL pública generada por tu propio repositorio
-    url_mapa_3d = "https://jesushernanllarenageologo.github.io/Simulador_Villicum-/static/visor_3d/index.html"
-    
-    components.iframe(url_mapa_3d, height=700, scrolling=False)
+# MOSTRAR MAPA INTERACTIVO Y COMPONENTES
+# ========================================================
+
+# 1. Renderiza el HTML de la experiencia (videos, tarjetas, etc.)
+st.components.v1.html(
+    html,
+    height=920,
+    scrolling=False
+)
+
+st.markdown("---")
+st.markdown("### Mapa Interactivo 3D")
+
+# 2. Incrusta el mapa 3D usando el servidor estático interno de Streamlit
+url_mapa_3d = "/app/static/visor_3d/index.html"
+
+components.iframe(url_mapa_3d, height=700, scrolling=False)
