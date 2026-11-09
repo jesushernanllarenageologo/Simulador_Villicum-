@@ -137,12 +137,13 @@ app.loadSceneFile("./data/index/scene.js", function (scene) {
   /* Pantalla Flotante Gigante: Marco ultra fino y minimalista en todo el contorno */
   #pantalla-holograma {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 95%; max-width: 1100px; /* Más ancho todavía */
+      width: 75%; /* Reducimos el ancho porcentual */
+      max-width: 800px; /* Reducimos el tamaño máximo a 800px (antes estaba en 1100px) */
       background: rgba(10, 15, 30, 0.95);
       border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 8px;
       box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
       z-index: 9999; display: none; flex-direction: column;
-      padding: 8px; /* Padding mínimo para que el marco sea súper fino en todos lados */
+      padding: 8px;
       backdrop-filter: blur(10px);
   }
   
