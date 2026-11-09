@@ -26,7 +26,7 @@ with main_col:
     try:
         with st.spinner("Cargando modelo 3D de alta fidelidad..."):
             # Aquí pegamos tu enlace exacto de GitHub Pages
-            enlace_mapa = "https://jesushernanllarenageologo.github.io/Simulador_Villicum-/visor_3d/index.html"
+            enlace_mapa = "https://jesushernanllarenageologo.github.io/Simulador_Villicum-/static/visor_3d/index.html"
             
             # Usamos iframe para incrustarlo como si fuera un video de YouTube
             st.components.v1.iframe(enlace_mapa, height=600, scrolling=False)
