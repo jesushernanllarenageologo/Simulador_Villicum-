@@ -134,10 +134,7 @@ app.loadSceneFile("./data/index/scene.js", function (scene) {
 <!-- INICIO DEL EFECTO GOOGLE MAPS CINEMÁTICO   -->
 <!-- ========================================== -->
 <style>
-  /* 1. Ocultar la tabla de QGIS cuando hay video */
-  #popup.oculto { display: none !important; }
-
-  /* 2. Diseño de la Pantalla Flotante (Estilo Simulador SCADA) */
+  /* Diseño de la Pantalla Flotante (Estilo Simulador SCADA) */
   #pantalla-holograma {
       position: absolute;
       top: 50%;
@@ -169,68 +166,5 @@ app.loadSceneFile("./data/index/scene.js", function (scene) {
     <div id="cerrar-video" onclick="cerrarHolograma()">✖</div>
     <h2 id="titulo-dique">Transmisión en Vivo</h2>
     <video id="video-cinematico" controls autoplay muted>
-        <source id="source-cinematico" src="" type="video/mp4">
-    </video>
-</div>
+        <source id="source-cinematico" src=""
 
-<script>
-  // Función para cerrar el video y volver a ver el mapa
-  function cerrarHolograma() {
-      document.getElementById('pantalla-holograma').style.display = 'none';
-      document.getElementById('video-cinematico').pause();
-  }
-
-  // 3. El Interceptor: Vigila cuando haces clic en un punto
-  const observer = new MutationObserver(() => {
-      let popupContenido = document.getElementById('popupcontent');
-      let popupVentana = document.getElementById('popup');
-      
-      if (popupContenido && popupContenido.innerHTML.trim() !== "") {
-          // Buscar si el punto clickeado tiene un video
-          let videoTag = popupContenido.querySelector('video source');
-          
-          if (videoTag) {
-              // Si hay video, ocultamos la tabla fea de QGIS inmediatamente
-              popupVentana.classList.add('oculto');
-              
-              // Cargamos el video en nuestra pantalla gigante
-              document.getElementById('source-cinematico').src = videoTag.src;
-              document.getElementById('video-cinematico').load();
-              
-              // Buscamos el nombre (Dique 1, Dique 2, etc.) para el título
-              let celdas = popupContenido.querySelectorAll('td');
-              celdas.forEach(celda => {
-                  if(celda.innerText.includes('Dique')) {
-                      document.getElementById('titulo-dique').innerText = "🔴 " + celda.innerText;
-                  }
-              });
-
-              // EFECTO GOOGLE MAPS: Disparamos el botón Orbit directamente por su ID
-              let btnOrbit = document.getElementById('orbitbtn');
-              if (btnOrbit) {
-                  btnOrbit.click(); 
-              }
-
-              // Mostramos el holograma gigante con el video después de 1.5 segundos (tiempo de vuelo)
-              setTimeout(() => {
-                  document.getElementById('pantalla-holograma').style.display = 'flex';
-                  document.getElementById('video-cinematico').play();
-              }, 1500);
-              
-              // Limpiamos para evitar que se repita
-              popupContenido.innerHTML = "";
-          } else {
-              // Si el punto no tiene video, dejamos que QGIS muestre su tabla normal
-              popupVentana.classList.remove('oculto');
-          }
-      }
-  });
-
-  // Activar el interceptor en el mapa
-  if(document.getElementById('popupcontent')){
-      observer.observe(document.getElementById('popupcontent'), { childList: true, subtree: true });
-  }
-</script>
-<!-- ========================================== -->
-</body>
-</html>
