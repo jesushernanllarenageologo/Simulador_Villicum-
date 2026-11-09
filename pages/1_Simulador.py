@@ -17,7 +17,7 @@ col4.metric("Etapa actual", get_estado_actual())
 st.divider()
 
 # 3. Layout principal
-main_col, control_col = st.columns([2, 1])
+main_col, control_col = st.columns([1, 1])
 
 # --- COLUMNA IZQUIERDA: VISOR 3D ---
 with main_col:
