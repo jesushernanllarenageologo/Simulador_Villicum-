@@ -1,4 +1,6 @@
+import time
 import streamlit as st
+import streamlit.components.v1 as components
 from core.state_manager import init_session_state, avanzar_etapa, get_estado_actual
 
 # 1. Configuración de la página
@@ -16,7 +18,7 @@ col4.metric("Etapa actual", get_estado_actual())
 
 st.divider()
 
-# 3. Layout principal
+# 3. Layout principal (Proporción 1:1 para que el mapa y el panel de video tengan el mismo tamaño inmenso)
 main_col, control_col = st.columns([1, 1])
 
 # --- COLUMNA IZQUIERDA: VISOR 3D ---
@@ -25,11 +27,11 @@ with main_col:
     
     try:
         with st.spinner("Cargando modelo 3D de alta fidelidad..."):
-            # Aquí pegamos tu enlace exacto de GitHub Pages
-            enlace_mapa = "https://jesushernanllarenageologo.github.io/Simulador_Villicum-/static/visor_3d/index.html"
+            # Truco anti-caché: le sumamos el tiempo actual a la URL para forzar al navegador a descargar la nueva versión de GitHub Pages
+            enlace_mapa = f"https://jesushernanllarenageologo.github.io/Simulador_Villicum-/static/visor_3d/index.html?refresh={time.time()}"
             
-            # Usamos iframe para incrustarlo como si fuera un video de YouTube
-            st.components.v1.iframe(enlace_mapa, height=600, scrolling=False)
+            # Usamos el componente iframe de Streamlit
+            components.iframe(enlace_mapa, height=600, scrolling=False)
             
     except Exception as e:
         st.error(f"Error al dibujar el mapa: {e}")
@@ -38,6 +40,7 @@ with main_col:
 with control_col:
     st.subheader("Controles")
     
+    # --- SISTEMA DE MONITOREO DE VIDEO NATIVO ---
     st.write("Cámaras de Infraestructura")
     nodo_seleccionado = st.selectbox(
         "Punto de Inspección:", 
@@ -45,18 +48,18 @@ with control_col:
     )
     
     if nodo_seleccionado == "Dique 3 (Ullum)":
-        st.success("Transmisión: Dique 3")
+        st.success("Transmisión en Vivo: Dique 3")
         
-        # --- AQUÍ VA EL CONTENEDOR CON BORDE ---
+        # Contenedor con borde para darle aspecto de pantalla de control SCADA
         with st.container(border=True):
             st.video("static/visor_3d/videos/ullum_superavitario.mp4", autoplay=True)
             
     elif nodo_seleccionado != "--- Seleccionar ---":
-        st.info(f"Cámara en {nodo_seleccionado} fuera de línea.")
+        st.info(f"Cámara en {nodo_seleccionado} temporalmente fuera de línea.")
         
     st.divider()
     
-    # --- RESTO DE TUS CONTROLES ---
+    # --- CONTROLES ORIGINALES ---
     st.write("Seleccione el escenario hidrológico inicial.")
     
     escenario = st.selectbox(
@@ -65,6 +68,12 @@ with control_col:
     )
     
     if st.button("▶ Iniciar", use_container_width=True):
+        
+        # Guardamos el escenario elegido
         st.session_state.escenario_seleccionado = escenario
+        
+        # Avanzamos la etapa del simulador
         avanzar_etapa()
+        
+        # Vamos a la pantalla de simulación
         st.switch_page("pages/5_Simulacion.py")
