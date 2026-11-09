@@ -129,70 +129,108 @@ app.loadSceneFile("./data/index/scene.js", function (scene) {
 
 });
 </script>
+
+<!-- ========================================== -->
+<!-- INICIO DEL EFECTO GOOGLE MAPS CINEMÁTICO   -->
+<!-- ========================================== -->
 <style>
-    /* Limpiamos el fondo blanco y hacemos la caja gigante */
-    #popup {
-        background-color: transparent !important;
-        border: none !important;
-        width: 450px !important; /* Tamaño gigante para el video */
-        box-shadow: none !important;
-    }
-    #popupbar { display: none !important; } /* Oculta la barra gris de arriba */
+  /* 1. Ocultar la tabla de QGIS cuando hay video */
+  #popup.oculto { display: none !important; }
+
+  /* 2. Diseño de la Pantalla Flotante (Estilo Simulador SCADA) */
+  #pantalla-holograma {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 700px;
+      background: rgba(10, 15, 30, 0.9);
+      border: 2px solid #00d2ff;
+      border-radius: 12px;
+      box-shadow: 0 0 40px rgba(0, 210, 255, 0.6);
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+  }
+  #titulo-dique { color: #00d2ff; font-family: sans-serif; text-align: center; margin: 0 0 15px 0; font-size: 26px;}
+  #cerrar-video {
+      position: absolute; top: 10px; right: 15px; color: white;
+      font-size: 28px; cursor: pointer; font-family: sans-serif; font-weight: bold;
+  }
+  #cerrar-video:hover { color: #ff4b4b; }
+  #video-cinematico { width: 100%; border-radius: 8px; border: 1px solid #444; }
 </style>
 
+<!-- Estructura del panel de video -->
+<div id="pantalla-holograma">
+    <div id="cerrar-video" onclick="cerrarHolograma()">✖</div>
+    <h2 id="titulo-dique">Transmisión en Vivo</h2>
+    <video id="video-cinematico" controls autoplay muted>
+        <source id="source-cinematico" src="" type="video/mp4">
+    </video>
+</div>
+
 <script>
-// Interceptamos el clic en el mapa para inyectar el diseño profesional
-document.addEventListener("click", function() {
-    setTimeout(() => {
-        let popup = document.getElementById("popup");
-        // Si el popup se abrió al hacer clic en un punto...
-        if (popup && popup.style.display !== "none") {
+  // Función para cerrar el video y volver a ver el mapa
+  function cerrarHolograma() {
+      document.getElementById('pantalla-holograma').style.display = 'none';
+      document.getElementById('video-cinematico').pause();
+  }
 
-            // 1. Extraer el nombre (ej: "Dique 3") de la tabla antes de destruirla
-            let nombreDique = "Transmisión en Vivo";
-            let celdas = popup.getElementsByTagName("td");
-            for (let i = 0; i < celdas.length; i++) {
-                if (celdas[i].innerText.includes("Dique")) {
-                    nombreDique = celdas[i].innerText;
-                    break;
-                }
-            }
+  // 3. El Interceptor: Vigila cuando haces clic en un punto
+  const observer = new MutationObserver(() => {
+      let popupContenido = document.getElementById('popupcontent');
+      let popupVentana = document.getElementById('popup');
+      
+      if (popupContenido && popupContenido.innerHTML.trim() !== "") {
+          // Buscar si el punto clickeado tiene un video
+          let videoTag = popupContenido.querySelector('video source');
+          
+          if (videoTag) {
+              // Si hay video, ocultamos la tabla fea de QGIS inmediatamente
+              popupVentana.classList.add('oculto');
+              
+              // Cargamos el video en nuestra pantalla gigante
+              document.getElementById('source-cinematico').src = videoTag.src;
+              document.getElementById('video-cinematico').load();
+              
+              // Buscamos el nombre (Dique 1, Dique 2, etc.) para el título
+              let celdas = popupContenido.querySelectorAll('td');
+              celdas.forEach(celda => {
+                  if(celda.innerText.includes('Dique')) {
+                      document.getElementById('titulo-dique').innerText = "🔴 " + celda.innerText;
+                  }
+              });
 
-            // 2. Buscar si hay un video cargado en ese punto
-            let videoObj = popup.querySelector("video");
+              // EFECTO GOOGLE MAPS: Disparamos el botón Orbit directamente por su ID
+              let btnOrbit = document.getElementById('orbitbtn');
+              if (btnOrbit) {
+                  btnOrbit.click(); 
+              }
 
-            if (videoObj && !popup.dataset.modificado) {
-                let videoSrc = videoObj.querySelector("source").src;
+              // Mostramos el holograma gigante con el video después de 1.5 segundos (tiempo de vuelo)
+              setTimeout(() => {
+                  document.getElementById('pantalla-holograma').style.display = 'flex';
+                  document.getElementById('video-cinematico').play();
+              }, 1500);
+              
+              // Limpiamos para evitar que se repita
+              popupContenido.innerHTML = "";
+          } else {
+              // Si el punto no tiene video, dejamos que QGIS muestre su tabla normal
+              popupVentana.classList.remove('oculto');
+          }
+      }
+  });
 
-                // 3. Destruir la tabla gris y reescribir con diseño de tablero de control
-                document.getElementById("popupcontent").innerHTML = `
-                    <div style="background: rgba(10, 15, 30, 0.85); padding: 15px; border-radius: 12px; border: 2px solid #00d2ff; box-shadow: 0px 0px 20px rgba(0, 210, 255, 0.4); backdrop-filter: blur(5px);">
-                        <h3 style="color: #00d2ff; font-family: sans-serif; text-align: center; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px;">
-                            🔴 ${nombreDique}
-                        </h3>
-                        <video width="100%" autoplay controls style="border-radius: 6px; border: 1px solid #444;">
-                            <source src="${videoSrc}" type="video/mp4">
-                        </video>
-                    </div>
-                `;
-                // Marcamos el popup para no reescribirlo dos veces
-                popup.dataset.modificado = "true";
-
-                // 4. ¡LA MAGIA! Buscar el botón "Orbit" oculto y hacerle clic para que la cámara vuele
-                let botones = popup.getElementsByTagName("button");
-                for (let btn of botones) {
-                    if (btn.innerText.includes("Orbit")) {
-                        btn.click();
-                    }
-                }
-
-                // 5. Ocultar los botones grises viejos
-                let divBotones = document.getElementById("actions");
-                if(divBotones) divBotones.style.display = "none";
-            }
-        }
-    }, 150); // Le damos 150 milisegundos a Qgis2threejs para que procese el clic
-});
+  // Activar el interceptor en el mapa
+  if(document.getElementById('popupcontent')){
+      observer.observe(document.getElementById('popupcontent'), { childList: true, subtree: true });
+  }
 </script>
+<!-- ========================================== -->
 </body>
 </html>
