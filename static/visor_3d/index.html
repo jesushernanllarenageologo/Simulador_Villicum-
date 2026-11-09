@@ -134,22 +134,28 @@ app.loadSceneFile("./data/index/scene.js", function (scene) {
 <!-- INICIO DEL EFECTO GOOGLE MAPS CINEMÁTICO   -->
 <!-- ========================================== -->
 <style>
-  /* Pantalla Flotante Gigante */
+  /* Pantalla Flotante Gigante con borde fino */
   #pantalla-holograma {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 80%; max-width: 700px; background: rgba(10, 15, 30, 0.9);
+      width: 95%; max-width: 1000px; /* Video mucho más grande */
+      background: rgba(10, 15, 30, 0.9);
       border: 2px solid #00d2ff; border-radius: 12px; box-shadow: 0 0 40px rgba(0, 210, 255, 0.6);
-      z-index: 9999; display: none; flex-direction: column; padding: 20px; backdrop-filter: blur(10px);
+      z-index: 9999; display: none; flex-direction: column;
+      padding: 10px 10px 15px 10px; /* Marco negro interior mucho más fino */
+      backdrop-filter: blur(10px);
   }
-  #titulo-dique { color: #00d2ff; font-family: sans-serif; text-align: center; margin: 0 0 15px 0; font-size: 26px;}
+  #titulo-dique {
+      color: #00d2ff; font-family: sans-serif; text-align: center;
+      margin: 5px 0 10px 0; font-size: 26px; font-weight: bold;
+  }
   #cerrar-video {
-      position: absolute; top: 10px; right: 15px; color: white;
-      font-size: 28px; cursor: pointer; font-family: sans-serif; font-weight: bold;
+      position: absolute; top: 5px; right: 12px; color: white;
+      font-size: 28px; cursor: pointer; font-family: sans-serif; font-weight: bold; z-index: 10000;
   }
   #cerrar-video:hover { color: #ff4b4b; }
   #video-cinematico { width: 100%; border-radius: 8px; border: 1px solid #444; }
 
-  /* El truco: Ocultar la tabla de QGIS haciéndola transparente, para que no interfiera */
+  /* Ocultar tabla QGIS */
   .popup-escondido { opacity: 0 !important; pointer-events: none !important; }
 </style>
 
@@ -162,57 +168,74 @@ app.loadSceneFile("./data/index/scene.js", function (scene) {
 </div>
 
 <script>
+  let orbitActivo = false;
+
   function cerrarHolograma() {
       document.getElementById('pantalla-holograma').style.display = 'none';
       document.getElementById('video-cinematico').pause();
-      // Le damos clic al botón de cerrar original de QGIS para reiniciar el ciclo
+      
+      // Detener órbita si cerramos el video manualmente
+      if (orbitActivo) {
+          let btnOrbit = document.getElementById('orbitbtn');
+          if (btnOrbit) btnOrbit.click();
+          orbitActivo = false;
+      }
+      
       let btnCerrarQgis = document.getElementById('closebtn');
       if(btnCerrarQgis) btnCerrarQgis.click();
   }
 
-  // MÉTODO FUERZA BRUTA: Escanea la pantalla cada 200 milisegundos (5 veces por seg)
+  // Detener órbita automáticamente cuando el video termine por sí solo
+  document.getElementById('video-cinematico').onended = function() {
+      if (orbitActivo) {
+          let btnOrbit = document.getElementById('orbitbtn');
+          if (btnOrbit) btnOrbit.click();
+          orbitActivo = false;
+      }
+  };
+
+  // Escáner de fuerza bruta
   setInterval(() => {
       let popup = document.getElementById('popup');
       let holograma = document.getElementById('pantalla-holograma');
       
       if (!popup || !holograma) return;
 
-      // Si QGIS acaba de abrir el popup en pantalla...
       if (window.getComputedStyle(popup).display !== 'none') {
           let videoTag = popup.querySelector('video source');
           
-          // Y si tiene un video y todavía NO hemos activado el holograma...
           if (videoTag && holograma.dataset.activo !== "true") {
               
-              holograma.dataset.activo = "true"; // Bloqueamos para que no parpadee
-              
-              // 1. Desaparecemos la tabla de QGIS a la fuerza
+              holograma.dataset.activo = "true";
               popup.classList.add('popup-escondido');
               
-              // 2. Cargamos el video
               document.getElementById('source-cinematico').src = videoTag.src;
               document.getElementById('video-cinematico').load();
               
-              // 3. Robamos el nombre del Dique para el título
+              // Ajuste de Título sin punto rojo y nombre exacto
               let celdas = popup.querySelectorAll('td');
               celdas.forEach(celda => {
-                  if(celda.innerText.includes('Dique')) {
-                      document.getElementById('titulo-dique').innerText = "🔴 " + celda.innerText;
+                  if(celda.innerText.includes('Dique 3')) {
+                      document.getElementById('titulo-dique').innerText = "Dique de Ullúm";
+                  } else if(celda.innerText.includes('Dique')) {
+                      // Si en el futuro agregas Dique 1 o 2, tomará su nombre limpio
+                      document.getElementById('titulo-dique').innerText = celda.innerText;
                   }
               });
 
-              // 4. Forzamos el clic en el botón Orbit para volar
+              // Iniciar vuelo de cámara
               let btnOrbit = document.getElementById('orbitbtn');
-              if (btnOrbit) btnOrbit.click(); 
+              if (btnOrbit) {
+                  btnOrbit.click(); 
+                  orbitActivo = true; // Marcamos que la cámara está girando
+              }
 
-              // 5. Mostramos nuestra pantalla holograma tras 1.5 segundos (tiempo de vuelo)
               setTimeout(() => {
                   holograma.style.display = 'flex';
                   document.getElementById('video-cinematico').play();
               }, 1500);
           }
       } else {
-          // Si el usuario cerró el popup, reseteamos el sistema para el próximo clic
           holograma.dataset.activo = "false";
           popup.classList.remove('popup-escondido');
       }
