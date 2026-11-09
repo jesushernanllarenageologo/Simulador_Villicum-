@@ -134,23 +134,12 @@ app.loadSceneFile("./data/index/scene.js", function (scene) {
 <!-- INICIO DEL EFECTO GOOGLE MAPS CINEMÁTICO   -->
 <!-- ========================================== -->
 <style>
-  /* Diseño de la Pantalla Flotante (Estilo Simulador SCADA) */
+  /* Pantalla Flotante Gigante */
   #pantalla-holograma {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 80%;
-      max-width: 700px;
-      background: rgba(10, 15, 30, 0.9);
-      border: 2px solid #00d2ff;
-      border-radius: 12px;
-      box-shadow: 0 0 40px rgba(0, 210, 255, 0.6);
-      z-index: 9999;
-      display: none;
-      flex-direction: column;
-      padding: 20px;
-      backdrop-filter: blur(10px);
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 80%; max-width: 700px; background: rgba(10, 15, 30, 0.9);
+      border: 2px solid #00d2ff; border-radius: 12px; box-shadow: 0 0 40px rgba(0, 210, 255, 0.6);
+      z-index: 9999; display: none; flex-direction: column; padding: 20px; backdrop-filter: blur(10px);
   }
   #titulo-dique { color: #00d2ff; font-family: sans-serif; text-align: center; margin: 0 0 15px 0; font-size: 26px;}
   #cerrar-video {
@@ -159,12 +148,76 @@ app.loadSceneFile("./data/index/scene.js", function (scene) {
   }
   #cerrar-video:hover { color: #ff4b4b; }
   #video-cinematico { width: 100%; border-radius: 8px; border: 1px solid #444; }
+
+  /* El truco: Ocultar la tabla de QGIS haciéndola transparente, para que no interfiera */
+  .popup-escondido { opacity: 0 !important; pointer-events: none !important; }
 </style>
 
-<!-- Estructura del panel de video -->
 <div id="pantalla-holograma">
     <div id="cerrar-video" onclick="cerrarHolograma()">✖</div>
     <h2 id="titulo-dique">Transmisión en Vivo</h2>
     <video id="video-cinematico" controls autoplay muted>
-        <source id="source-cinematico" src=""
+        <source id="source-cinematico" src="" type="video/mp4">
+    </video>
+</div>
 
+<script>
+  function cerrarHolograma() {
+      document.getElementById('pantalla-holograma').style.display = 'none';
+      document.getElementById('video-cinematico').pause();
+      // Le damos clic al botón de cerrar original de QGIS para reiniciar el ciclo
+      let btnCerrarQgis = document.getElementById('closebtn');
+      if(btnCerrarQgis) btnCerrarQgis.click();
+  }
+
+  // MÉTODO FUERZA BRUTA: Escanea la pantalla cada 200 milisegundos (5 veces por seg)
+  setInterval(() => {
+      let popup = document.getElementById('popup');
+      let holograma = document.getElementById('pantalla-holograma');
+      
+      if (!popup || !holograma) return;
+
+      // Si QGIS acaba de abrir el popup en pantalla...
+      if (window.getComputedStyle(popup).display !== 'none') {
+          let videoTag = popup.querySelector('video source');
+          
+          // Y si tiene un video y todavía NO hemos activado el holograma...
+          if (videoTag && holograma.dataset.activo !== "true") {
+              
+              holograma.dataset.activo = "true"; // Bloqueamos para que no parpadee
+              
+              // 1. Desaparecemos la tabla de QGIS a la fuerza
+              popup.classList.add('popup-escondido');
+              
+              // 2. Cargamos el video
+              document.getElementById('source-cinematico').src = videoTag.src;
+              document.getElementById('video-cinematico').load();
+              
+              // 3. Robamos el nombre del Dique para el título
+              let celdas = popup.querySelectorAll('td');
+              celdas.forEach(celda => {
+                  if(celda.innerText.includes('Dique')) {
+                      document.getElementById('titulo-dique').innerText = "🔴 " + celda.innerText;
+                  }
+              });
+
+              // 4. Forzamos el clic en el botón Orbit para volar
+              let btnOrbit = document.getElementById('orbitbtn');
+              if (btnOrbit) btnOrbit.click(); 
+
+              // 5. Mostramos nuestra pantalla holograma tras 1.5 segundos (tiempo de vuelo)
+              setTimeout(() => {
+                  holograma.style.display = 'flex';
+                  document.getElementById('video-cinematico').play();
+              }, 1500);
+          }
+      } else {
+          // Si el usuario cerró el popup, reseteamos el sistema para el próximo clic
+          holograma.dataset.activo = "false";
+          popup.classList.remove('popup-escondido');
+      }
+  }, 200);
+</script>
+<!-- ========================================== -->
+</body>
+</html>
