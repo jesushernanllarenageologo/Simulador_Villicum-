@@ -29,7 +29,8 @@ app.loadData({
         "propertyNames": [
           "id",
           "NOMBRES",
-          "ruta_video"
+          "ruta_video",
+          "video_mp4"
         ],
         "label": {
           "relative": true,
@@ -64,6 +65,7 @@ app.loadData({
                 "prop": [
                   "100",
                   "Naciente",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Naciente",
@@ -83,6 +85,7 @@ app.loadData({
                 "prop": [
                   "101",
                   "Mina",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Mina",
@@ -102,6 +105,7 @@ app.loadData({
                 "prop": [
                   "102",
                   "Toma",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Toma",
@@ -121,6 +125,7 @@ app.loadData({
                 "prop": [
                   "103",
                   "Uni\u00f3n 1",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Uni\u00f3n 1",
@@ -140,6 +145,7 @@ app.loadData({
                 "prop": [
                   "104",
                   "Union 2",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Union 2",
@@ -159,6 +165,7 @@ app.loadData({
                 "prop": [
                   "105",
                   "Dique 1",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Dique 1",
@@ -178,6 +185,7 @@ app.loadData({
                 "prop": [
                   "106",
                   "Dique 2",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Dique 2",
@@ -197,7 +205,8 @@ app.loadData({
                 "prop": [
                   "107",
                   "Dique 3",
-                  "videos/ullum_superavitario.mp4"
+                  "videos/ullum_superavitario.mp4",
+                  "<video width=\"100%\" autoplay muted controls><source src=\"videos/ullum_superavitario.mp4\" type=\"video/mp4\"></video>"
                 ],
                 "lbl": "Dique 3",
                 "lh": 2400.0
@@ -216,6 +225,7 @@ app.loadData({
                 "prop": [
                   "108",
                   "Divisi\u00f3n",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Divisi\u00f3n",
@@ -235,6 +245,7 @@ app.loadData({
                 "prop": [
                   "109",
                   "Emiliano",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Emiliano",
@@ -254,6 +265,7 @@ app.loadData({
                 "prop": [
                   "110",
                   "Canales",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Canales",
@@ -273,6 +285,7 @@ app.loadData({
                 "prop": [
                   "111",
                   "Ciudad",
+                  "NULL",
                   "NULL"
                 ],
                 "lbl": "Ciudad",
