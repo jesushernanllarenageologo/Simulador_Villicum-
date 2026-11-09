@@ -19,7 +19,7 @@ col4.metric("Etapa actual", get_estado_actual())
 st.divider()
 
 # 3. Layout principal (Proporción 1:1 para que el mapa y el panel de video tengan el mismo tamaño inmenso)
-main_col, control_col = st.columns([1, 1])
+main_col, control_col = st.columns([4, 1])
 
 # --- COLUMNA IZQUIERDA: VISOR 3D ---
 with main_col:
