@@ -17,7 +17,7 @@ col4.metric("Etapa actual", get_estado_actual())
 st.divider()
 
 # 3. Layout principal
-main_col, control_col = st.columns([3, 1])
+main_col, control_col = st.columns([2, 1])
 
 # --- COLUMNA IZQUIERDA: VISOR 3D ---
 with main_col:
@@ -38,7 +38,6 @@ with main_col:
 with control_col:
     st.subheader("Controles")
     
-    # --- NUEVO: SISTEMA DE MONITOREO DE VIDEO ---
     st.write("Cámaras de Infraestructura")
     nodo_seleccionado = st.selectbox(
         "Punto de Inspección:", 
@@ -47,14 +46,17 @@ with control_col:
     
     if nodo_seleccionado == "Dique 3 (Ullum)":
         st.success("Transmisión: Dique 3")
-        # Ruta local a la carpeta videos que mostraste en tu imagen
-        st.video("static/visor_3d/videos/ullum_superavitario.mp4", autoplay=True)
+        
+        # --- AQUÍ VA EL CONTENEDOR CON BORDE ---
+        with st.container(border=True):
+            st.video("static/visor_3d/videos/ullum_superavitario.mp4", autoplay=True)
+            
     elif nodo_seleccionado != "--- Seleccionar ---":
         st.info(f"Cámara en {nodo_seleccionado} fuera de línea.")
         
     st.divider()
     
-    # --- TUS CONTROLES ORIGINALES INTACTOS ---
+    # --- RESTO DE TUS CONTROLES ---
     st.write("Seleccione el escenario hidrológico inicial.")
     
     escenario = st.selectbox(
@@ -63,11 +65,6 @@ with control_col:
     )
     
     if st.button("▶ Iniciar", use_container_width=True):
-        # Guardamos el escenario elegido
         st.session_state.escenario_seleccionado = escenario
-        
-        # Avanzamos la etapa del simulador
         avanzar_etapa()
-        
-        # Vamos a la pantalla de simulación
         st.switch_page("pages/5_Simulacion.py")
