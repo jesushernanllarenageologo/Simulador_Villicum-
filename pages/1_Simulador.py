@@ -37,6 +37,24 @@ with main_col:
 # --- COLUMNA DERECHA: CONTROLES ---
 with control_col:
     st.subheader("Controles")
+    
+    # --- NUEVO: SISTEMA DE MONITOREO DE VIDEO ---
+    st.write("Cámaras de Infraestructura")
+    nodo_seleccionado = st.selectbox(
+        "Punto de Inspección:", 
+        ["--- Seleccionar ---", "Dique 1 (Punta Negra)", "Dique 2 (Los Caracoles)", "Dique 3 (Ullum)"]
+    )
+    
+    if nodo_seleccionado == "Dique 3 (Ullum)":
+        st.success("Transmisión: Dique 3")
+        # Ruta local a la carpeta videos que mostraste en tu imagen
+        st.video("static/visor_3d/videos/ullum_superavitario.mp4", autoplay=True)
+    elif nodo_seleccionado != "--- Seleccionar ---":
+        st.info(f"Cámara en {nodo_seleccionado} fuera de línea.")
+        
+    st.divider()
+    
+    # --- TUS CONTROLES ORIGINALES INTACTOS ---
     st.write("Seleccione el escenario hidrológico inicial.")
     
     escenario = st.selectbox(
@@ -45,7 +63,6 @@ with control_col:
     )
     
     if st.button("▶ Iniciar", use_container_width=True):
-        
         # Guardamos el escenario elegido
         st.session_state.escenario_seleccionado = escenario
         
