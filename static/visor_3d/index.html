@@ -129,5 +129,70 @@ app.loadSceneFile("./data/index/scene.js", function (scene) {
 
 });
 </script>
+<style>
+    /* Limpiamos el fondo blanco y hacemos la caja gigante */
+    #popup {
+        background-color: transparent !important;
+        border: none !important;
+        width: 450px !important; /* Tamaño gigante para el video */
+        box-shadow: none !important;
+    }
+    #popupbar { display: none !important; } /* Oculta la barra gris de arriba */
+</style>
+
+<script>
+// Interceptamos el clic en el mapa para inyectar el diseño profesional
+document.addEventListener("click", function() {
+    setTimeout(() => {
+        let popup = document.getElementById("popup");
+        // Si el popup se abrió al hacer clic en un punto...
+        if (popup && popup.style.display !== "none") {
+
+            // 1. Extraer el nombre (ej: "Dique 3") de la tabla antes de destruirla
+            let nombreDique = "Transmisión en Vivo";
+            let celdas = popup.getElementsByTagName("td");
+            for (let i = 0; i < celdas.length; i++) {
+                if (celdas[i].innerText.includes("Dique")) {
+                    nombreDique = celdas[i].innerText;
+                    break;
+                }
+            }
+
+            // 2. Buscar si hay un video cargado en ese punto
+            let videoObj = popup.querySelector("video");
+
+            if (videoObj && !popup.dataset.modificado) {
+                let videoSrc = videoObj.querySelector("source").src;
+
+                // 3. Destruir la tabla gris y reescribir con diseño de tablero de control
+                document.getElementById("popupcontent").innerHTML = `
+                    <div style="background: rgba(10, 15, 30, 0.85); padding: 15px; border-radius: 12px; border: 2px solid #00d2ff; box-shadow: 0px 0px 20px rgba(0, 210, 255, 0.4); backdrop-filter: blur(5px);">
+                        <h3 style="color: #00d2ff; font-family: sans-serif; text-align: center; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px;">
+                            🔴 ${nombreDique}
+                        </h3>
+                        <video width="100%" autoplay controls style="border-radius: 6px; border: 1px solid #444;">
+                            <source src="${videoSrc}" type="video/mp4">
+                        </video>
+                    </div>
+                `;
+                // Marcamos el popup para no reescribirlo dos veces
+                popup.dataset.modificado = "true";
+
+                // 4. ¡LA MAGIA! Buscar el botón "Orbit" oculto y hacerle clic para que la cámara vuele
+                let botones = popup.getElementsByTagName("button");
+                for (let btn of botones) {
+                    if (btn.innerText.includes("Orbit")) {
+                        btn.click();
+                    }
+                }
+
+                // 5. Ocultar los botones grises viejos
+                let divBotones = document.getElementById("actions");
+                if(divBotones) divBotones.style.display = "none";
+            }
+        }
+    }, 150); // Le damos 150 milisegundos a Qgis2threejs para que procese el clic
+});
+</script>
 </body>
 </html>
