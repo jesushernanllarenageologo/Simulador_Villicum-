@@ -1,4 +1,7 @@
 import streamlit as st
+import time
+import threading # <-- Importación para las luces en segundo plano
+from core.wled_controller import enviar_comando_wled
 from pathlib import Path
 import base64
 import mimetypes
@@ -248,29 +251,18 @@ if not escenario:
 
 
 # ============================================================
-# POR AHORA SOLO SUPERAVITARIO
+# POR AHORA SOLO SUPERAVITARIO (BLOQUE DESACTIVADO PARA EL HACKATON)
 # ============================================================
+# Si en el futuro quieres bloquear de nuevo los otros escenarios, 
+# quita los numerales de abajo:
 
-if escenario != "Superavitario":
-
-    st.title("🌊 Simulación Hídrica")
-
-    st.markdown(
-        f"### Escenario inicial: **{escenario}**"
-    )
-
-    st.info(
-        f"El escenario {escenario} todavía "
-        "no tiene cargada la experiencia audiovisual."
-    )
-
-    if st.button("← Volver"):
-
-        st.switch_page(
-            "pages/1_Simulador.py"
-        )
-
-    st.stop()
+# if escenario != "Superavitario":
+#     st.title("🌊 Simulación Hídrica")
+#     st.markdown(f"### Escenario inicial: **{escenario}**")
+#     st.info(f"El escenario {escenario} todavía no tiene cargada la experiencia audiovisual.")
+#     if st.button("← Volver"):
+#         st.switch_page("pages/1_Simulador.py")
+#     st.stop()
 
 
 # ============================================================
@@ -721,15 +713,26 @@ if not st.session_state.experiencia_iniciada:
     )
 
     with col2:
+        
+        # Función en segundo plano para controlar WLED sin trabar el video
+        def animar_luces_inicio():
+            enviar_comando_wled({"on": True, "seg": [{"id": 0, "start": 0, "stop": 11, "col": [[0, 0, 0]]}]})
+            time.sleep(0.5) 
+            for i in range(1, 12):
+                enviar_comando_wled({"seg": [{"id": 0, "start": 0, "stop": i, "col": [[0, 150, 255]], "fx": 0}]})
+                time.sleep(0.4)
 
         if st.button(
             "▶ INICIAR EXPERIENCIA",
             type="primary",
             use_container_width=True
         ):
+            # Iniciar hilo de luces
+            hilo = threading.Thread(target=animar_luces_inicio)
+            hilo.start()
 
+            # Pasar inmediatamente al video
             st.session_state.experiencia_iniciada = True
-
             st.rerun()
 
 
