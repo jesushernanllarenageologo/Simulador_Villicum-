@@ -1,12 +1,12 @@
 import streamlit as st
 import time
-import threading # <-- Importación para las luces en segundo plano
+import threading 
 from core.wled_controller import enviar_comando_wled
 from pathlib import Path
 import base64
 import mimetypes
 import json
-import streamlit.components.v1 as components # Importación necesaria para el iframe
+import streamlit.components.v1 as components 
 
 from core.state_manager import init_session_state
 
@@ -677,10 +677,10 @@ if not st.session_state.experiencia_iniciada:
         
         # Función en segundo plano para controlar WLED
         def animar_luces_inicio():
-            # 1. RETARDO AUMENTADO: Esperamos 3 segundos exactos para que la web cargue el video
-            time.sleep(3.0) 
+            # 1. Retardo para sincronizar con la carga del video (ajústalo si el video tarda más)
+            time.sleep(1.0) 
             
-            # 2. Preparamos la tira LED: encendida, sin transiciones, efecto sólido y en negro
+            # 2. Reseteamos el segmento, efecto sólido (0), sin transición (0) y lo ponemos en negro
             enviar_comando_wled({
                 "on": True, 
                 "bri": 255,
@@ -689,30 +689,28 @@ if not st.session_state.experiencia_iniciada:
             })
             time.sleep(0.2) 
             
-            # 3. MÉTODO NUEVO (Sin bucles): Pintamos los LEDs de forma absoluta para que queden FIJOS
-            for i in range(1, 12):
+            # 3. DIRECCIONAMIENTO INDIVIDUAL ESTRICTO: Pintamos de a un solo LED por vez para que queden fijos
+            for led_index in range(0, 11): # Del LED 0 al 10
                 enviar_comando_wled({
                     "seg": [
                         {
                             "id": 0, 
-                            # El parámetro "i" pinta exactamente desde el led 0 hasta el led 'i' y lo congela
-                            "i": [0, i, [0, 150, 255]] 
+                            "i": [led_index, [0, 150, 255]] 
                         }
                     ]
                 })
-                # Velocidad a la que avanza el agua (0.4 segundos entre cada led)
-                time.sleep(0.4)
+                # Velocidad del flujo de agua (0.4 seg entre cada LED)
+                time.sleep(0.4) 
 
         if st.button(
             "▶ INICIAR EXPERIENCIA",
             type="primary",
             use_container_width=True
         ):
-            # Iniciar hilo de luces
+            # Iniciar hilo de luces para no trabar la interfaz
             hilo = threading.Thread(target=animar_luces_inicio)
             hilo.start()
 
-            # Pasar inmediatamente al video
             st.session_state.experiencia_iniciada = True
             st.rerun()
 
