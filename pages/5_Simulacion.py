@@ -6,7 +6,7 @@ from pathlib import Path
 import base64
 import mimetypes
 import json
-import streamlit.components.v1 as components
+import streamlit.components.v1 as components # Importación necesaria para el iframe
 
 from core.state_manager import init_session_state
 
@@ -253,6 +253,7 @@ if not escenario:
 # ============================================================
 # POR AHORA SOLO SUPERAVITARIO (BLOQUE DESACTIVADO PARA EL HACKATON)
 # ============================================================
+#
 # if escenario != "Superavitario":
 #     st.title("🌊 Simulación Hídrica")
 #     st.markdown(f"### Escenario inicial: **{escenario}**")
@@ -674,36 +675,32 @@ if not st.session_state.experiencia_iniciada:
 
     with col2:
         
-        # Función en segundo plano para controlar WLED de manera sólida y sincronizada
+        # Función en segundo plano para controlar WLED
         def animar_luces_inicio():
-            # CONFIGURACIÓN: Cambia este número para que la luz arranque más tarde o más temprano.
-            # 1.5 significa que espera 1.5 segundos (lo que tarda la web en cargar el video) antes de encender
-            RETARDO_VIDEO = 1.0 
-            time.sleep(RETARDO_VIDEO)
+            # 1. RETARDO AUMENTADO: Esperamos 3 segundos exactos para que la web cargue el video
+            time.sleep(3.0) 
             
-            # 1. Aseguramos encendido y limpiamos el tramo asegurando "transition": 0 para evitar efectos raros
+            # 2. Preparamos la tira LED: encendida, sin transiciones, efecto sólido y en negro
             enviar_comando_wled({
                 "on": True, 
+                "bri": 255,
                 "transition": 0,
                 "seg": [{"id": 0, "start": 0, "stop": 12, "col": [[0, 0, 0]], "fx": 0}]
             })
-            time.sleep(0.1) 
+            time.sleep(0.2) 
             
-            # 2. Encendemos secuencialmente fijando el tamaño del segmento y sin transición
+            # 3. MÉTODO NUEVO (Sin bucles): Pintamos los LEDs de forma absoluta para que queden FIJOS
             for i in range(1, 12):
                 enviar_comando_wled({
                     "seg": [
                         {
                             "id": 0, 
-                            "start": 0, 
-                            "stop": i, # El agua crece y SE QUEDA
-                            "col": [[0, 150, 255]], 
-                            "fx": 0,
-                            "transition": 0 # Clave para que no se apague
+                            # El parámetro "i" pinta exactamente desde el led 0 hasta el led 'i' y lo congela
+                            "i": [0, i, [0, 150, 255]] 
                         }
                     ]
                 })
-                # Cambia el 0.4 para igualar la velocidad del agua en tu video
+                # Velocidad a la que avanza el agua (0.4 segundos entre cada led)
                 time.sleep(0.4)
 
         if st.button(
