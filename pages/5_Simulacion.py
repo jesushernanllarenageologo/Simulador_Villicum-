@@ -21,9 +21,105 @@ st.set_page_config(
     layout="wide"
 )
 
+if not hasattr(st.components, "v2"):
+    st.error(
+        "Esta página necesita una versión de Streamlit que incluya st.components.v2 "
+        "para detectar cuándo el video está listo. Actualizá Streamlit y volvé a iniciar la app."
+    )
+    st.stop()
 init_session_state()
 
 BASE_DIR = Path(__file__).resolve().parents[1]
+# ============================================================
+# WLED: CONTROL DE LEDS DE INICIO
+# ============================================================
+
+WLED_LOCK = threading.Lock()
+
+
+def enviar_comando_wled_seguro(comando):
+    """Evita que dos peticiones WLED se envíen al mismo tiempo."""
+    with WLED_LOCK:
+        enviar_comando_wled(comando)
+
+
+def apagar_luces_inicio():
+    """Apaga los primeros 12 LED del segmento 0."""
+    enviar_comando_wled_seguro({
+        "on": True,
+        "bri": 255,
+        "transition": 0,
+        "seg": [{"id": 0, "start": 0, "stop": 12, "i": [0, 12, [0, 0, 0]]}]
+    })
+
+
+def animar_luces_inicio():
+    """Enciende los LED 1 a 10 uno por uno y los deja prendidos."""
+    for led_index in range(1, 11):
+        enviar_comando_wled_seguro({
+            "on": True,
+            "bri": 255,
+            "transition": 0,
+            "seg": [{"id": 0, "start": 0, "stop": 12, "i": [led_index, [0, 150, 255]]}]
+        })
+        time.sleep(0.4)
+
+
+def encender_led_0_al_cargar_video():
+    """Callback de Streamlit: enciende el LED 0 cuando el video puede reproducirse."""
+    if st.session_state.get("led_0_video_listo", False):
+        return
+
+    enviar_comando_wled_seguro({
+        "on": True,
+        "bri": 255,
+        "transition": 0,
+        "seg": [{"id": 0, "start": 0, "stop": 12, "i": [0, [0, 150, 255]]}]
+    })
+    st.session_state["led_0_video_listo"] = True
+
+
+# Componente bidireccional: muestra el HTML existente en un iframe y avisa
+# a Python cuando el video 1 emite el evento "canplay".
+EXPERIENCIA_HTML_COMPONENT = st.components.v2.component(
+    name="experiencia_html_con_evento_video",
+    html='<iframe id="experiencia-html-iframe" title="Experiencia hídrica" allow="autoplay"></iframe>',
+    css="""
+        #experiencia-html-iframe {
+            display: block;
+            width: 100%;
+            height: 920px;
+            border: 0;
+            background: transparent;
+        }
+    """,
+    js="""
+        export default function({ parentElement, data, setTriggerValue }) {
+            const frame = parentElement.querySelector("#experiencia-html-iframe");
+            if (!frame || frame.dataset.htmlInjected === "1") return;
+
+            frame.addEventListener("load", () => {
+                const video = frame.contentDocument?.getElementById("video-1");
+                if (!video) return;
+
+                const avisarPython = () => {
+                    if (frame.dataset.videoReadySent === "1") return;
+                    frame.dataset.videoReadySent = "1";
+                    setTriggerValue("video_ready", Date.now());
+                };
+
+                if (video.readyState >= 3) {
+                    avisarPython();
+                } else {
+                    video.addEventListener("canplay", avisarPython, { once: true });
+                }
+            }, { once: true });
+
+            frame.srcdoc = data.html;
+            frame.dataset.htmlInjected = "1";
+        }
+    """
+)
 
 
 # ============================================================
@@ -675,43 +771,28 @@ if not st.session_state.experiencia_iniciada:
 
     with col2:
         
-        # Función en segundo plano para controlar WLED
-        def animar_luces_inicio():
-            # 1. Esperamos 1 segundo para que el video empiece a cargar
-            time.sleep(1.0) 
-            
-            # 2. Dejamos el tramo en negro y congelado (sin transiciones ni efectos)
-            enviar_comando_wled({
-                "on": True, 
-                "bri": 255,
-                "transition": 0,
-                "seg": [{"id": 0, "start": 0, "stop": 12, "col": [[0, 0, 0]], "fx": 0}]
-            })
-            time.sleep(0.2) 
-            
-            # 3. AHORA SÍ: Sintaxis correcta de WLED para pintar de a un solo LED (sin corchetes dobles)
-            for led_index in range(0, 11): 
-                enviar_comando_wled({
-                    "seg": [
-                        {
-                            "id": 0, 
-                            "i": [led_index, 0, 150, 255] 
-                        }
-                    ]
-                })
-                # Pausa entre cada foquito (ajústalo a la velocidad de tu video)
-                time.sleep(0.4) 
-
+        # Las luces quedan apagadas mientras la pantalla inicial espera.
+        if not st.session_state.get("luces_inicio_apagadas", False):
+            apagar_luces_inicio()
+            st.session_state["luces_inicio_apagadas"] = True
         if st.button(
             "▶ INICIAR EXPERIENCIA",
             type="primary",
             use_container_width=True
         ):
-            # Iniciar hilo de luces
-            hilo = threading.Thread(target=animar_luces_inicio)
+            # Asegurar que todos los LED comiencen apagados.
+            apagar_luces_inicio()
+            st.session_state["luces_inicio_apagadas"] = True
+            st.session_state["led_0_video_listo"] = False
+
+            # La secuencia 1–10 empieza con el botón. El LED 0 se enciende
+            # después, desde el aviso "canplay" del video.
+            hilo = threading.Thread(
+                target=animar_luces_inicio,
+                daemon=True
+            )
             hilo.start()
 
-            # Pasar inmediatamente al video
             st.session_state.experiencia_iniciada = True
             st.rerun()
 
@@ -4608,13 +4689,14 @@ function continuarDistribuidor() {
     # MOSTRAR MAPA INTERACTIVO Y COMPONENTES
     # ========================================================
     
-    # 1. Renderiza el HTML de la experiencia (videos, tarjetas, etc.)
-    st.components.v1.html(
-        html,
-        height=920,
-        scrolling=False
+    # 1. Renderiza la experiencia y recibe el aviso cuando el video está listo.
+    EXPERIENCIA_HTML_COMPONENT(
+        data={"html": html},
+        on_video_ready_change=encender_led_0_al_cargar_video,
+        key="experiencia_html_wled",
+        width="stretch",
+        height=920
     )
-    
     st.markdown("---")
     st.markdown("### Mapa Interactivo 3D")
     
