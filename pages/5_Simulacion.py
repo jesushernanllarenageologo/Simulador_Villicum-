@@ -677,10 +677,10 @@ if not st.session_state.experiencia_iniciada:
         
         # Función en segundo plano para controlar WLED
         def animar_luces_inicio():
-            # 1. Retardo para sincronizar con la carga del video (ajústalo si el video tarda más)
+            # 1. Esperamos 1 segundo para que el video empiece a cargar
             time.sleep(1.0) 
             
-            # 2. Reseteamos el segmento, efecto sólido (0), sin transición (0) y lo ponemos en negro
+            # 2. Dejamos el tramo en negro y congelado (sin transiciones ni efectos)
             enviar_comando_wled({
                 "on": True, 
                 "bri": 255,
@@ -689,17 +689,17 @@ if not st.session_state.experiencia_iniciada:
             })
             time.sleep(0.2) 
             
-            # 3. DIRECCIONAMIENTO INDIVIDUAL ESTRICTO: Pintamos de a un solo LED por vez para que queden fijos
-            for led_index in range(0, 11): # Del LED 0 al 10
+            # 3. AHORA SÍ: Sintaxis correcta de WLED para pintar de a un solo LED (sin corchetes dobles)
+            for led_index in range(0, 11): 
                 enviar_comando_wled({
                     "seg": [
                         {
                             "id": 0, 
-                            "i": [led_index, [0, 150, 255]] 
+                            "i": [led_index, 0, 150, 255] 
                         }
                     ]
                 })
-                # Velocidad del flujo de agua (0.4 seg entre cada LED)
+                # Pausa entre cada foquito (ajústalo a la velocidad de tu video)
                 time.sleep(0.4) 
 
         if st.button(
@@ -707,10 +707,11 @@ if not st.session_state.experiencia_iniciada:
             type="primary",
             use_container_width=True
         ):
-            # Iniciar hilo de luces para no trabar la interfaz
+            # Iniciar hilo de luces
             hilo = threading.Thread(target=animar_luces_inicio)
             hilo.start()
 
+            # Pasar inmediatamente al video
             st.session_state.experiencia_iniciada = True
             st.rerun()
 
