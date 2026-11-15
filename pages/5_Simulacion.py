@@ -6,7 +6,7 @@ from pathlib import Path
 import base64
 import mimetypes
 import json
-import streamlit.components.v1 as components # Importación necesaria para el iframe
+import streamlit.components.v1 as components
 
 from core.state_manager import init_session_state
 
@@ -253,9 +253,6 @@ if not escenario:
 # ============================================================
 # POR AHORA SOLO SUPERAVITARIO (BLOQUE DESACTIVADO PARA EL HACKATON)
 # ============================================================
-# Si en el futuro quieres bloquear de nuevo los otros escenarios, 
-# quita los numerales de abajo:
-
 # if escenario != "Superavitario":
 #     st.title("🌊 Simulación Hídrica")
 #     st.markdown(f"### Escenario inicial: **{escenario}**")
@@ -631,43 +628,6 @@ ullum_detalle_data = (
 
 
 # ============================================================
-# BASE DE DATOS DIQUES
-# ============================================================
-#
-# Toda esta sección se comenta porque la interactividad
-# de los marcadores ya fue programada directamente en el mapa 3D de QGIS.
-#
-# DIQUES_INTERACTIVOS = {
-#
-#     "caracoles": {
-#         "nombre": "Complejo Hidroeléctrico Los Caracoles",
-#         "etiqueta": "LOS CARACOLES",
-#         "detalle": caracoles_detalle_data,
-#         "componentes": caracoles_componentes
-#     },
-#
-#     "punta_negra": {
-#         "nombre": "Complejo Hidroeléctrico Punta Negra",
-#         "etiqueta": "PUNTA NEGRA",
-#         "detalle": punta_negra_detalle_data,
-#         "componentes": punta_negra_componentes
-#     },
-#
-#     "ullum": {
-#         "nombre": "Complejo Hidroeléctrico Dique de Ullum",
-#         "etiqueta": "ULLUM",
-#         "detalle": ullum_detalle_data,
-#         "componentes": ullum_componentes
-#     }
-# }
-#
-# diques_interactivos_json = json.dumps(
-#     DIQUES_INTERACTIVOS,
-#     ensure_ascii=False
-# )
-
-
-# ============================================================
 # ESTADO STREAMLIT
 # ============================================================
 
@@ -714,12 +674,36 @@ if not st.session_state.experiencia_iniciada:
 
     with col2:
         
-        # Función en segundo plano para controlar WLED sin trabar el video
+        # Función en segundo plano para controlar WLED de manera sólida y sincronizada
         def animar_luces_inicio():
-            enviar_comando_wled({"on": True, "seg": [{"id": 0, "start": 0, "stop": 11, "col": [[0, 0, 0]]}]})
-            time.sleep(0.5) 
+            # CONFIGURACIÓN: Cambia este número para que la luz arranque más tarde o más temprano.
+            # 1.5 significa que espera 1.5 segundos (lo que tarda la web en cargar el video) antes de encender
+            RETARDO_VIDEO = 1.0 
+            time.sleep(RETARDO_VIDEO)
+            
+            # 1. Aseguramos encendido y limpiamos el tramo asegurando "transition": 0 para evitar efectos raros
+            enviar_comando_wled({
+                "on": True, 
+                "transition": 0,
+                "seg": [{"id": 0, "start": 0, "stop": 12, "col": [[0, 0, 0]], "fx": 0}]
+            })
+            time.sleep(0.1) 
+            
+            # 2. Encendemos secuencialmente fijando el tamaño del segmento y sin transición
             for i in range(1, 12):
-                enviar_comando_wled({"seg": [{"id": 0, "start": 0, "stop": i, "col": [[0, 150, 255]], "fx": 0}]})
+                enviar_comando_wled({
+                    "seg": [
+                        {
+                            "id": 0, 
+                            "start": 0, 
+                            "stop": i, # El agua crece y SE QUEDA
+                            "col": [[0, 150, 255]], 
+                            "fx": 0,
+                            "transition": 0 # Clave para que no se apague
+                        }
+                    ]
+                })
+                # Cambia el 0.4 para igualar la velocidad del agua en tu video
                 time.sleep(0.4)
 
         if st.button(
