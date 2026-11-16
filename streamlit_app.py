@@ -1,39 +1,58 @@
 import streamlit as st
-from core.state_manager import init_session_state, reiniciar_simulacion
+from PIL import Image
+from pathlib import Path
 
-st.set_page_config(
-    page_title="Simulador Hídrico - Río San Juan",
-    page_icon="💧",
-    layout="wide"
-)
+# Configuración inicial
+st.set_page_config(page_title="Simulador Hídrico San Juan", page_icon="💧", layout="wide")
 
-# Inicializar estado de la sesión
-init_session_state()
+# Rutas de imágenes (Ajustá estas rutas a las imágenes reales que tengas en tu carpeta assets)
+BASE_DIR = Path(__file__).resolve().parent
+img_hero = BASE_DIR / "assets" / "images" / "fondo_mina.jpg" # O usá una foto linda del Río San Juan
 
-st.title('💧 Simulador Hídrico Interactivo del Río San Juan')
+# Encabezado principal
+st.title("💧 Simulador Hídrico Interactivo del Río San Juan")
+st.markdown("---")
 
-st.markdown("""
-### El Problema
-La cuenca del Río San Juan es un ecosistema árido donde el agua es un recurso vital y escaso. 
-Diversos actores (minería, agricultura, consumo urbano e industrial) dependen de la misma fuente de agua,
-lo que requiere una gestión cuidadosa y estratégica, especialmente en escenarios de sequía.
+# Layout de dos columnas
+col1, col2 = st.columns([1.2, 1])
 
-### Objetivo
-Esta aplicación web interactiva permite visualizar y comprender de manera dinámica la gestión del agua 
-a lo largo de la cuenca del Río San Juan, desde la alta cordillera hasta los valles agrícolas.
-
-### La Cuenca
-El recorrido del agua comienza en la **alta cordillera y los glaciares**, pasa por zonas de **explotación minera**, 
-llega a los **embalses de la cuenca media** y finalmente se distribuye en la **zona urbana y agrícola**.
-
-### Funcionamiento
-El simulador funciona por etapas. A medida que el agua avanza por el territorio, se te pedirá tomar 
-decisiones sobre el uso y distribución del agua. Cada decisión afectará la disponibilidad aguas abajo.
-""")
-
-col1, col2, col3 = st.columns([1, 2, 1])
+with col1:
+    st.markdown("### El Problema")
+    st.write(
+        "La cuenca del Río San Juan es un ecosistema árido donde el agua es un recurso vital y escaso. "
+        "Diversos actores (minería, agricultura, consumo urbano e industrial) dependen de la misma fuente."
+    )
+    
+    st.markdown("### Objetivo")
+    st.write(
+        "Esta aplicación web interactiva permite visualizar y comprender de manera dinámica la gestión del agua, "
+        "desde la alta cordillera hasta los valles agrícolas, tomando decisiones en tiempo real."
+    )
 
 with col2:
-    if st.button("▶ Iniciar simulación", use_container_width=True, type="primary"):
-        reiniciar_simulacion()
-        st.switch_page("pages/1_Simulador.py")
+    # Si tenés la imagen, la mostramos acá para romper tanto texto
+    if img_hero.exists():
+        st.image(str(img_hero), use_container_width=True, caption="Cuenca del Río San Juan")
+    else:
+        st.info("Agregá una imagen hero en assets/images/")
+
+st.markdown("---")
+
+# Sección de Etapas con íconos
+st.markdown("### 🗺️ El Recorrido del Agua")
+cols = st.columns(3)
+with cols[0]:
+    st.info("🏔️ **Alta Cordillera**\n\nNacimiento del recurso y paso por la zona de explotación minera.")
+with cols[1]:
+    st.info("🌊 **Cuenca Media**\n\nSistema de embalses (Caracoles, Punta Negra, Ullum) para regulación.")
+with cols[2]:
+    st.info("🏙️ **Valles y Ciudad**\n\nDistribución para uso agrícola, industrial y consumo humano.")
+
+st.write("")
+
+# Botón central grande
+col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+with col_btn2:
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("▶ INICIAR SIMULACIÓN", type="primary", use_container_width=True):
+        st.switch_page("pages/1_Simulador.py") # Asegurate que la ruta al simulador sea la correcta

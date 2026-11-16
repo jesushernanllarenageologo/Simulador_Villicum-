@@ -7,7 +7,7 @@ from core.state_manager import init_session_state, avanzar_etapa, get_estado_act
 st.set_page_config(page_title="Simulador", page_icon="🕹️", layout="wide")
 init_session_state()
 
-st.title("🕹️ Simulador Hídrico")
+st.title("Simulador Hídrico Cuenca Rio San Juan")
 
 # 2. Parte superior: Estado general
 col1, col2, col3, col4 = st.columns(4)
