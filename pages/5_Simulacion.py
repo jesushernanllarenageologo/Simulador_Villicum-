@@ -35,6 +35,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 # ============================================================
 
 WLED_LOCK = threading.Lock()
+INTERVALO_LED_SEGUNDOS = 0.8
 
 
 def enviar_comando_wled_seguro(comando):
@@ -44,12 +45,32 @@ def enviar_comando_wled_seguro(comando):
 
 
 def apagar_luces_inicio():
-    """Apaga los primeros 12 LED del segmento 0."""
+    """Apaga los LED 0–10 del primer segmento."""
     enviar_comando_wled_seguro({
         "on": True,
         "bri": 255,
         "transition": 0,
-        "seg": [{"id": 0, "start": 0, "stop": 12, "i": [0, 12, [0, 0, 0]]}]
+        "seg": [{"id": 0, "start": 0, "stop": 11, "i": [0, 11, [0, 0, 0]]}]
+    })
+
+
+def apagar_segmento_diques():
+    """Apaga los LED físicos 11–19 del segundo segmento WLED (id 1)."""
+    enviar_comando_wled_seguro({
+        "on": True,
+        "bri": 255,
+        "transition": 0,
+        "seg": [{"id": 1, "start": 11, "stop": 20, "i": [0, 9, [0, 0, 0]]}]
+    })
+
+
+def apagar_segmento_distribuidor():
+    """Apaga los LED físicos 20–25 del tercer segmento WLED (id 2)."""
+    enviar_comando_wled_seguro({
+        "on": True,
+        "bri": 255,
+        "transition": 0,
+        "seg": [{"id": 2, "start": 20, "stop": 26, "i": [0, 6, [0, 0, 0]]}]
     })
 
 
@@ -60,27 +81,99 @@ def animar_luces_inicio():
             "on": True,
             "bri": 255,
             "transition": 0,
-            "seg": [{"id": 0, "start": 0, "stop": 12, "i": [led_index, [0, 150, 255]]}]
+            "seg": [{"id": 0, "start": 0, "stop": 11, "i": [led_index, [0, 150, 255]]}]
         })
-        time.sleep(0.4)
+        time.sleep(INTERVALO_LED_SEGUNDOS)
+
+
+def animar_luces_diques():
+    """Enciende los LED físicos 11–19 uno por uno y los deja prendidos."""
+    for led_fisico in range(11, 20):
+        posicion_segmento = led_fisico - 11
+        enviar_comando_wled_seguro({
+            "on": True,
+            "bri": 255,
+            "transition": 0,
+            "seg": [{
+                "id": 1,
+                "start": 11,
+                "stop": 20,
+                "i": [posicion_segmento, [0, 150, 255]]
+            }]
+        })
+        time.sleep(INTERVALO_LED_SEGUNDOS)
+
+
+def animar_luces_distribuidor():
+    """Enciende los LED físicos 20–25 uno por uno y los deja prendidos."""
+    for led_fisico in range(20, 26):
+        posicion_segmento = led_fisico - 20
+        enviar_comando_wled_seguro({
+            "on": True,
+            "bri": 255,
+            "transition": 0,
+            "seg": [{
+                "id": 2,
+                "start": 20,
+                "stop": 26,
+                "i": [posicion_segmento, [0, 150, 255]]
+            }]
+        })
+        time.sleep(INTERVALO_LED_SEGUNDOS)
 
 
 def encender_led_0_al_cargar_video():
-    """Callback de Streamlit: enciende el LED 0 cuando el video puede reproducirse."""
+    """Al estar listo el video, enciende el LED 0 e inicia la secuencia 1–10."""
     if st.session_state.get("led_0_video_listo", False):
         return
 
+    # El evento "canplay" llega cuando el video ya tiene datos para arrancar.
+    # La secuencia espera aquí para comenzar sincronizada con la experiencia.
+    st.session_state["led_0_video_listo"] = True
     enviar_comando_wled_seguro({
         "on": True,
         "bri": 255,
         "transition": 0,
-        "seg": [{"id": 0, "start": 0, "stop": 12, "i": [0, [0, 150, 255]]}]
+        "seg": [{"id": 0, "start": 0, "stop": 11, "i": [0, [0, 150, 255]]}]
     })
-    st.session_state["led_0_video_listo"] = True
+
+    if not st.session_state.get("secuencia_leds_inicio_lanzada", False):
+        st.session_state["secuencia_leds_inicio_lanzada"] = True
+        hilo = threading.Thread(
+            target=animar_luces_inicio,
+            daemon=True
+        )
+        hilo.start()
+
+
+def iniciar_segmento_diques_al_cargar_video():
+    """Al estar listo el video 2, inicia la secuencia de los LED 11–19."""
+    if st.session_state.get("secuencia_leds_diques_lanzada", False):
+        return
+
+    st.session_state["secuencia_leds_diques_lanzada"] = True
+    hilo = threading.Thread(
+        target=animar_luces_diques,
+        daemon=True
+    )
+    hilo.start()
+
+
+def iniciar_segmento_distribuidor_al_presionar_boton():
+    """Al continuar al distribuidor, inicia la secuencia de los LED 20–25."""
+    if st.session_state.get("secuencia_leds_distribuidor_lanzada", False):
+        return
+
+    st.session_state["secuencia_leds_distribuidor_lanzada"] = True
+    hilo = threading.Thread(
+        target=animar_luces_distribuidor,
+        daemon=True
+    )
+    hilo.start()
 
 
 # Componente bidireccional: muestra el HTML existente en un iframe y avisa
-# a Python cuando el video 1 emite el evento "canplay".
+# a Python cuando los videos están listos o se pulsa continuar al distribuidor.
 EXPERIENCIA_HTML_COMPONENT = st.components.v2.component(
     name="experiencia_html_con_evento_video",
     html='<iframe id="experiencia-html-iframe" title="Experiencia hídrica" allow="autoplay"></iframe>',
@@ -99,19 +192,53 @@ EXPERIENCIA_HTML_COMPONENT = st.components.v2.component(
             if (!frame || frame.dataset.htmlInjected === "1") return;
 
             frame.addEventListener("load", () => {
-                const video = frame.contentDocument?.getElementById("video-1");
-                if (!video) return;
+                const documento = frame.contentDocument;
+                const video1 = documento?.getElementById("video-1");
+                const video2 = documento?.getElementById("video-2");
 
-                const avisarPython = () => {
-                    if (frame.dataset.videoReadySent === "1") return;
-                    frame.dataset.videoReadySent = "1";
-                    setTriggerValue("video_ready", Date.now());
+                const avisarPython = (trigger, marca) => {
+                    if (frame.dataset[marca] === "1") return;
+                    frame.dataset[marca] = "1";
+                    setTriggerValue(trigger, Date.now());
                 };
 
-                if (video.readyState >= 3) {
-                    avisarPython();
-                } else {
-                    video.addEventListener("canplay", avisarPython, { once: true });
+                if (video1) {
+                    const avisarVideo1 = () => avisarPython(
+                        "video_ready",
+                        "videoReadySent"
+                    );
+
+                    if (video1.readyState >= 3) {
+                        avisarVideo1();
+                    } else {
+                        video1.addEventListener("canplay", avisarVideo1, { once: true });
+                    }
+                }
+
+                if (video2) {
+                    video2.addEventListener("play", () => {
+                        const avisarVideo2 = () => avisarPython(
+                            "video_2_ready",
+                            "video2ReadySent"
+                        );
+
+                        if (video2.readyState >= 3) {
+                            avisarVideo2();
+                        } else {
+                            video2.addEventListener("canplay", avisarVideo2, { once: true });
+                        }
+                    }, { once: true });
+                }
+
+                const botonDistribuidor = documento?.getElementById(
+                    "continuar-distribuidor-btn"
+                );
+                if (botonDistribuidor) {
+                    botonDistribuidor.addEventListener("click", () => {
+                        if (frame.dataset.distribuidorStartSent === "1") return;
+                        frame.dataset.distribuidorStartSent = "1";
+                        setTriggerValue("distribuidor_start", Date.now());
+                    });
                 }
             }, { once: true });
 
@@ -738,7 +865,7 @@ if "experiencia_iniciada" not in st.session_state:
 # ============================================================
 
 st.title(
-    "🌊 Simulación Hídrica"
+    "Simulación Hídrica Cuenca del Río San Juan"
 )
 
 
@@ -774,6 +901,8 @@ if not st.session_state.experiencia_iniciada:
         # Las luces quedan apagadas mientras la pantalla inicial espera.
         if not st.session_state.get("luces_inicio_apagadas", False):
             apagar_luces_inicio()
+            apagar_segmento_diques()
+            apagar_segmento_distribuidor()
             st.session_state["luces_inicio_apagadas"] = True
         if st.button(
             "▶ INICIAR EXPERIENCIA",
@@ -782,16 +911,13 @@ if not st.session_state.experiencia_iniciada:
         ):
             # Asegurar que todos los LED comiencen apagados.
             apagar_luces_inicio()
+            apagar_segmento_diques()
+            apagar_segmento_distribuidor()
             st.session_state["luces_inicio_apagadas"] = True
             st.session_state["led_0_video_listo"] = False
-
-            # La secuencia 1–10 empieza con el botón. El LED 0 se enciende
-            # después, desde el aviso "canplay" del video.
-            hilo = threading.Thread(
-                target=animar_luces_inicio,
-                daemon=True
-            )
-            hilo.start()
+            st.session_state["secuencia_leds_inicio_lanzada"] = False
+            st.session_state["secuencia_leds_diques_lanzada"] = False
+            st.session_state["secuencia_leds_distribuidor_lanzada"] = False
 
             st.session_state.experiencia_iniciada = True
             st.rerun()
@@ -3670,6 +3796,7 @@ body {
 
         <button
             class="btn-principal"
+            id="continuar-distribuidor-btn"
             onclick="continuarDistribuidor()"
         >
             Continuar hacia el distribuidor →
@@ -4693,6 +4820,8 @@ function continuarDistribuidor() {
     EXPERIENCIA_HTML_COMPONENT(
         data={"html": html},
         on_video_ready_change=encender_led_0_al_cargar_video,
+        on_video_2_ready_change=iniciar_segmento_diques_al_cargar_video,
+        on_distribuidor_start_change=iniciar_segmento_distribuidor_al_presionar_boton,
         key="experiencia_html_wled",
         width="stretch",
         height=920
