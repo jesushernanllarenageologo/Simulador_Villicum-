@@ -978,4 +978,4 @@ function finalizarSimulacion() { window.parent.location.reload(); }
     st.markdown("### Mapa Interactivo 3D")
     
     url_mapa_3d = "/app/static/visor_3d/index.html"
-    components.iframe(url_mapa_3d, height=700, scrolling=False)89
+    components.iframe(url_mapa_3d, height=700, scrolling=False)
