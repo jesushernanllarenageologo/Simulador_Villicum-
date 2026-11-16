@@ -64,7 +64,7 @@ with control_col:
     
     escenario = st.selectbox(
         "Escenario",
-        ["Normal", "Sequía", "Superavitario"]
+        ["Superavitario"]
     )
     
     if st.button("▶ Iniciar", use_container_width=True):
