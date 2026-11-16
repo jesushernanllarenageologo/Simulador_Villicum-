@@ -8,7 +8,7 @@ st.set_page_config(page_title="Simulador Hídrico San Juan", page_icon="💧", l
 # Rutas de imágenes (Ajustá los nombres a los archivos que tengas en tu carpeta assets/images)
 BASE_DIR = Path(__file__).resolve().parent
 img_hero = BASE_DIR / "assets" / "images" / "mapa_cuenca.png" # La imagen del mapa que subiste
-img_modelo = BASE_DIR / "assets" / "images" / "modelo_3d.png"    # Nueva imagen de la maqueta topográfica
+img_modelo = BASE_DIR / "assets" / "images" / "mapa_3d.png"   # Nueva imagen de la maqueta topográfica
 
 # Encabezado principal
 st.title("💧 Simulador Hídrico Interactivo del Río San Juan")
