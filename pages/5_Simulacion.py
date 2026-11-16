@@ -1,3 +1,4 @@
+
 import streamlit as st
 import time
 import threading 
@@ -4359,7 +4360,8 @@ function reproducirVideo3() {
 
     video3.currentTime = 0;
 
-    video3.play().catch(() => {
+
+eo3.play().catch(() => {
         video3.controls = true;
     });
 
