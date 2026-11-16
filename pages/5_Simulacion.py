@@ -301,51 +301,39 @@ def buscar_por_prefijo(carpeta: Path, prefijo: str):
     return None
 
 
-def crear_tarjeta_proceso(
-    titulo,
-    subtitulo,
-    texto,
-    imagen
-):
-
+def crear_tarjeta_proceso(titulo, subtitulo, texto, imagen):
     if imagen:
-
+        # Contenedor limpio oscuro con el diagrama adaptado 
         bloque_imagen = f"""
-        <img
-            src="{imagen}"
-            class="foto-proceso"
-        >
+        <div style="background-color: #0d1820; padding: 10px; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <img
+                src="{imagen}"
+                class="foto-proceso"
+                style="max-width: 100%; max-height: 220px; object-fit: contain;"
+            >
+        </div>
         """
-
     else:
-
         bloque_imagen = """
-        <div class="placeholder-foto">
-            Imagen no disponible
+        <div class="placeholder-foto" style="height: 220px; display: flex; align-items: center; justify-content: center; background-color: #0d1820; color: #64d6df;">
+            Diagrama no disponible
         </div>
         """
 
     return f"""
-    <div class="card-proceso">
-
+    <div class="card-proceso" style="background: rgba(10,22,28,0.7); border: 1px solid rgba(255,255,255,0.15); border-radius: 17px; overflow: hidden; display: flex; flex-direction: column;">
         {bloque_imagen}
-
-        <div class="card-proceso-body">
-
-            <div class="card-subtitle">
+        <div class="card-proceso-body" style="padding: 20px;">
+            <div class="card-subtitle" style="color: #64d6df; font-size: 11px; letter-spacing: 1.5px; font-weight: 800; text-transform: uppercase;">
                 {subtitulo}
             </div>
-
-            <div class="card-title">
+            <div class="card-title" style="font-size: 22px; font-weight: 800; margin: 8px 0 12px; color: #ffffff;">
                 {titulo}
             </div>
-
-            <div class="card-text">
+            <div class="card-text" style="font-size: 14.5px; line-height: 1.55; color: #dbe8eb;">
                 {texto}
             </div>
-
         </div>
-
     </div>
     """
 
@@ -564,10 +552,18 @@ video_4_path = (
     / "Ullum_Ciudad.mp4"
 )
 
-# Permitimos que siga aunque no exista para no frenar la app entera si hay un error de ruta,
-# pero si está la ruta bien (como en tu captura) lo va a cargar.
 if not video_4_path.exists():
     st.warning("No se encontró el video 4 en la ruta especificada. Verifica las carpetas.")
+
+
+# ============================================================
+# VIDEOS EXPLORAR DIQUES
+# ============================================================
+EXPLORAR_DIR = BASE_DIR / "assets" / "videos" / "explorar"
+
+v_caracoles_path = EXPLORAR_DIR / "caracoles.mp4"
+v_puntanegra_path = EXPLORAR_DIR / "punta_negra.mp4"
+v_ullum_path = EXPLORAR_DIR / "ullum.mp4"
 
 
 # ============================================================
@@ -591,12 +587,6 @@ img_moderno_path = (
 img_tradicional_path = (
     MINA_DIR
     / "metodo_tradicional_abierto.jpg"
-)
-
-
-fondo_mina_path = (
-    MINA_DIR
-    / "fondo_mina.jpg"
 )
 
 
@@ -653,92 +643,26 @@ ullum_menu_path = (
 
 
 # ============================================================
-# IMÁGENES DETALLE
-# ============================================================
-
-caracoles_detalle_path = (
-    CARACOLES_DIR
-    / "caracoles_detalle.jpg"
-)
-
-
-punta_negra_detalle_path = (
-    PUNTA_NEGRA_DIR
-    / "punta_negra_detalle.jpg"
-)
-
-
-ullum_detalle_path = (
-    ULLUM_DIR
-    / "ullum_detalle.jpg"
-)
-
-
-# ============================================================
 # CONVERTIR ARCHIVOS
 # ============================================================
 
-video_1_data = file_to_data_uri(
-    video_1_path
-)
+video_1_data = file_to_data_uri(video_1_path)
+video_2_data = file_to_data_uri(video_2_path)
+video_3_data = file_to_data_uri(video_3_path)
+video_4_data = file_to_data_uri(video_4_path)
 
-video_2_data = file_to_data_uri(
-    video_2_path
-)
+v_caracoles_data = file_to_data_uri(v_caracoles_path) or ""
+v_puntanegra_data = file_to_data_uri(v_puntanegra_path) or ""
+v_ullum_data = file_to_data_uri(v_ullum_path) or ""
 
-video_3_data = file_to_data_uri(
-    video_3_path
-)
-video_4_data = file_to_data_uri(
-    video_4_path
-)
+img_moderno_data = file_to_data_uri(img_moderno_path)
+img_tradicional_data = file_to_data_uri(img_tradicional_path)
 
 
-img_moderno_data = file_to_data_uri(
-    img_moderno_path
-)
+caracoles_menu_data = file_to_data_uri(caracoles_menu_path)
+punta_negra_menu_data = file_to_data_uri(punta_negra_menu_path)
+ullum_menu_data = file_to_data_uri(ullum_menu_path)
 
-img_tradicional_data = file_to_data_uri(
-    img_tradicional_path
-)
-
-fondo_mina_data = file_to_data_uri(
-    fondo_mina_path
-)
-
-
-caracoles_menu_data = file_to_data_uri(
-    caracoles_menu_path
-)
-
-punta_negra_menu_data = file_to_data_uri(
-    punta_negra_menu_path
-)
-
-ullum_menu_data = file_to_data_uri(
-    ullum_menu_path
-)
-
-
-caracoles_detalle_data = (
-    file_to_data_uri(
-        caracoles_detalle_path
-    ) or ""
-)
-
-
-punta_negra_detalle_data = (
-    file_to_data_uri(
-        punta_negra_detalle_path
-    ) or ""
-)
-
-
-ullum_detalle_data = (
-    file_to_data_uri(
-        ullum_detalle_path
-    ) or ""
-)
 
 
 # ============================================================
@@ -909,30 +833,9 @@ else:
 
 
     # ========================================================
-    # FONDO MINA
+    # FONDO MINA LISO
     # ========================================================
-
-    if fondo_mina_data:
-
-        fondo_css = f"""
-        linear-gradient(
-            90deg,
-            rgba(0,0,0,0.48) 0%,
-            rgba(0,0,0,0.34) 48%,
-            rgba(0,0,0,0.20) 100%
-        ),
-        url("{fondo_mina_data}")
-        """
-
-    else:
-
-        fondo_css = """
-        linear-gradient(
-            135deg,
-            #28343b,
-            #50616a
-        )
-        """
+    fondo_css = "linear-gradient(135deg, #0d1820, #152b39)"
 
 
     # ========================================================
@@ -3077,7 +2980,30 @@ body {
 
 
 <!-- =====================================================
-     EXPLORADOR DIQUES
+     VIDEOS EXPLORAR DIQUES
+===================================================== -->
+<div id="pantalla-exp-caracoles" class="pantalla-video" style="display:none;">
+    <video id="vid-caracoles" class="video-recorrido" controls playsinline src="__V_CARACOLES__"></video>
+    <div class="etiqueta-video">🔍 Los Caracoles</div>
+    <button class="btn-secundario" style="position:absolute; top:28px; right:30px; z-index:10;" onclick="mostrarMenuDiques()">✖ Volver al Menú</button>
+</div>
+
+<div id="pantalla-exp-puntanegra" class="pantalla-video" style="display:none;">
+    <video id="vid-puntanegra" class="video-recorrido" controls playsinline src="__V_PUNTANEGRA__"></video>
+    <div class="etiqueta-video">🔍 Punta Negra</div>
+    <button class="btn-secundario" style="position:absolute; top:28px; right:30px; z-index:10;" onclick="mostrarMenuDiques()">✖ Volver al Menú</button>
+</div>
+
+<div id="pantalla-exp-ullum" class="pantalla-video" style="display:none;">
+    <video id="vid-ullum" class="video-recorrido" controls playsinline src="__V_ULLUM__"></video>
+    <div class="etiqueta-video">🔍 Quebrada de Ullum</div>
+    <button class="btn-secundario" style="position:absolute; top:28px; right:30px; z-index:10;" onclick="mostrarMenuDiques()">✖ Volver al Menú</button>
+</div>
+
+
+
+<!-- =====================================================
+     EXPLORADOR DIQUES (HTML Mantenido para evitar roturas de CSS, lógica pasada a videos)
 ===================================================== -->
 
 <div
@@ -3895,7 +3821,13 @@ const pantallas = [
     
     "pantalla-ciudad",
     
-    "resultado-ciudad"
+    "resultado-ciudad",
+    
+    "pantalla-exp-caracoles",
+    
+    "pantalla-exp-puntanegra",
+    
+    "pantalla-exp-ullum"
 
 ];
 
@@ -4149,118 +4081,26 @@ function mostrarMenuDiques() {
 // ==========================================================
 
 function explorarDique(clave) {
+    ocultarTodo();
+    let vid;
+    
+    if (clave === 'caracoles') {
+        document.getElementById('pantalla-exp-caracoles').style.display = 'block';
+        vid = document.getElementById('vid-caracoles');
+    } else if (clave === 'punta_negra') {
+        document.getElementById('pantalla-exp-puntanegra').style.display = 'block';
+        vid = document.getElementById('vid-puntanegra');
+    } else if (clave === 'ullum') {
+        document.getElementById('pantalla-exp-ullum').style.display = 'block';
+        vid = document.getElementById('vid-ullum');
+    }
 
-
-    // const dique =
-    //     diquesInteractivos[clave];
-
-
-    // if (!dique) {
-    //     return;
-    // }
-
-
-    // diqueActual = clave;
-
-
-    // ocultarTodo();
-
-
-    // document.getElementById(
-    //     "explorador-dique"
-    // ).style.display =
-    //     "block";
-
-
-    // document.getElementById(
-    //     "explorador-etiqueta"
-    // ).textContent =
-    //     "EXPLORADOR · " +
-    //     dique.etiqueta;
-
-
-    // document.getElementById(
-    //     "explorador-titulo"
-    // ).textContent =
-    //     dique.nombre;
-
-
-    // document.getElementById(
-    //     "imagen-detalle-dique"
-    // ).src =
-    //     dique.detalle;
-
-
-    // document.getElementById(
-    //     "panel-inicial"
-    // ).style.display =
-    //     "flex";
-
-
-    // document.getElementById(
-    //     "panel-activo"
-    // ).style.display =
-    //     "none";
-
-
-    // const contenedor =
-    //     document.getElementById(
-    //         "contenedor-hotspots"
-    //     );
-
-
-    // contenedor.innerHTML = "";
-
-
-    // Object.entries(
-    //     dique.componentes
-    // ).forEach(
-    //     function([numero, dato]) {
-
-
-    //         const boton =
-    //             document.createElement(
-    //                 "button"
-    //             );
-
-
-    //         boton.className =
-    //             "hotspot";
-
-
-    //         boton.textContent =
-    //             numero;
-
-
-    //         boton.dataset.numero =
-    //             numero;
-
-
-    //         boton.style.left =
-    //             dato.x + "%";
-
-
-    //         boton.style.top =
-    //             dato.y + "%";
-
-
-    //         boton.onclick =
-    //             function() {
-
-    //                 seleccionarComponente(
-    //                     numero
-    //                 );
-
-    //             };
-
-
-    //         contenedor.appendChild(
-    //             boton
-    //         );
-
-    //     }
-    // );
-
+    if (vid) {
+        vid.currentTime = 0;
+        vid.play().catch(() => { vid.controls = true; });
+        // Cuando el video termina, vuelve al menú automáticamente
+        vid.onended = mostrarMenuDiques;
+    }
 }
 
 
@@ -4270,98 +4110,8 @@ function explorarDique(clave) {
 
 function seleccionarComponente(numero) {
 
-
-    // const dato =
-    //     diquesInteractivos[
-    //         diqueActual
-    //     ].componentes[
-    //         numero
-    //     ];
-
-
-    // document.querySelectorAll(
-    //     ".hotspot"
-    // ).forEach(
-    //     function(elemento) {
-
-    //         elemento.classList.remove(
-    //             "activo"
-    //         );
-
-    //     }
-    // );
-
-
-    // const activo =
-    //     document.querySelector(
-    //         '.hotspot[data-numero="' +
-    //         numero +
-    //         '"]'
-    //     );
-
-
-    // if (activo) {
-
-    //     activo.classList.add(
-    //         "activo"
-    //     );
-
-    // }
-
-
-    // document.getElementById(
-    //     "panel-inicial"
-    // ).style.display =
-    //     "none";
-
-
-    // document.getElementById(
-    //     "panel-activo"
-    // ).style.display =
-    //     "block";
-
-
-    // const imagen =
-    //     document.getElementById(
-    //         "imagen-componente"
-    //     );
-
-
-    // if (dato.imagen) {
-
-    //     imagen.src =
-    //         dato.imagen;
-
-    //     imagen.style.display =
-    //         "block";
-
-    // }
-
-    // else {
-
-    //     imagen.style.display =
-    //         "none";
-
-    // }
-
-
-    // document.getElementById(
-    //     "numero-componente"
-    // ).textContent =
-    //     numero +
-    //     " · COMPONENTE";
-
-
-    // document.getElementById(
-    //     "titulo-componente"
-    // ).textContent =
-    //     dato.nombre;
-
-
-    // document.getElementById(
-    //     "texto-componente"
-    // ).textContent =
-    //     dato.texto || "";
+    // Ya no se usa porque pasamos todo a videos. 
+    // Se deja vacío para no romper nada que llame a la función.
 
 }
 
@@ -4833,7 +4583,7 @@ function continuarDistribuidor() {
     # REEMPLAZOS
     # ========================================================
 
-    html = html_template # <- ACÁ ESTÁ LA CORRECCIÓN QUE SOLUCIONA EL NAMEERROR
+    html = html_template
 
 
     html = html.replace(
@@ -4864,6 +4614,20 @@ function continuarDistribuidor() {
         video_4_data or ""
     )
 
+    html = html.replace(
+        "__V_CARACOLES__",
+        v_caracoles_data
+    )
+
+    html = html.replace(
+        "__V_PUNTANEGRA__",
+        v_puntanegra_data
+    )
+
+    html = html.replace(
+        "__V_ULLUM__",
+        v_ullum_data
+    )
 
     html = html.replace(
         "__TRADICIONAL__",
