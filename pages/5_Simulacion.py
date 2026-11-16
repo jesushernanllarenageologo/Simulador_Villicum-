@@ -863,6 +863,49 @@ else:
     # TARJETAS DIQUES
     # ========================================================
 
+    caracoles_html = crear_tarjeta_dique(
+
+        identificador="caracoles",
+
+        nombre="Los Caracoles",
+
+        subtitulo="""
+        Explorá los principales componentes
+        del aprovechamiento hidroeléctrico.
+        """,
+
+        imagen=caracoles_menu_data
+    )
+
+
+    punta_negra_html = crear_tarjeta_dique(
+
+        identificador="punta_negra",
+
+        nombre="Punta Negra",
+
+        subtitulo="""
+        Explorá sus principales componentes
+        y cómo se distribuyen dentro del complejo.
+        """,
+
+        imagen=punta_negra_menu_data
+    )
+
+
+    ullum_html = crear_tarjeta_dique(
+
+        identificador="ullum",
+
+        nombre="Quebrada de Ullum",
+
+        subtitulo="""
+        Explorá la presa, el embalse
+        y las principales obras hidráulicas.
+        """,
+
+        imagen=ullum_menu_data
+    )
 
 
 
