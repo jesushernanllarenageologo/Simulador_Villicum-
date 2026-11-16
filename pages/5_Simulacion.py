@@ -122,13 +122,12 @@ def animar_luces_distribuidor():
         time.sleep(INTERVALO_LED_SEGUNDOS)
 
 
-def encender_led_0_al_cargar_video():
-    """Al estar listo el video, enciende el LED 0 e inicia la secuencia 1–10."""
+def encender_led_0_al_iniciar_video():
+    """Al reproducirse el video 1, enciende el LED 0 e inicia la secuencia 1–10."""
     if st.session_state.get("led_0_video_listo", False):
         return
 
-    # El evento "canplay" llega cuando el video ya tiene datos para arrancar.
-    # La secuencia espera aquí para comenzar sincronizada con la experiencia.
+    # La secuencia inicia cuando el video realmente empieza a reproducirse.
     st.session_state["led_0_video_listo"] = True
     enviar_comando_wled_seguro({
         "on": True,
@@ -146,8 +145,8 @@ def encender_led_0_al_cargar_video():
         hilo.start()
 
 
-def iniciar_segmento_diques_al_cargar_video():
-    """Al estar listo el video 2, inicia la secuencia de los LED 11–19."""
+def iniciar_segmento_diques_al_reproducir_video():
+    """Al reproducirse el video 2, inicia la secuencia de los LED 11–19."""
     if st.session_state.get("secuencia_leds_diques_lanzada", False):
         return
 
@@ -173,7 +172,7 @@ def iniciar_segmento_distribuidor_al_presionar_boton():
 
 
 # Componente bidireccional: muestra el HTML existente en un iframe y avisa
-# a Python cuando los videos están listos o se pulsa continuar al distribuidor.
+# a Python cuando los videos empiezan o se pulsa continuar al distribuidor.
 EXPERIENCIA_HTML_COMPONENT = st.components.v2.component(
     name="experiencia_html_con_evento_video",
     html='<iframe id="experiencia-html-iframe" title="Experiencia hídrica" allow="autoplay"></iframe>',
@@ -204,30 +203,22 @@ EXPERIENCIA_HTML_COMPONENT = st.components.v2.component(
 
                 if (video1) {
                     const avisarVideo1 = () => avisarPython(
-                        "video_ready",
-                        "videoReadySent"
+                        "video_1_playing",
+                        "video1PlayingSent"
                     );
 
-                    if (video1.readyState >= 3) {
+                    if (!video1.paused && video1.readyState >= 3) {
                         avisarVideo1();
                     } else {
-                        video1.addEventListener("canplay", avisarVideo1, { once: true });
+                        video1.addEventListener("playing", avisarVideo1, { once: true });
                     }
                 }
 
                 if (video2) {
-                    video2.addEventListener("play", () => {
-                        const avisarVideo2 = () => avisarPython(
-                            "video_2_ready",
-                            "video2ReadySent"
-                        );
-
-                        if (video2.readyState >= 3) {
-                            avisarVideo2();
-                        } else {
-                            video2.addEventListener("canplay", avisarVideo2, { once: true });
-                        }
-                    }, { once: true });
+                    video2.addEventListener("playing", () => avisarPython(
+                        "video_2_playing",
+                        "video2PlayingSent"
+                    ), { once: true });
                 }
 
                 const botonDistribuidor = documento?.getElementById(
@@ -2736,7 +2727,7 @@ body {
         id="video-1"
         class="video-recorrido"
         autoplay
-        muted
+        controls
         playsinline
         src="__VIDEO_1__"
     ></video>
@@ -3081,7 +3072,7 @@ body {
     <video
         id="video-2"
         class="video-recorrido"
-        muted
+        controls
         playsinline
         src="__VIDEO_2__"
     ></video>
@@ -3323,7 +3314,7 @@ body {
     <video
         id="video-3"
         class="video-recorrido"
-        muted
+        controls
         playsinline
         src="__VIDEO_3__"
     ></video>
@@ -3937,7 +3928,9 @@ function reproducirVideo1() {
 
     video1.currentTime = 0;
 
-    video1.play();
+    video1.play().catch(() => {
+        video1.controls = true;
+    });
 
 }
 
@@ -4100,7 +4093,9 @@ function reproducirVideo2() {
 
     video2.currentTime = 0;
 
-    video2.play();
+    video2.play().catch(() => {
+        video2.controls = true;
+    });
 
 }
 
@@ -4364,7 +4359,9 @@ function reproducirVideo3() {
 
     video3.currentTime = 0;
 
-    video3.play();
+    video3.play().catch(() => {
+        video3.controls = true;
+    });
 
 }
 
@@ -4816,11 +4813,11 @@ function continuarDistribuidor() {
     # MOSTRAR MAPA INTERACTIVO Y COMPONENTES
     # ========================================================
     
-    # 1. Renderiza la experiencia y recibe el aviso cuando el video está listo.
+    # 1. Renderiza la experiencia y recibe el aviso cuando empieza a reproducirse.
     EXPERIENCIA_HTML_COMPONENT(
         data={"html": html},
-        on_video_ready_change=encender_led_0_al_cargar_video,
-        on_video_2_ready_change=iniciar_segmento_diques_al_cargar_video,
+        on_video_1_playing_change=encender_led_0_al_iniciar_video,
+        on_video_2_playing_change=iniciar_segmento_diques_al_reproducir_video,
         on_distribuidor_start_change=iniciar_segmento_distribuidor_al_presionar_boton,
         key="experiencia_html_wled",
         width="stretch",
