@@ -941,7 +941,1762 @@ else:
     html_template = """
 
 <style>
+/* =========================================================
+   GENERAL
+========================================================= */
 
+body {
+
+    margin: 0;
+
+    background: #0d1820;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+}
+
+
+.experiencia {
+
+    width: 100%;
+
+    height: 900px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background: #0d1820;
+
+}
+
+
+/* =========================================================
+   PANTALLAS
+========================================================= */
+
+.pantalla-contenido {
+
+    display: none;
+
+    width: 100%;
+
+    height: 900px;
+
+    box-sizing: border-box;
+
+    padding:
+        35px 38px;
+
+    color: white;
+
+    overflow-y: auto;
+
+}
+
+
+.pantalla-mina {
+
+    background:
+        __FONDO_MINA__;
+
+    background-size: cover;
+
+    background-position: center;
+
+}
+
+
+/* =========================================================
+   VIDEOS
+========================================================= */
+
+.pantalla-video {
+
+    width: 100%;
+
+    height: 900px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    background: black;
+
+}
+
+
+.video-recorrido {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    object-position: center;
+
+}
+
+
+.etiqueta-video {
+
+    position: absolute;
+
+    top: 28px;
+
+    left: 30px;
+
+    padding:
+        12px 18px;
+
+    border-radius: 12px;
+
+    color: white;
+
+    background:
+        rgba(0,0,0,0.48);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.20);
+
+    backdrop-filter:
+        blur(8px);
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   TÍTULOS
+========================================================= */
+
+.titulo-etapa {
+
+    font-size: 13px;
+
+    letter-spacing: 2.2px;
+
+    color: #64d6df;
+
+    font-weight: 800;
+
+    margin-bottom: 9px;
+
+}
+
+
+.titulo-principal {
+
+    font-size: 40px;
+
+    line-height: 1.1;
+
+    font-weight: 800;
+
+    margin-bottom: 14px;
+
+}
+
+
+.descripcion {
+
+    max-width: 1050px;
+
+    font-size: 16px;
+
+    line-height: 1.55;
+
+    margin-bottom: 20px;
+
+}
+
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.botones-navegacion {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 13px;
+
+    flex-wrap: wrap;
+
+    margin-top: 22px;
+
+}
+
+
+.btn-principal,
+.btn-secundario {
+
+    border:
+        1px solid
+        rgba(255,255,255,0.25);
+
+    border-radius: 12px;
+
+    padding:
+        14px 22px;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.btn-principal {
+
+    background:
+        #169cad;
+
+}
+
+
+.btn-principal:hover {
+
+    background:
+        #22b6c8;
+
+    transform:
+        translateY(-2px);
+
+}
+
+
+.btn-secundario {
+
+    background:
+        rgba(7,20,28,0.62);
+
+}
+
+
+/* =========================================================
+   TARJETAS MINA
+========================================================= */
+
+.grid-procesos {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 18px;
+
+}
+
+
+.card-proceso {
+
+    overflow: hidden;
+
+    border-radius: 17px;
+
+    background:
+        rgba(10,22,28,0.60);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+}
+
+
+.foto-proceso {
+
+    width: 100%;
+
+    height: 195px;
+
+    object-fit: cover;
+
+}
+
+
+.card-proceso-body {
+
+    padding: 17px 19px;
+
+}
+
+
+.card-subtitle {
+
+    color: #66d6df;
+
+    font-size: 11px;
+
+    letter-spacing: 1.5px;
+
+    font-weight: 800;
+
+}
+
+
+.card-title {
+
+    font-size: 22px;
+
+    font-weight: 800;
+
+    margin:
+        5px 0 9px;
+
+}
+
+
+.card-text {
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+}
+
+
+.info-clave {
+
+    margin-top: 17px;
+
+    padding:
+        15px 18px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(5,20,27,0.55);
+
+    border:
+        1px solid
+        rgba(99,211,222,0.36);
+
+}
+
+
+/* =========================================================
+   DECISIÓN MINA
+========================================================= */
+
+.pregunta {
+
+    font-size: 24px;
+
+    font-weight: 800;
+
+    margin:
+        27px 0 18px;
+
+}
+
+
+.opciones {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 15px;
+
+}
+
+
+.opcion {
+
+    padding: 22px;
+
+    color: white;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    border-radius: 16px;
+
+    background:
+        rgba(7,20,28,0.62);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.22);
+
+}
+
+
+.opcion strong {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 18px;
+
+}
+
+
+.opcion span {
+
+    font-size: 14px;
+
+    line-height: 1.45;
+
+}
+
+
+/* =========================================================
+   RESULTADO MINA
+========================================================= */
+
+.resultado-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        0.85fr 1.15fr;
+
+    gap: 35px;
+
+    align-items: center;
+
+}
+
+
+.donut-wrapper {
+
+    display: flex;
+
+    justify-content: center;
+
+}
+
+
+.donut {
+
+    width: 300px;
+
+    height: 300px;
+
+    border-radius: 50%;
+
+    position: relative;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background:
+        conic-gradient(
+            #e5a13a
+            0%
+            calc(var(--consumo) * 1%),
+
+            #42bfd0
+            calc(var(--consumo) * 1%)
+            100%
+        );
+
+}
+
+
+.donut::before {
+
+    content: "";
+
+    width: 195px;
+
+    height: 195px;
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    background:
+        #071921;
+
+}
+
+
+.donut-centro {
+
+    position: relative;
+
+    z-index: 2;
+
+    text-align: center;
+
+}
+
+
+.donut-numero {
+
+    font-size: 50px;
+
+    font-weight: 800;
+
+}
+
+
+.donut-texto {
+
+    max-width: 140px;
+
+    font-size: 14px;
+
+    color: #cce8ed;
+
+}
+
+
+.metricas {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 11px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.metrica {
+
+    padding: 17px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(7,20,28,0.60);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.15);
+
+}
+
+
+.metrica-numero {
+
+    font-size: 28px;
+
+    font-weight: 800;
+
+}
+
+
+.metrica-label {
+
+    margin-top: 4px;
+
+    font-size: 12px;
+
+    color: #c8dce1;
+
+}
+
+
+.resultado-explicacion,
+.modelo-educativo {
+
+    padding: 18px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(7,20,28,0.58);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.16);
+
+    line-height: 1.55;
+
+}
+
+
+.modelo-educativo {
+
+    margin-top: 14px;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   MENÚ DIQUES
+========================================================= */
+
+#menu-diques {
+
+    background:
+        linear-gradient(
+            135deg,
+            #071925,
+            #0c3547,
+            #10556b
+        );
+
+}
+
+
+.recorrido-diques {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    padding: 12px;
+
+    margin:
+        7px 0 24px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(255,255,255,0.06);
+
+}
+
+
+.nodo-recorrido {
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+}
+
+
+.flecha-recorrido {
+
+    color: #64d6df;
+
+}
+
+
+.grid-diques {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 16px;
+
+}
+
+
+.card-dique {
+
+    overflow: hidden;
+
+    border-radius: 17px;
+
+    background:
+        rgba(4,18,27,0.67);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.16);
+
+}
+
+
+.foto-card-dique {
+
+    width: 100%;
+
+    height: 205px;
+
+    object-fit: cover;
+
+}
+
+
+.card-dique-body {
+
+    padding: 17px;
+
+}
+
+
+.card-dique-kicker {
+
+    font-size: 10px;
+
+    color: #65d7df;
+
+    letter-spacing: 1.4px;
+
+    font-weight: 800;
+
+}
+
+
+.card-dique-title {
+
+    margin:
+        5px 0 7px;
+
+    font-size: 22px;
+
+    font-weight: 800;
+
+}
+
+
+.card-dique-text {
+
+    min-height: 43px;
+
+    color: #dbe8eb;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+}
+
+
+.btn-explorar {
+
+    width: 100%;
+
+    margin-top: 14px;
+
+    padding: 12px;
+
+    border: 0;
+
+    border-radius: 10px;
+
+    color: white;
+
+    background: #169cad;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   EXPLORADOR
+========================================================= */
+
+#explorador-dique {
+
+    background:
+        linear-gradient(
+            135deg,
+            #071720,
+            #0b303f
+        );
+
+}
+
+
+.explorador-top {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 15px;
+
+}
+
+
+.guia-explorador {
+
+    padding:
+        10px 14px;
+
+    margin-bottom: 16px;
+
+    border-radius: 11px;
+
+    background:
+        rgba(255,255,255,0.06);
+
+}
+
+
+.explorador-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0,1.55fr)
+        minmax(275px,0.65fr);
+
+    gap: 17px;
+
+    align-items: start;
+
+}
+
+
+.mapa-hotspots {
+
+    position: relative;
+
+    overflow: hidden;
+
+    width: 100%;
+
+    border-radius: 16px;
+
+    background: black;
+
+}
+
+
+.img-detalle {
+
+    display: block;
+
+    width: 100%;
+
+    height: auto;
+
+}
+
+
+.hotspot {
+
+    position: absolute;
+
+    width: 44px;
+
+    height: 44px;
+
+    transform:
+        translate(-50%,-50%);
+
+    border-radius: 50%;
+
+    border:
+        2px solid white;
+
+    color: white;
+
+    background:
+        rgba(3,20,28,0.78);
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    z-index: 5;
+
+}
+
+
+.hotspot.activo {
+
+    background:
+        #2cc2d1;
+
+    box-shadow:
+        0 0 0 6px
+        rgba(44,194,209,0.19);
+
+}
+
+
+.panel-componente {
+
+    min-height: 515px;
+
+    overflow: hidden;
+
+    border-radius: 16px;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.14);
+
+}
+
+
+.panel-inicial {
+
+    min-height: 515px;
+
+    box-sizing: border-box;
+
+    padding: 30px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    flex-direction: column;
+
+    text-align: center;
+
+}
+
+
+.panel-activo {
+
+    display: none;
+
+}
+
+
+.imagen-componente {
+
+    width: 100%;
+
+    height: 235px;
+
+    object-fit: cover;
+
+}
+
+
+.numero-componente {
+
+    margin:
+        19px 20px 4px;
+
+    color: #64d6df;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+}
+
+
+.titulo-componente {
+
+    margin:
+        0 20px;
+
+    font-size: 23px;
+
+    font-weight: 800;
+
+}
+
+
+.texto-componente {
+
+    margin:
+        15px 20px;
+
+    padding-top: 15px;
+
+    min-height: 90px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,0.10);
+
+}
+
+
+/* =========================================================
+   ULLUM · PANTALLA INFORMATIVA
+========================================================= */
+
+#info-ullum {
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            #17465a 0%,
+            #0b2735 48%,
+            #061720 100%
+        );
+
+}
+
+
+.rueda-wrapper {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1.15fr;
+
+    gap: 35px;
+
+    align-items: center;
+
+    margin-top: 25px;
+
+}
+
+
+.rueda {
+
+    position: relative;
+
+    width: 470px;
+
+    height: 470px;
+
+    max-width: 100%;
+
+    margin: auto;
+
+}
+
+
+.rueda-centro {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    width: 155px;
+
+    height: 155px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+    box-sizing: border-box;
+
+    padding: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #168fa2,
+            #1eb6c8
+        );
+
+    border:
+        5px solid
+        rgba(255,255,255,0.18);
+
+    box-shadow:
+        0 0 0 12px
+        rgba(35,193,207,0.08);
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+}
+
+
+.rueda-btn {
+
+    position: absolute;
+
+    width: 150px;
+
+    min-height: 82px;
+
+    padding: 13px;
+
+    border-radius: 15px;
+
+    color: white;
+
+    background:
+        rgba(5,22,30,0.82);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.20);
+
+    cursor: pointer;
+
+    font-weight: 700;
+
+    transition: 0.2s;
+
+}
+
+
+.rueda-btn:hover,
+.rueda-btn.activo {
+
+    background:
+        #168fa2;
+
+    transform:
+        scale(1.04);
+
+}
+
+
+.rueda-top {
+
+    top: 0;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+}
+
+
+.rueda-bottom {
+
+    bottom: 0;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+}
+
+
+.rueda-left {
+
+    left: 0;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+}
+
+
+.rueda-right {
+
+    right: 0;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+}
+
+
+.panel-info-ullum {
+
+    min-height: 360px;
+
+    box-sizing: border-box;
+
+    padding: 30px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.15);
+
+}
+
+
+.info-icono {
+
+    font-size: 45px;
+
+}
+
+
+.info-titulo {
+
+    margin:
+        10px 0;
+
+    font-size: 29px;
+
+    font-weight: 800;
+
+}
+
+
+.info-texto {
+
+    color: #d7e7ea;
+
+    font-size: 16px;
+
+    line-height: 1.6;
+
+}
+
+
+/* =========================================================
+   DECISIÓN ULLUM
+========================================================= */
+
+#decision-ullum, #pantalla-ciudad {
+
+    background:
+        linear-gradient(
+            135deg,
+            #08202b,
+            #0e3e50
+        );
+
+}
+
+
+.opciones-ullum {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 17px;
+
+    margin-top: 28px;
+
+}
+
+
+.opcion-ullum {
+
+    min-height: 230px;
+
+    padding: 24px;
+
+    box-sizing: border-box;
+
+    text-align: left;
+
+    border-radius: 18px;
+
+    color: white;
+
+    background:
+        rgba(5,20,28,0.68);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.opcion-ullum:hover {
+
+    transform:
+        translateY(-5px);
+
+    border-color:
+        #55d1dd;
+
+}
+
+
+.opcion-icono {
+
+    font-size: 34px;
+
+}
+
+
+.opcion-titulo {
+
+    margin:
+        11px 0 8px;
+
+    font-size: 21px;
+
+    font-weight: 800;
+
+}
+
+
+.opcion-desc {
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    color: #d7e5e9;
+
+}
+
+
+.opcion-dato {
+
+    margin-top: 18px;
+
+    padding-top: 13px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,0.12);
+
+    color: #65d6df;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   RESULTADO ULLUM Y CIUDAD
+========================================================= */
+
+#resultado-ullum, #resultado-ciudad {
+
+    background:
+        linear-gradient(
+            135deg,
+            #061923,
+            #0b3546
+        );
+
+}
+
+
+.resultado-ullum-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        0.85fr 1.15fr;
+
+    gap: 40px;
+
+    align-items: center;
+
+    margin-top: 30px;
+
+}
+
+
+.donut-ullum {
+
+    width: 315px;
+
+    height: 315px;
+
+    margin: auto;
+
+    position: relative;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        conic-gradient(
+            #33bccb
+            0%
+            calc(var(--reserva) * 1%),
+
+            #e5a13a
+            calc(var(--reserva) * 1%)
+            100%
+        );
+
+}
+
+
+.donut-ullum::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 205px;
+
+    height: 205px;
+
+    border-radius: 50%;
+
+    background:
+        #071b24;
+
+}
+
+
+.donut-ullum-centro {
+
+    position: relative;
+
+    z-index: 2;
+
+    text-align: center;
+
+}
+
+
+.reserva-numero {
+
+    font-size: 51px;
+
+    font-weight: 800;
+
+}
+
+
+.reserva-label {
+
+    width: 135px;
+
+    font-size: 14px;
+
+    color: #cbe6ea;
+
+}
+
+
+.leyenda-donut {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 18px;
+
+    margin-top: 17px;
+
+    font-size: 13px;
+
+}
+
+
+.punto-reserva,
+.punto-liberado {
+
+    display: inline-block;
+
+    width: 10px;
+
+    height: 10px;
+
+    margin-right: 5px;
+
+    border-radius: 50%;
+
+}
+
+
+.punto-reserva {
+
+    background:
+        #33bccb;
+
+}
+
+
+.punto-liberado {
+
+    background:
+        #e5a13a;
+
+}
+
+
+.metricas-ullum {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 12px;
+
+}
+
+
+.metrica-ullum {
+
+    padding: 19px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(5,20,28,0.65);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.15);
+
+}
+
+
+.metrica-ullum-numero {
+
+    font-size: 27px;
+
+    font-weight: 800;
+
+}
+
+
+.metrica-ullum-label {
+
+    margin-top: 4px;
+
+    font-size: 12px;
+
+    color: #c8dce1;
+
+}
+
+
+.resultado-ullum-texto {
+
+    margin-top: 15px;
+
+    padding: 18px;
+
+    border-radius: 14px;
+
+    line-height: 1.55;
+
+    background:
+        rgba(5,20,28,0.62);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.15);
+
+}
+
+
+.aviso-modelo {
+
+    margin-top: 13px;
+
+    font-size: 12px;
+
+    color: #c6dadd;
+
+}
+
+
+/* =========================================================
+   SIGUIENTE ETAPA
+========================================================= */
+
+#aviso-distribuidor {
+
+    display: none;
+
+    margin-top: 16px;
+
+    padding: 16px;
+
+    border-radius: 13px;
+
+    text-align: center;
+
+    background:
+        rgba(70,201,213,0.12);
+
+    border:
+        1px solid
+        rgba(70,201,213,0.35);
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .grid-procesos,
+    .opciones,
+    .resultado-grid,
+    .grid-diques,
+    .explorador-grid,
+    .rueda-wrapper,
+    .opciones-ullum,
+    .resultado-ullum-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .metricas,
+    .metricas-ullum {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .rueda {
+
+        transform:
+            scale(0.85);
+
+    }
+
+}
+
+</style>
+
+
+
+<div class="experiencia">
+
+
+<!-- =====================================================
+     VIDEO 1
+===================================================== -->
+
+<div
+    id="video-1-screen"
+    class="pantalla-video"
+>
+
+    <video
+        id="video-1"
+        class="video-recorrido"
+        autoplay
+        controls
+        playsinline
+        src="__VIDEO_1__"
+    ></video>
+
+    <div class="etiqueta-video">
+        🏔️ Cordillera → Mina
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     INFO MINA
+===================================================== -->
+
+<div
+    id="info-mina"
+    class="pantalla-contenido pantalla-mina"
+>
+
+    <div class="titulo-etapa">
+        PARADA 1 · CUENCA ALTA
+    </div>
+
+    <div class="titulo-principal">
+        ⛏️ Gestión del agua en la actividad minera
+    </div>
+
+    <div class="descripcion">
+
+        Antes de tomar una decisión,
+        observá cómo distintas formas de gestión
+        modifican el consumo neto de agua.
+
+    </div>
+
+    <div class="grid-procesos">
+
+        __TRADICIONAL__
+
+        __MODERNO__
+
+    </div>
+
+    <div class="info-clave">
+
+        <strong>💡 Concepto clave:</strong>
+
+        una mayor recuperación y recirculación
+        reduce la necesidad de incorporar agua fresca.
+
+    </div>
+
+    <div class="botones-navegacion">
+
+        <button
+            class="btn-secundario"
+            onclick="reproducirVideo1()"
+        >
+            ↻ Reproducir recorrido
+        </button>
+
+        <button
+            class="btn-principal"
+            onclick="mostrarDecisionMina()"
+        >
+            Continuar a la decisión →
+        </button>
+
+    </div>
+
+</div>
 
 
 
