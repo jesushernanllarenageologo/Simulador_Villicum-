@@ -942,6 +942,7 @@ else:
     html_template = """
 
 <style>
+
 /* =========================================================
    GENERAL
 ========================================================= */
@@ -4910,7 +4911,6 @@ function continuarDistribuidor() {
         on_video_2_playing_change=iniciar_segmento_diques_al_reproducir_video,
         on_distribuidor_start_change=iniciar_segmento_distribuidor_al_presionar_boton,
         key="experiencia_html_wled",
-        width="stretch",
         height=920
     )
     st.markdown("---")
